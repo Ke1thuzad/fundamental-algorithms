@@ -8,21 +8,21 @@ void natural_numbers(unsigned int x) {
     for (int i = 1; i < 101; ++i) {
         if (i % x == 0) {
             key = 1;
-            printf_s("%d ", i);
+            printf("%d ", i);
         }
     }
-    if (!key) printf_s("None");
-    printf_s("\n");
+    if (!key) printf("None");
+    printf("\n");
 }
 
 void is_prime(unsigned int x) {
     for (int i = 2; i < (int)sqrt((double)x) + 1; ++i) {
         if (x % i == 0) {
-            printf_s("%d is a compound number.", x);
+            printf("%d is a compound number.", x);
             return;
         }
     }
-    printf_s("%d is a prime number", x);
+    printf("%d is a prime number", x);
 }
 
 void to_base16(unsigned int x) {
@@ -37,9 +37,9 @@ void to_base16(unsigned int x) {
 
     for (int j = 0; j < size; ++j) {
         if (result[j])
-            printf_s("%c ", result[j]);
+            printf("%c ", result[j]);
     }
-    printf_s("\n");
+    printf("\n");
 
 }
 
@@ -48,9 +48,9 @@ void exponent_table(unsigned int x) {
 
     for (int i = 1; i < 11; ++i) {
         for (int j = 1; j <= x; ++j) {
-            printf_s("%llu ", power(j, i));
+            printf("%llu ", power(j, i));
         }
-        printf_s("\n");
+        printf("\n");
     }
 }
 
@@ -64,17 +64,20 @@ long long power(unsigned int x, unsigned int y) {
 
 void natural_sum(unsigned int x) {
     if (x < 1) exit(OUT_OF_BOUNDS);
-    printf_s("%d", x * (1 + x) / 2);
+    printf("%d", x * (1 + x) / 2);
 }
 
 void factorial(unsigned int x) {
-    if (x == 0) printf_s("1");
+    if (x == 0) printf("1");
 
-    Array result = value_to_arr(x);
+    Array result = value_to_arr(x), temp;
     for (int i = 1; i < x; ++i) {
-        result = multiply(result, i);
+        temp = multiply(result, i);
+        free(result.val);
+        result = temp;
     }
     reverse_print_arr(result);
+    free(result.val);
 }
 
 Array create_arr(unsigned int length) {
@@ -82,6 +85,8 @@ Array create_arr(unsigned int length) {
     arr.capacity = length;
     arr.length = 0;
     arr.val = malloc(length);
+
+    if (!arr.val) exit(1);
 
     return arr;
 }
@@ -95,8 +100,9 @@ int append(Array* arr, unsigned char value) {
 
 void resize(Array* arr, int size_delta) {
     unsigned char* new_addr = malloc(arr->capacity + size_delta);
-    if (!new_addr) return;
-    memmove(new_addr, arr->val, arr->length);
+    if (!new_addr) exit(1);
+    memcpy(new_addr, arr->val, arr->length);
+    free(arr->val);
     arr->val = new_addr;
     arr->capacity += size_delta;
 }
@@ -108,21 +114,21 @@ void extend(Array* arr) {
 
 void print_arr(const Array arr) {
     for (int i = 0; i < arr.length; ++i) {
-        printf_s("%u ", arr.val[i]);
+        printf("%u ", arr.val[i]);
     }
 }
 
 void reverse_print_arr(const Array arr) {
     for (int i = arr.length - 1; i >= 0; --i) {
-        printf_s("%u", arr.val[i]);
+        printf("%u", arr.val[i]);
     }
 }
 
 Array value_to_arr(unsigned int value) {
     Array result = create_arr((int)log10((double)value) + 1);
     while (value > 0) {
-        append(&result, value % 10);
-        value /= 10;
+        append(&result, value % 1000);
+        value /= 1000;
     }
     return result;
 }
@@ -141,6 +147,7 @@ Array multiply(const Array A, unsigned int B) {
         append(&result, shift % 10);
         shift /= 10;
     }
+
 
     return result;
 }

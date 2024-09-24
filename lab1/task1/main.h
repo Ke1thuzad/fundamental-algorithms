@@ -17,7 +17,7 @@ typedef enum kOpts {
 
 typedef enum errcode {
     OUT_OF_BOUNDS = 2,
-    WRONG_OPTION
+    INCORRECT_OPTION
 } errcode;
 
 void natural_numbers(unsigned int);
