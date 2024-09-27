@@ -1,4 +1,5 @@
 #include "main.h"
+#include <stdio.h>
 
 long double compute_limit(long double eps, limit_f f) {
     int n = 1;
@@ -28,7 +29,7 @@ long double dichotomy_method(long double eps, equation_f f, long double lborder,
     if (f(lborder) * f(rborder) >= 0) {
 //        printf_s("Wrong interval");
         exit(2);
-        return 0;
+//        return 0;
     }
 
     long double delta = 1, midpoint;
@@ -59,8 +60,8 @@ long double compute_limit_sqrt2(long double eps) {
 
 
 long double compute_series_sqrt2(long double eps) {
-    int n = 2;
-    long double prod = 0, prev_prod, cur_val = 1, delta = 1;
+    int n = 1;
+    long double prod = 1, prev_prod, cur_val, delta = 1;
     while (delta > eps) {
         prev_prod = prod;
         cur_val = series_sqrt2(n++);
@@ -69,4 +70,17 @@ long double compute_series_sqrt2(long double eps) {
     }
 
     return prod;
+}
+
+long double compute_limit_pi(long double eps) {
+    int n = 2;
+    long double prev_val, cur_val = 4, delta = 1;
+    while (delta > eps) {
+        prev_val = cur_val;
+        cur_val *= (4.0 * n * (n - 1)) / powl(2 * n - 1, 2.0);
+        delta = fabsl(cur_val - prev_val);
+        n++;
+    }
+
+    return cur_val;
 }

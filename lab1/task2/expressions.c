@@ -15,7 +15,8 @@ long double equation_e(long double x) {
 
 
 long double limit_pi(int n) {
-    return M_PI * powl(tgammal((long double)n), 2) / (powl(tgammal((long double)n + 0.5), 2));
+    return 0;
+//    return M_PI * powl(tgammal((long double)n), 2) / (powl(tgammal((long double)n + 0.5), 2));
 }
 
 long double series_pi(long double prev, int n) {

@@ -5,24 +5,20 @@
 
 void natural_numbers(unsigned int x) {
     unsigned char key = 0;
-    for (int i = 1; i < 101; ++i) {
-        if (i % x == 0) {
-            key = 1;
-            printf("%d ", i);
-        }
+    for (int i = x; i < 101; i += x) {
+        printf("%d ", i);
     }
-    if (!key) printf("None");
     printf("\n");
 }
 
 void is_prime(unsigned int x) {
     for (int i = 2; i < (int)sqrt((double)x) + 1; ++i) {
         if (x % i == 0) {
-            printf("%d is a compound number.", x);
+            printf("%d is a compound number.\n", x);
             return;
         }
     }
-    printf("%d is a prime number", x);
+    printf("%d is a prime number.\n", x);
 }
 
 void to_base16(unsigned int x) {

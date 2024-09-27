@@ -12,6 +12,8 @@ long double compute_series(long double, series_f, int, int);
 long double dichotomy_method(long double, equation_f, long double, long double);
 long double compute_limit_sqrt2(long double);
 long double compute_series_sqrt2(long double);
+long double compute_limit_pi(long double);
+
 
 long double limit_e(int);
 long double series_e(long double, int);

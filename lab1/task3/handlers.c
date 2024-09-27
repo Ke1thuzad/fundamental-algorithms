@@ -14,6 +14,7 @@ double parse_double(char* str) {
 
     while (str[i] != '\0') {
         if (str[i] == '.') {
+            if (point) exit(INCORRECT_ARGUMENTS);
             point = i;
             i++;
             continue;
@@ -27,7 +28,7 @@ double parse_double(char* str) {
         }
         i++;
     }
-    return sign * int_part + real_part;
+    return sign * (int_part + real_part);
 }
 
 int parse_int(char* str) {

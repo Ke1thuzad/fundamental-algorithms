@@ -7,7 +7,7 @@ int GetOpts(int argc, char** argv, kOpts *option, int *number) {
 
     for (int i = 1; i <= 2; ++i) {
         const char* proceeding_option = argv[i];
-        if (proceeding_option[0] == '/' || proceeding_option[0] == '-') {
+        if ((proceeding_option[0] == '/' || proceeding_option[0] == '-') && !proceeding_option[2]) {
             switch (proceeding_option[1])
             {
                 case 'h':

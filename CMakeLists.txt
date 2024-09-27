@@ -14,3 +14,4 @@ add_executable(lab1t3
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
+target_link_libraries(lab1t3 m)

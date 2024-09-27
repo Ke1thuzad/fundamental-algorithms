@@ -18,7 +18,7 @@ typedef enum errcode {
     INCORRECT_ARGUMENTS
 } errcode;
 
-typedef void (*option)(char** argv);
+typedef void (*option)(char**);
 
 int chrtoint(char);
 double parse_double(char*);
