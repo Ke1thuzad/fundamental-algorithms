@@ -55,6 +55,7 @@ void option_q(char** argv) {
     }
     for (i = 0; i < 3; ++i) {
         double a = coefficients[i];
+        if (fabs(a) < eps) continue;
         for (int j = 0; j < 3; ++j) {
             if (j == i) continue;
             double b = coefficients[j];

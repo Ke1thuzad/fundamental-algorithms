@@ -1,6 +1,37 @@
 #include "main.h"
 #include <stdio.h>
 
+int chrtoint(char x) {
+    int a = x - '0';
+    if (a < 0 || a > 9) exit(1);
+    return a;
+}
+
+long double parse_ldouble(char* str) {
+    double real_part = 0;
+    int i = 0, int_part = 0, point = 0, sign = 1;
+
+    if (str[0] == '-') i++, sign = -1;
+
+    while (str[i] != '\0') {
+        if (str[i] == '.') {
+            if (point) exit(2);
+            point = i;
+            i++;
+            continue;
+        }
+        int number = chrtoint(str[i]);
+        if (point) {
+            real_part += number / pow(10.0, (double)(i - point));
+        } else {
+            int_part *= 10;
+            int_part += number;
+        }
+        i++;
+    }
+    return sign * (int_part + real_part);
+}
+
 long double compute_limit(long double eps, limit_f f) {
     int n = 1;
     long double delta = 1, res = f(n), prev;
@@ -46,6 +77,20 @@ long double dichotomy_method(long double eps, equation_f f, long double lborder,
     return midpoint;
 }
 
+long double secant_method(long double eps, equation_f f, long double x0, long double x1) {
+    long double x_prev = x0, x = x1, x_next;
+    long double delta = 1;
+
+    while (delta > eps) {
+        x_next = x - f(x) * (x - x_prev) / (f(x) - f(x_prev));
+        delta = fabsl(x_next - x);
+        x_prev = x;
+        x = x_next;
+    }
+
+    return x;
+}
+
 long double compute_limit_sqrt2(long double eps) {
     int n = 1;
     long double delta = 1, res = -0.5, prev;
@@ -64,7 +109,7 @@ long double compute_series_sqrt2(long double eps) {
     long double prod = 1, prev_prod, cur_val, delta = 1;
     while (delta > eps) {
         prev_prod = prod;
-        cur_val = series_sqrt2(n++);
+        cur_val = series_sqrt2(++n);
         prod *= cur_val;
         delta = fabsl(prev_prod - prod);
     }

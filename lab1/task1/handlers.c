@@ -12,7 +12,7 @@ void natural_numbers(unsigned int x) {
 }
 
 void is_prime(unsigned int x) {
-    for (int i = 2; i < (int)sqrt((double)x) + 1; ++i) {
+    for (int i = 2; i <= (int)sqrt((double)x); ++i) {
         if (x % i == 0) {
             printf("%d is a compound number.\n", x);
             return;

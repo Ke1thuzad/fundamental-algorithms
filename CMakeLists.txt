@@ -11,7 +11,10 @@ add_executable(lab1t3
         lab1/task3/main.c
         lab1/task3/main.h
         lab1/task3/handlers.c)
+add_executable(lab1t4 lab1/task4/main.c lab1/task4/main.h
+        lab1/task4/handlers.c)
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
+target_link_libraries(lab1t4 m)

@@ -55,19 +55,3 @@ long double series_sqrt2(int n) {
 long double equation_sqrt2(long double x) {
     return x * x - 2;
 }
-
-
-//long double limit_pi(int n) {
-//    return pow(1 + 1.0/n, (double)n);
-//}
-//
-//long double series_pi(long double prev, int n) {
-//    if (n == 0) return prev;
-//    return prev * 1/n;
-//}
-//
-//long double equation_pi(long double x) {
-//    return cosl(x) + 1;
-//}
-
-

@@ -32,10 +32,15 @@ int GetOpts(int argc, char** argv, kOpts *option, int *number) {
                     exit(INCORRECT_OPTION);
             }
         } else {
+            int lst;
             for (int j = 0; proceeding_option[j]; ++j) {
+                lst = *number;
                 if (proceeding_option[j] >= '0' && proceeding_option[j] <= '9') {
                     *number *= 10;
                     *number += proceeding_option[j] - '0';
+                    if (*number <= lst || *number % 10 != proceeding_option[j] - '0') {
+                        printf("Possible int overflow.\n");
+                    }
                 } else {
                     return 1;
                 }
