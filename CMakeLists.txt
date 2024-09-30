@@ -21,6 +21,13 @@ add_executable(lab1t4 lab1/task4/main.c lab1/task4/main.h
         lab1/task4/handlers.c
         lab1/error_handler.c
         lab1/error_handler.h)
+add_executable(lab1t7 lab1/task7/main.c lab1/task7/main.h
+        lab1/error_handler.c
+        lab1/error_handler.h)
+add_executable(lab1t5 lab1/task5/main.c lab1/task5/main.h
+        lab1/task5/methods.c
+        lab1/error_handler.c
+        lab1/error_handler.h)
 add_executable(lab1t6 lab1/task6/main.c lab1/task6/main.h
         lab1/task6/methods.c
         lab1/error_handler.c

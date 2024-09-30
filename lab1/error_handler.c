@@ -18,6 +18,9 @@ void throw_err(errcode err) {
         case MEMORY_NOT_ALLOCATED:
             err_msg = "Memory was not allocated";
             break;
+        case FILE_ERROR:
+            err_msg = "Failed to open file.";
+            break;
         default:
             err_msg = "An unknown message has occurred.";
             break;

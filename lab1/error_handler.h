@@ -7,9 +7,10 @@
 typedef enum errcode {
     OUT_OF_BOUNDS = 2,
     NOT_A_NUMBER,
-    INCORRECT_OPTION,
     INCORRECT_ARGUMENTS,
-    MEMORY_NOT_ALLOCATED
+    INCORRECT_OPTION,
+    MEMORY_NOT_ALLOCATED,
+    FILE_ERROR
 } errcode;
 
 void throw_err(errcode err);

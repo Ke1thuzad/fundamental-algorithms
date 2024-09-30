@@ -8,7 +8,7 @@ int chrtoint(char x) {
 
 double parse_double(char* str) {
     double real_part = 0;
-    int i = 0, int_part = 0, point = 0, sign = 1;
+    int i = 0, int_part = 0, point = 0, sign = 1, multiplier = 1;
 
     if (str[0] == '-') i++, sign = -1;
 
@@ -21,7 +21,7 @@ double parse_double(char* str) {
         }
         int number = chrtoint(str[i]);
         if (point) {
-            real_part += number / pow(10.0, (double)(i - point));
+            real_part += (double)number / (multiplier *= 10);
         } else {
             int_part *= 10;
             int_part += number;
@@ -30,6 +30,7 @@ double parse_double(char* str) {
     }
     return sign * (int_part + real_part);
 }
+
 
 double integrate(double eps, double (*f)(double), double upper_bound, double lower_bound) {
     if (lower_bound > upper_bound) {

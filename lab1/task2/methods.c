@@ -1,6 +1,4 @@
 #include "main.h"
-#include "error.h"
-#include <stdio.h>
 
 int chrtoint(char x) {
     int a = x - '0';
@@ -9,8 +7,8 @@ int chrtoint(char x) {
 }
 
 long double parse_ldouble(char* str) {
-    double real_part = 0;
-    int i = 0, int_part = 0, point = 0, sign = 1;
+    long double real_part = 0;
+    int i = 0, int_part = 0, point = 0, sign = 1, multiplier = 1;
 
     if (str[0] == '-') i++, sign = -1;
 
@@ -23,7 +21,7 @@ long double parse_ldouble(char* str) {
         }
         int number = chrtoint(str[i]);
         if (point) {
-            real_part += number / pow(10.0, (double)(i - point));
+            real_part += (long double)number / (multiplier *= 10);
         } else {
             int_part *= 10;
             int_part += number;
