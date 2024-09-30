@@ -1,16 +1,16 @@
 #include <math.h>
 #include "main.h"
 
-char *stringcopy(char *dst, const char *src) {
+char *string_copy(char *dst, const char *src) {
     char *dstaddr = dst;
-    while(*dst++ = *src++);
+    while((*dst++ = *src++));
     return dstaddr;
 }
 
 void process_files(char *in, char *out, handler func) {
     FILE *in_stream = fopen(in, "r");
     if (!in_stream) {
-        exit(FILE_ERROR);
+        throw_err(FILE_ERROR);
     }
 
     func(in_stream, out);
@@ -38,7 +38,7 @@ int is_letter(int x) {
 void handler_option_d(FILE *in_stream, char *out_filename) {
     FILE *out_stream = fopen(out_filename, "w");
     if (!out_stream) {
-        exit(FILE_ERROR);
+        throw_err(FILE_ERROR);
     }
 
     int cur;
@@ -56,7 +56,7 @@ void handler_option_d(FILE *in_stream, char *out_filename) {
 void handler_option_i(FILE *in_stream, char *out_filename) {
     FILE *out_stream = fopen(out_filename, "w");
     if (!out_stream) {
-        exit(FILE_ERROR);
+        throw_err(FILE_ERROR);
     }
     int cur;
     unsigned int length = 0;
@@ -77,7 +77,7 @@ void handler_option_i(FILE *in_stream, char *out_filename) {
 void handler_option_s(FILE *in_stream, char *out_filename) {
     FILE *out_stream = fopen(out_filename, "w");
     if (!out_stream) {
-        exit(FILE_ERROR);
+        throw_err(FILE_ERROR);
     }
     int cur;
     unsigned int length = 0;
@@ -98,7 +98,7 @@ void handler_option_s(FILE *in_stream, char *out_filename) {
 void handler_option_a(FILE *in_stream, char *out_filename) {
     FILE *out_stream = fopen(out_filename, "w");
     if (!out_stream) {
-        exit(FILE_ERROR);
+        throw_err(FILE_ERROR);
     }
     int cur;
 

@@ -3,7 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <malloc.h>
+#include <string.h>
 
+#include "../error_handler.h"
 #include "array.h"
 
 typedef enum kOpts {
@@ -14,11 +18,6 @@ typedef enum kOpts {
     OPT_A,
     OPT_F
 } kOpts;
-
-typedef enum errcode {
-    OUT_OF_BOUNDS = 2,
-    INCORRECT_OPTION
-} errcode;
 
 void natural_numbers(unsigned int);
 void is_prime(unsigned int);

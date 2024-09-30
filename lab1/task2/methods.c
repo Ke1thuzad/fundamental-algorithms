@@ -1,9 +1,10 @@
 #include "main.h"
+#include "error.h"
 #include <stdio.h>
 
 int chrtoint(char x) {
     int a = x - '0';
-    if (a < 0 || a > 9) exit(1);
+    if (a < 0 || a > 9) throw_err(OUT_OF_BOUNDS);
     return a;
 }
 
@@ -15,7 +16,7 @@ long double parse_ldouble(char* str) {
 
     while (str[i] != '\0') {
         if (str[i] == '.') {
-            if (point) exit(2);
+            if (point) throw_err(INCORRECT_ARGUMENTS);
             point = i;
             i++;
             continue;
@@ -59,7 +60,7 @@ long double compute_series(long double eps, series_f f, int multiplier, int n) {
 long double dichotomy_method(long double eps, equation_f f, long double lborder, long double rborder) {
     if (f(lborder) * f(rborder) >= 0) {
 //        printf_s("Wrong interval");
-        exit(2);
+        throw_err(INCORRECT_ARGUMENTS);
 //        return 0;
     }
 

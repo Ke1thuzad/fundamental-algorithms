@@ -13,12 +13,6 @@ long double equation_e(long double x) {
     return logl(x) - 1;
 }
 
-
-long double limit_pi(int n) {
-    return 0;
-//    return M_PI * powl(tgammal((long double)n), 2) / (powl(tgammal((long double)n + 0.5), 2));
-}
-
 long double series_pi(long double prev, int n) {
     if (n == 0) return -1;
     return pow(-1.0, n - 1.0) / (2 * (double)n - 1);
@@ -48,7 +42,7 @@ long double limit_sqrt2(long double prev, int n) {
 }
 
 long double series_sqrt2(int n) {
-    if (n < 2) exit(1); // ERR OUT OF BOUNDS
+    if (n < 2) throw_err(OUT_OF_BOUNDS);
     return exp2l(exp2l(-n));
 }
 

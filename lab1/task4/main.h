@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../error_handler.h"
+
 typedef enum kOpts {
     OPT_D,
     OPT_I,
@@ -12,15 +14,9 @@ typedef enum kOpts {
     OPT_A
 } kOpts;
 
-typedef enum errcode {
-    INCORRECT_OPTION = 2,
-    INCORRECT_ARGUMENTS,
-    FILE_ERROR
-} errcode;
-
 typedef void (*handler)(FILE*, char*);
 
-char* stringcopy(char*, const char*);
+char* string_copy(char*, const char*);
 void process_files(char*, char*, handler);
 int is_num(int);
 void handler_option_d(FILE*, char*);

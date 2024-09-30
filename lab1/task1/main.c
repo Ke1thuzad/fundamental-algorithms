@@ -29,7 +29,7 @@ int GetOpts(int argc, char** argv, kOpts *option, int *number) {
                     *option = OPT_F;
                     break;
                 default:
-                    exit(INCORRECT_OPTION);
+                    throw_err(INCORRECT_OPTION);
             }
         } else {
             int lst;
@@ -64,7 +64,7 @@ int main (int argc, char** argv) {
 
     if (GetOpts(argc, argv, &opt, &proceed_number)) {
         printf("%s", "Incorrect option");
-        exit(INCORRECT_OPTION);
+        throw_err(INCORRECT_OPTION);
     }
 
     handlers[opt](proceed_number);

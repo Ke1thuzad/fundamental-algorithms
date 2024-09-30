@@ -4,21 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
 #include "../error_handler.h"
-
-typedef enum kOpts {
-    OPT_Q,
-    OPT_M,
-    OPT_T
-} kOpts;
-
-typedef void (*option)(char**);
 
 int chrtoint(char);
 double parse_double(char*);
-int parse_int(char*);
-void option_q(char**);
-void option_m(char**);
-void option_t(char**);
+double integrate(double, double (*)(double), double, double);
+double func_a(double);
+double func_b(double);
+double func_c(double);
+double func_d(double);
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

@@ -1,6 +1,3 @@
-#include <math.h>
-#include <malloc.h>
-#include <string.h>
 #include "main.h"
 
 void natural_numbers(unsigned int x) {
@@ -40,7 +37,7 @@ void to_base16(unsigned int x) {
 }
 
 void exponent_table(unsigned int x) {
-    if (x > 10 || x < 1) exit(OUT_OF_BOUNDS);
+    if (x > 10 || x < 1) throw_err(OUT_OF_BOUNDS);
 
     for (int i = 1; i < 11; ++i) {
         for (int j = 1; j <= x; ++j) {
@@ -59,7 +56,7 @@ long long power(unsigned int x, unsigned int y) {
 }
 
 void natural_sum(unsigned int x) {
-    if (x < 1) exit(OUT_OF_BOUNDS);
+    if (x < 1) throw_err(OUT_OF_BOUNDS);
     printf("%d", x * (1 + x) / 2);
 }
 
@@ -82,7 +79,7 @@ Array create_arr(unsigned int length) {
     arr.length = 0;
     arr.val = malloc(length);
 
-    if (!arr.val) exit(1);
+    if (!arr.val) throw_err(MEMORY_NOT_ALLOCATED);
 
     return arr;
 }
@@ -96,7 +93,9 @@ int append(Array* arr, unsigned char value) {
 
 void resize(Array* arr, int size_delta) {
     unsigned char* new_addr = malloc(arr->capacity + size_delta);
-    if (!new_addr) exit(1);
+
+    if (!new_addr) throw_err(MEMORY_NOT_ALLOCATED);
+
     memcpy(new_addr, arr->val, arr->length);
     free(arr->val);
     arr->val = new_addr;

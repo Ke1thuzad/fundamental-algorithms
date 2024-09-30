@@ -2,10 +2,12 @@
 #define FUNDAMENTAL_ALGORITHMS_MAIN_H
 #include <stdlib.h>
 #include <math.h>
+#include "../error_handler.h"
 
 typedef long double (*limit_f)(int);
 typedef long double (*series_f)(long double, int);
 typedef long double (*equation_f)(long double);
+
 
 int chrtoint(char);
 long double parse_ldouble(char*);
@@ -33,11 +35,5 @@ long double equation_ln2(long double);
 long double limit_sqrt2(long double, int);
 long double series_sqrt2(int);
 long double equation_sqrt2(long double);
-
-long double limit_gamma(int);
-long double series_gamma(long double, int);
-long double equation_gamma(long double);
-
-
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

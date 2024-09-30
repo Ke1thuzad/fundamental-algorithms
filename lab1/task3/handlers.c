@@ -2,7 +2,7 @@
 
 int chrtoint(char x) {
     int a = x - '0';
-    if (a < 0 || a > 9) exit(NOT_A_NUMBER);
+    if (a < 0 || a > 9) throw_err(NOT_A_NUMBER);
     return a;
 }
 
@@ -14,7 +14,7 @@ double parse_double(char* str) {
 
     while (str[i] != '\0') {
         if (str[i] == '.') {
-            if (point) exit(INCORRECT_ARGUMENTS);
+            if (point) throw_err(INCORRECT_ARGUMENTS);
             point = i;
             i++;
             continue;
@@ -41,7 +41,7 @@ int parse_int(char* str) {
         result += chrtoint(str[i]);
         i++;
     }
-    if (result == 0) exit(INCORRECT_ARGUMENTS);
+    if (result == 0) throw_err(INCORRECT_ARGUMENTS);
 
     return sign * result;
 }
@@ -55,13 +55,17 @@ void option_q(char** argv) {
     }
     for (i = 0; i < 3; ++i) {
         double a = coefficients[i];
-        if (fabs(a) < eps) continue;
         for (int j = 0; j < 3; ++j) {
             if (j == i) continue;
             double b = coefficients[j];
             for (int k = 0; k < 3; ++k) {
                 if (k == i || k == j) continue;
                 double c = coefficients[k];
+                if (fabs(a) < eps) {
+                    printf("\nCoefficients: %f %f %f\n", a, b, c);
+                    printf("Root: %f\n", -c / b);
+                    continue;
+                }
                 double D = b * b - 4 * a * c;
 
                 printf("\nCoefficients: %f %f %f\n", a, b, c);

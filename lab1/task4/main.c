@@ -11,10 +11,10 @@ int GetOpts(int argc, char** argv, kOpts *option, char* in_path, char* out_path)
         const char* proceeding_option = argv[i];
         if ((proceeding_option[0] == '/' || proceeding_option[0] == '-')) {
             if (proceeding_option[1] == 'n') {
-                stringcopy(out_path, argv[3]);
+                string_copy(out_path, argv[3]);
                 arg_index = 2;
             } else if (proceeding_option[2]) {
-                exit(INCORRECT_ARGUMENTS);
+                throw_err(INCORRECT_ARGUMENTS);
             } else {
                 flag = 1;
             }
@@ -34,10 +34,10 @@ int GetOpts(int argc, char** argv, kOpts *option, char* in_path, char* out_path)
                     *option = OPT_A;
                     break;
                 default:
-                    exit(INCORRECT_OPTION);
+                    throw_err(INCORRECT_OPTION);
             }
         } else {
-            stringcopy(in_path, proceeding_option);
+            string_copy(in_path, proceeding_option);
         }
 
     }
@@ -60,7 +60,7 @@ int main (int argc, char** argv) {
 
     if (GetOpts(argc, argv, &opt, in_path, out_path)) {
         printf("%s", "Incorrect option");
-        exit(INCORRECT_OPTION);
+        throw_err(INCORRECT_OPTION);
     }
     process_files(in_path, out_path, handlers[opt]);
     return 0;
