@@ -12,13 +12,13 @@ typedef enum kOpts {
     OPT_T
 } kOpts;
 
-typedef void (*option)(char**);
+typedef int (*option)(char**);
 
-int chrtoint(char);
-double parse_double(char*);
-int parse_int(char*);
-void option_q(char**);
-void option_m(char**);
-void option_t(char**);
+int chrtoint(char, int*);
+int parse_double(char*, double*);
+int parse_int(char*, int*);
+int option_q(char**);
+int option_m(char**);
+int option_t(char**);
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

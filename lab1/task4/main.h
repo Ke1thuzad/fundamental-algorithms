@@ -14,14 +14,15 @@ typedef enum kOpts {
     OPT_A
 } kOpts;
 
-typedef void (*handler)(FILE*, char*);
+typedef int (*handler)(FILE*, char*);
 
+int is_str_equal(char* str1, char* str2);
 char* string_copy(char*, const char*);
-void process_files(char*, char*, handler);
+int process_files(char*, char*, handler);
 int is_num(int);
-void handler_option_d(FILE*, char*);
-void handler_option_i(FILE*, char*);
-void handler_option_s(FILE*, char*);
-void handler_option_a(FILE*, char*);
+int handler_option_d(FILE*, char*);
+int handler_option_i(FILE*, char*);
+int handler_option_s(FILE*, char*);
+int handler_option_a(FILE*, char*);
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

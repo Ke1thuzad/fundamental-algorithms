@@ -7,9 +7,9 @@
 
 #include "../error_handler.h"
 
-int chrtoint(char);
-double parse_double(char*);
-double integrate(double, double (*)(double), double, double);
+int chrtoint(char, int*);
+int parse_double(char*, double*);
+int integrate(double, double (*)(double), double, double, double*);
 double func_a(double);
 double func_b(double);
 double func_c(double);

@@ -1,12 +1,13 @@
 #include "main.h"
 
-int chrtoint(char x) {
+int chrtoint(char x, int* num) {
     int a = x - '0';
-    if (a < 0 || a > 9) throw_err(OUT_OF_BOUNDS);
-    return a;
+    if (a < 0 || a > 9) return throw_err(OUT_OF_BOUNDS);
+    *num = a;
+    return 0;
 }
 
-long double parse_ldouble(char* str) {
+int parse_ldouble(char* str, long double *res) {
     long double real_part = 0;
     int i = 0, int_part = 0, point = 0, sign = 1, multiplier = 1;
 
@@ -14,12 +15,15 @@ long double parse_ldouble(char* str) {
 
     while (str[i] != '\0') {
         if (str[i] == '.') {
-            if (point) throw_err(INCORRECT_ARGUMENTS);
+            if (point) return throw_err(INCORRECT_ARGUMENTS);
             point = i;
             i++;
             continue;
         }
-        int number = chrtoint(str[i]);
+        int number, err = chrtoint(str[i], &number);
+        if(err) {
+            return err;
+        }
         if (point) {
             real_part += (long double)number / (multiplier *= 10);
         } else {
@@ -28,7 +32,8 @@ long double parse_ldouble(char* str) {
         }
         i++;
     }
-    return sign * (int_part + real_part);
+    *res = sign * (int_part + real_part);
+    return 0;
 }
 
 long double compute_limit(long double eps, limit_f f) {
@@ -36,7 +41,7 @@ long double compute_limit(long double eps, limit_f f) {
     long double delta = 1, res = f(n), prev;
     while (delta > eps) {
         prev = res;
-        n += 100;
+        n += 10;
         res = f(n);
         delta = fabsl(prev - res);
     }
@@ -55,10 +60,10 @@ long double compute_series(long double eps, series_f f, int multiplier, int n) {
     return multiplier * sum;
 }
 
-long double dichotomy_method(long double eps, equation_f f, long double lborder, long double rborder) {
+int dichotomy_method(long double eps, equation_f f, long double lborder, long double rborder, long double *res) {
     if (f(lborder) * f(rborder) >= 0) {
 //        printf_s("Wrong interval");
-        throw_err(INCORRECT_ARGUMENTS);
+        return throw_err(INCORRECT_ARGUMENTS);
 //        return 0;
     }
 
@@ -72,8 +77,8 @@ long double dichotomy_method(long double eps, equation_f f, long double lborder,
         else
             lborder = midpoint;
     }
-
-    return midpoint;
+    *res = midpoint;
+    return 0;
 }
 
 long double secant_method(long double eps, equation_f f, long double x0, long double x1) {

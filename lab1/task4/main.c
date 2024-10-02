@@ -2,7 +2,7 @@
 
 int GetOpts(int argc, char** argv, kOpts *option, char* in_path, char* out_path) {
     if (argc < 2 || argc > 4) {
-        return 1;
+        return throw_err(INCORRECT_ARGUMENTS);
     }
 
     unsigned char arg_index = 1, flag = 0;
@@ -14,7 +14,7 @@ int GetOpts(int argc, char** argv, kOpts *option, char* in_path, char* out_path)
                 string_copy(out_path, argv[3]);
                 arg_index = 2;
             } else if (proceeding_option[2]) {
-                throw_err(INCORRECT_ARGUMENTS);
+                return throw_err(INCORRECT_ARGUMENTS);
             } else {
                 flag = 1;
             }
@@ -34,7 +34,7 @@ int GetOpts(int argc, char** argv, kOpts *option, char* in_path, char* out_path)
                     *option = OPT_A;
                     break;
                 default:
-                    throw_err(INCORRECT_OPTION);
+                    return throw_err(INCORRECT_OPTION);
             }
         } else {
             string_copy(in_path, proceeding_option);
@@ -43,6 +43,9 @@ int GetOpts(int argc, char** argv, kOpts *option, char* in_path, char* out_path)
     }
     if (flag) {
         strcpy(out_path + 4, in_path);
+    }
+    if (is_str_equal(in_path, out_path)) {
+        return throw_err(INCORRECT_ARGUMENTS);
     }
 
     return 0;
@@ -58,10 +61,12 @@ int main (int argc, char** argv) {
         handler_option_a
     };
 
-    if (GetOpts(argc, argv, &opt, in_path, out_path)) {
-        printf("%s", "Incorrect option");
-        throw_err(INCORRECT_OPTION);
-    }
-    process_files(in_path, out_path, handlers[opt]);
+    int err = GetOpts(argc, argv, &opt, in_path, out_path);
+    if (err)
+        return err;
+
+    err = process_files(in_path, out_path, handlers[opt]);
+    if (err)
+        return err;
     return 0;
 }

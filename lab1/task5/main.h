@@ -6,8 +6,8 @@
 
 #include "../error_handler.h"
 
-int chrtoint(char);
-double parse_double(char*);
+int chrtoint(char, int*);
+int parse_double(char*, double*);
 double eval_series(double eps, double x, double (*f)(double prev, double x, int n), int n);
 double func_a(double prev, double x, int n);
 double func_b(double prev, double x, int n);

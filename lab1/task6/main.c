@@ -3,18 +3,24 @@
 int main(int argc, char** argv) {
 
     if (argc != 2)
-        throw_err(INCORRECT_ARGUMENTS);
+        return throw_err(INCORRECT_ARGUMENTS);
 
-    double eps = parse_double(argv[1]);
+    double eps, res;
+    int err = parse_double(argv[1], &eps);
+    if (err)
+        return err;
 
     if (eps > 1 || eps < 0) {
-        throw_err(INCORRECT_ARGUMENTS);
+        return throw_err(INCORRECT_ARGUMENTS);
     }
+    err = integrate(eps, func_a, 1, 0, &res);
+    printf("Integral a: %f\n", res);
+    err |= integrate(eps, func_b, 1, 0, &res);
+    printf("Integral b: %f\n", res);
+    err |= integrate(eps, func_c, 1, 0, &res);
+    printf("Integral c: %f\n", res);
+    err |= integrate(eps, func_d, 1, 0, &res);
+    printf("Integral d: %f\n", res);
 
-    printf("Integral a: %f\n", integrate(eps, func_a, 1, 0));
-    printf("Integral b: %f\n", integrate(eps, func_b, 1, 0));
-    printf("Integral c: %f\n", integrate(eps, func_c, 1, 0));
-    printf("Integral d: %f\n", integrate(eps, func_d, 1, 0));
-
-    return 0;
+    return err;
 }

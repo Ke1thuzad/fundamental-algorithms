@@ -1,12 +1,13 @@
 #include "main.h"
 
-int chrtoint(char x) {
+int chrtoint(char x, int* num) {
     int a = x - '0';
-    if (a < 0 || a > 9) throw_err(NOT_A_NUMBER);
-    return a;
+    if (a < 0 || a > 9) return throw_err(OUT_OF_BOUNDS);
+    *num = a;
+    return 0;
 }
 
-double parse_double(char* str) {
+int parse_double(char* str, double *res) {
     double real_part = 0;
     int i = 0, int_part = 0, point = 0, sign = 1, multiplier = 1;
 
@@ -14,12 +15,15 @@ double parse_double(char* str) {
 
     while (str[i] != '\0') {
         if (str[i] == '.') {
-            if (point) throw_err(INCORRECT_ARGUMENTS);
+            if (point) return throw_err(INCORRECT_ARGUMENTS);
             point = i;
             i++;
             continue;
         }
-        int number = chrtoint(str[i]);
+        int number, err = chrtoint(str[i], &number);
+        if(err) {
+            return err;
+        }
         if (point) {
             real_part += (double)number / (multiplier *= 10);
         } else {
@@ -28,13 +32,13 @@ double parse_double(char* str) {
         }
         i++;
     }
-    return sign * (int_part + real_part);
+    *res = sign * (int_part + real_part);
+    return 0;
 }
 
-
-double integrate(double eps, double (*f)(double), double upper_bound, double lower_bound) {
+int integrate(double eps, double (*f)(double), double upper_bound, double lower_bound, double* res) {
     if (lower_bound > upper_bound) {
-        throw_err(INCORRECT_ARGUMENTS);
+        return throw_err(INCORRECT_ARGUMENTS);
     }
 
     double area = 0;
@@ -45,8 +49,8 @@ double integrate(double eps, double (*f)(double), double upper_bound, double low
         area += f(mid) * (x - prev);
         prev = x;
     }
-
-    return area;
+    *res = area;
+    return 0;
 }
 
 double func_a(double x) {

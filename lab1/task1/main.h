@@ -11,20 +11,21 @@
 #include "array.h"
 
 typedef enum kOpts {
+    OPT_S = -1,
     OPT_H,
     OPT_P,
-    OPT_S,
     OPT_E,
     OPT_A,
     OPT_F
 } kOpts;
 
-void natural_numbers(unsigned int);
-void is_prime(unsigned int);
-void to_base16(unsigned int);
+int natural_numbers(unsigned int);
+int is_prime(unsigned int);
+int to_base16(unsigned int, int);
+int to_base(unsigned int x, unsigned char base, char* result, size_t res_size);
 long long power(unsigned int, unsigned int);
-void exponent_table(unsigned int);
-void natural_sum(unsigned int);
-void factorial(unsigned int);
+int exponent_table(unsigned int);
+int natural_sum(unsigned int);
+int factorial(unsigned int);
 
 #endif

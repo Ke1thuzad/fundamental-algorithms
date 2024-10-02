@@ -1,6 +1,6 @@
 #include "error_handler.h"
 
-void throw_err(errcode err) {
+int throw_err(errcode err) {
     char* err_msg;
     switch(err) {
         case OUT_OF_BOUNDS:
@@ -25,6 +25,6 @@ void throw_err(errcode err) {
             err_msg = "An unknown message has occurred.";
             break;
     }
-    fprintf(stderr, "%s", err_msg);
-    exit(err);
+    fprintf(stderr, "%s\n", err_msg);
+    return (err);
 }

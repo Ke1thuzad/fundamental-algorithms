@@ -13,6 +13,6 @@ typedef enum errcode {
     FILE_ERROR
 } errcode;
 
-void throw_err(errcode err);
+int throw_err(errcode err);
 
 #endif //FUNDAMENTAL_ALGORITHMS_ERROR_HANDLER_H
