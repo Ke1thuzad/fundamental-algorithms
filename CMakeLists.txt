@@ -3,7 +3,7 @@ project(fundamental_algorithms C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(lab1t1 lab1/task1/main.c lab1/task1/handlers.c lab1/task1/main.h lab1/task1/array.h
+add_executable(lab1t1 lab1/task1/main.c lab1/task1/handlers.c lab1/task1/main.h lab1/array.h
         lab1/error_handler.c
         lab1/error_handler.h)
 add_executable(lab1t2 lab1/task2/main.c lab1/task2/main.h
@@ -23,7 +23,9 @@ add_executable(lab1t4 lab1/task4/main.c lab1/task4/main.h
         lab1/error_handler.h)
 add_executable(lab1t7 lab1/task7/main.c lab1/task7/main.h
         lab1/error_handler.c
-        lab1/error_handler.h)
+        lab1/error_handler.h
+        lab1/task7/handlers.c
+        lab1/array.c)
 add_executable(lab1t5 lab1/task5/main.c lab1/task5/main.h
         lab1/task5/methods.c
         lab1/error_handler.c
