@@ -15,8 +15,9 @@ int is_num(int x);
 int is_letter(int x);
 int to_lower(int x);
 int base_char_to_dec(char x);
-//int to_decimal(const Array x, unsigned char base, Array *result);
+int to_decimal(Array x, unsigned char base, Array *result);
 int convert_base(Array* x, int from_base, int to_base, Array* result);
+
 int is_unique(const Array* arr, int size);
 int is_str_equal(char* str1, char* str2);
 

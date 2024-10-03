@@ -100,7 +100,8 @@ int read_value(FILE** f, Array* result) {
         destroy(&arr);
         return throw_err(INCORRECT_ARGUMENTS);
     }
-    err = convert_base(&arr, max + 1, 10, result);
+    // TODO: Replace it with long arithmetic one.
+    err = to_decimal(arr, max + 1, result);
 
     destroy(&arr);
     if (err)
@@ -125,7 +126,7 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
     if (result)
         destroy(result);
 
-    int err, shift = 0;
+    int err;
     err = create_arr(5, result);
     if (err) {
         destroy(result);
@@ -140,9 +141,16 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         free(pwr);
         return err;
     }
-    Array* temp = malloc(sizeof(Array));
+    append(pwr, '1');
 
-    reverse(&x);
+    Array* temp = malloc(sizeof(Array));
+    Array* temp2 = malloc(sizeof(Array)); // TODO: free this memory
+    err = create_arr(5, temp2);
+    err = create_arr(5, temp);
+    if (err)
+        return err;
+
+    reverse(&x); // do I really need to?
 
     for (int i = 0; i < x.length; ++i) {
         int ch = base_char_to_dec(x.val[i]);
@@ -155,21 +163,21 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
             return err;
         }
 
+        // TODO: Multiply array by character and add arrays together.
+        add_arrays(*temp2, *temp, result);
+        copy(temp2, result); // TODO: error handling
 
-
-//        err = copy(pwr, temp);
-//        if (err) {
-//            destroy(temp);
-//            destroy(pwr);
-//            free(temp);
-//            free(pwr);
-//            return err;
-//        }
+        err = multiply(*pwr, base, temp);
+        copy(pwr, temp);
+        destroy(temp);
     }
     destroy(temp);
+    destroy(temp2);
     destroy(pwr);
     free(temp);
+    free(temp2);
     free(pwr);
+    reverse(result);
 
 
 
