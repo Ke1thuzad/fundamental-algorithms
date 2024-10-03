@@ -46,10 +46,24 @@ void destroy(Array* arr) {
     arr->capacity = 0;
 }
 
+int copy(Array* dst, Array* src) {
+    destroy(dst);
+    dst->val = calloc(src->capacity, sizeof(char));
+    dst->length = src->length;
+    dst->capacity = src->capacity;
+
+    char* tempdst = dst->val, *tempsrc = src->val;
+    while ((*dst->val++ = *src->val++));
+    dst->val = tempdst;
+    src->val = tempsrc;
+    return 0;
+}
+
 void print_arr(const Array arr) {
     for (int i = 0; i < arr.length; ++i) {
-        printf("%u ", arr.val[i]);
+        printf("%c ", arr.val[i]);
     }
+    printf("\n");
 }
 
 void reverse_print_arr(const Array arr) {
@@ -58,16 +72,32 @@ void reverse_print_arr(const Array arr) {
     }
 }
 
+int reverse(Array* arr) {
+    int size = arr->length;
+    for (int i = 0; i < size / 2; ++i) {
+        char temp = arr->val[i];
+        arr->val[i] = arr->val[size - i - 1];
+        arr->val[size - i - 1] = temp;
+    }
+
+    return 0;
+}
+
 int value_to_arr(unsigned int value, Array* result) {
+    if (result)
+        destroy(result);
     int err = create_arr(10, result);
     if (err)
         return err;
     while (value > 0) {
-        err = append(result, value % 10);
-        if (err)
+        err = append(result, value % 10 + '0');
+        if (err) {
+            destroy(result);
             return err;
+        }
         value /= 10;
     }
+    reverse(result);
     return 0;
 }
 
@@ -86,21 +116,91 @@ int str_to_arr(char* str, Array* result) {
 
 }
 
-//Array multiply(const Array A, unsigned int B) {
-//    Array result = create_arr(A.capacity + 5);
-//    int shift = 0;
-//
-//    for (int i = 0; i < A.length; i++) {
-//        int product = A.val[i] * B + shift;
-//        shift = product / 10;
-//        append(&result, product % 10);
-//    }
-//
-//    while (shift > 0) {
-//        append(&result, shift % 10);
-//        shift /= 10;
-//    }
-//
-//
-//    return result;
-//}
+int add(const Array A, unsigned int B, Array* result) {
+    if (result)
+        destroy(result);
+    int err = create_arr(5, result);
+    if (err)
+        return err;
+
+    int i = 0, sum = 0, shift = 0;
+
+    while(B > 0) {
+        if (A.val[i])
+            sum = A.val[i++] - '0' + B % 10 + shift;
+        else
+            sum = B % 10 + shift;
+        shift = sum / 10;
+        append(result, sum % 10 + '0');
+        B /= 10;
+    }
+
+    while (shift > 0) {
+        append(result, shift % 10 + '0');
+        shift /= 10;
+    }
+    return 0;
+}
+
+int add_arrays(const Array A, const Array B, Array* result) {
+    if (result)
+        destroy(result);
+    int err = create_arr(5, result);
+    if (err)
+        return err;
+
+    int i = 0, sum = 0, shift = 0;
+
+    while(A.val[i] && B.val[i]) {
+        sum = A.val[i] - '0' + B.val[i] - '0' + shift;
+        shift = sum / 10;
+        append(result, sum % 10 + '0');
+        i++;
+    }
+    int j = i;
+    while (A.val[i]) {
+        append(result, A.val[i++]);
+    }
+    while (B.val[j]) {
+        append(result, B.val[j++]);
+    }
+
+    while (shift > 0) {
+        append(result, shift % 10 + '0');
+        shift /= 10;
+    }
+    return 0;
+}
+
+int multiply(const Array A, unsigned int B, Array* result) {
+    if (result)
+        destroy(result);
+    int err = create_arr(5, result);
+    if (err) {
+        destroy(result);
+        return err;
+    }
+    int shift = 0;
+
+    for (int i = 0; i < A.length; i++) {
+        int product = (A.val[i] - '0') * B + shift;
+        shift = product / 10;
+        err = append(result, product % 10 + '0');
+        if (err) {
+            destroy(result);
+            return err;
+        }
+    }
+
+    while (shift > 0) {
+        err = append(result, shift % 10 + '0');
+        if (err) {
+            destroy(result);
+            return err;
+        }
+        shift /= 10;
+    }
+
+
+    return 0;
+}
