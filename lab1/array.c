@@ -7,6 +7,7 @@ int create_arr(unsigned int length, Array* arr) {
     arr->val = malloc(length);
 
     if (!arr->val) return throw_err(MEMORY_NOT_ALLOCATED);
+    arr->val[0] = '\0';
 
     return 0;
 }
@@ -40,7 +41,8 @@ int extend(Array* arr) {
 }
 
 void destroy(Array* arr) {
-    free(arr->val);
+    if (arr->val)
+        free(arr->val);
     arr->val = NULL;
     arr->length = 0;
     arr->capacity = 0;
