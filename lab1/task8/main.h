@@ -9,7 +9,7 @@
 int handler(Array* paths);
 int open_descriptors(Array* paths, char** flags, FILE** descriptors, int size);
 int seek_char(FILE** f, int* result);
-int read_value(FILE** f, Array* result);
+int read_value(FILE** f, Array* result, char first);
 int is_alnum(int x);
 int is_num(int x);
 int is_letter(int x);

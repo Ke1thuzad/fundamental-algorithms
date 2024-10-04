@@ -15,7 +15,6 @@ int handler(Array* paths) {
             return err;
         if (ch == -1)
             break;
-        fseek(in, -1, ftell(in));
 
         if (!is_alnum(ch))
             return throw_err(INCORRECT_ARGUMENTS);
@@ -24,7 +23,7 @@ int handler(Array* paths) {
         err = create_arr(2, &val);
         if (err)
             return err;
-        err = read_value(&in, &val);
+        err = read_value(&in, &val, ch);
         if (err)
             return err;
         fprintf(out, "%s\n", val.val);
@@ -80,13 +79,15 @@ int seek_char(FILE** f, int* result) {
     return 0;
 }
 
-int read_value(FILE** f, Array* result) {
+int read_value(FILE** f, Array* result, char first) {
     Array arr;
     int err = create_arr(2, &arr);
     if (err) {
         destroy(&arr);
         return err;
     }
+    if (first)
+        append(&arr, first);
 
     int character = fgetc(*f), max = 0, cur = 0;
     while (is_alnum(character)) {
@@ -125,6 +126,8 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
     printf("%d ", base);
     if (result)
         destroy(result);
+    int ind = 0;
+    Array* deleteOnExit[5];
 
     int err;
     err = create_arr(5, result);
@@ -132,137 +135,137 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         destroy(result);
         return err;
     }
+    deleteOnExit[ind++] = result;
 
     Array* pwr = malloc(sizeof(Array));
     err = create_arr(5, pwr);
     if (err) {
-        destroy(result);
-        destroy(pwr);
+        for (int j = 0; j < ind; ++j) {
+            destroy(deleteOnExit[j]);
+        }
         free(pwr);
         return err;
     }
     append(pwr, '1');
+    deleteOnExit[ind++] = pwr;
 
-    Array* temp = malloc(sizeof(Array));
-    Array* temp2 = malloc(sizeof(Array)); // TODO: free this memory
-    err = create_arr(5, temp2);
-    err = create_arr(5, temp);
-    if (err)
+    Array temp;
+    Array temp2;
+    err = create_arr(5, &temp2);
+    err |= create_arr(5, &temp);
+    if (err) {
+        for (int j = 0; j < ind; ++j) {
+            destroy(deleteOnExit[j]);
+        }
+        free(pwr);
         return err;
+    }
+
+    deleteOnExit[ind++] = &temp;
+    deleteOnExit[ind++] = &temp2;
 
     reverse(&x);
 
     for (int i = 0; i < x.length; ++i) {
         int ch = base_char_to_dec(x.val[i]);
-        err = multiply(*pwr, ch, temp);
+        err = multiply(*pwr, ch, &temp);
         if (err) {
-            destroy(temp);
-            destroy(pwr);
-            free(temp);
+            for (int j = 0; j < ind; ++j) {
+                destroy(deleteOnExit[j]);
+            }
             free(pwr);
             return err;
         }
 
-        // TODO: Multiply array by character and add arrays together.
-        add_arrays(*temp2, *temp, result);
-        copy(temp2, result); // TODO: error handling
-
-        err = multiply(*pwr, base, temp);
-        copy(pwr, temp);
-    }
-    destroy(temp);
-    destroy(temp2);
-    destroy(pwr);
-    free(temp);
-    free(temp2);
-    free(pwr);
-    reverse(result);
-
-
-
-    // MULTIPLY PWR AS ARR BY CHAR
-
-
-
-
-
-
-
-
-
-
-
-
-//    for (int i = x.length - 1; i >= 0; --i) {
-//        int chr = base_char_to_dec(x.val[i]), product = chr * pwr;
-//        shift = product / 10;
-//        err = append(result, product % 10);
-//        if (err) {
-//            destroy(result);
-//            return err;
-//        }
-//        pwr *= base;
-//    }
-//
-//    while (shift > 0) {
-//        err = append(result, shift % 10);
-//        if (err) {
-//            destroy(result);
-//            return err;
-//        }
-//        shift /= 10;
-//    }
-//    print_arr(*result);
-//    printf("%d\n", *result);
-    return 0;
-}
-
-int convert_base(Array* x, int from_base, int to_base, Array* result) {
-    printf("%d\n", from_base);
-    if (from_base < 2 || from_base > 36 || to_base < 2 || to_base > 36) {
-        return throw_err(OUT_OF_BOUNDS);
-    }
-    char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    long long decimal_value = 0;
-    long long power = 1;
-    for (int i = x->length - 1; i >= 0; --i) {
-        int digit = base_char_to_dec(x->val[i]);
-        if (digit < 0 || digit >= from_base) {
-            return throw_err(INCORRECT_ARGUMENTS);
-        }
-        decimal_value += digit * power;
-        power *= from_base;
-    }
-
-    destroy(result);
-    int err = create_arr(10, result);
-    if (err) {
-        return err;
-    }
-
-    if (decimal_value == 0) {
-        append(result, '0');
-        return 0;
-    }
-
-    while (decimal_value > 0) {
-        int remainder = decimal_value % to_base;
-        char digit_char = letters[remainder];
-        if (digit_char == '\0') {
-            return throw_err(INCORRECT_ARGUMENTS);
-        }
-        err = append(result, digit_char);
+        err = add_arrays(temp2, temp, result);
         if (err) {
+            for (int j = 0; j < ind; ++j) {
+                destroy(deleteOnExit[j]);
+            }
+            free(pwr);
             return err;
         }
-        decimal_value /= to_base;
+
+        err = copy(&temp2, result);
+        if (err) {
+            for (int j = 0; j < ind; ++j) {
+                destroy(deleteOnExit[j]);
+            }
+            free(pwr);
+            return err;
+        }
+
+        err = multiply(*pwr, base, &temp);
+        if (err) {
+            for (int j = 0; j < ind; ++j) {
+                destroy(deleteOnExit[j]);
+            }
+            free(pwr);
+            return err;
+        }
+        err = copy(pwr, &temp);
+        if (err) {
+            for (int j = 0; j < ind; ++j) {
+                destroy(deleteOnExit[j]);
+            }
+            free(pwr);
+            return err;
+        }
     }
-
+    for (int j = 0; j < ind; ++j) {
+        destroy(deleteOnExit[j]);
+    }
+    free(pwr);
     reverse(result);
-
     return 0;
 }
+
+//int convert_base(Array* x, int from_base, int to_base, Array* result) {
+//    printf("%d\n", from_base);
+//    if (from_base < 2 || from_base > 36 || to_base < 2 || to_base > 36) {
+//        return throw_err(OUT_OF_BOUNDS);
+//    }
+//    char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//
+//    long long decimal_value = 0;
+//    long long power = 1;
+//    for (int i = x->length - 1; i >= 0; --i) {
+//        int digit = base_char_to_dec(x->val[i]);
+//        if (digit < 0 || digit >= from_base) {
+//            return throw_err(INCORRECT_ARGUMENTS);
+//        }
+//        decimal_value += digit * power;
+//        power *= from_base;
+//    }
+//
+//    destroy(result);
+//    int err = create_arr(10, result);
+//    if (err) {
+//        return err;
+//    }
+//
+//    if (decimal_value == 0) {
+//        append(result, '0');
+//        return 0;
+//    }
+//
+//    while (decimal_value > 0) {
+//        int remainder = decimal_value % to_base;
+//        char digit_char = letters[remainder];
+//        if (digit_char == '\0') {
+//            return throw_err(INCORRECT_ARGUMENTS);
+//        }
+//        err = append(result, digit_char);
+//        if (err) {
+//            return err;
+//        }
+//        decimal_value /= to_base;
+//    }
+//
+//    reverse(result);
+//
+//    return 0;
+//}
 
 int is_unique(const Array* arr, int size) {
     for (int i = 0; i < size - 1; ++i) {

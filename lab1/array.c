@@ -161,10 +161,16 @@ int add_arrays(const Array A, const Array B, Array* result) {
     }
     int j = i;
     while (A.val[i]) {
-        append(result, A.val[i++]);
+        sum = A.val[i] - '0' + shift;
+        shift = sum / 10;
+        append(result, sum % 10 + '0');
+        i++;
     }
     while (B.val[j]) {
-        append(result, B.val[j++]);
+        sum = B.val[j] - '0' + shift;
+        shift = sum / 10;
+        append(result, sum % 10 + '0');
+        j++;
     }
 
     while (shift > 0) {
