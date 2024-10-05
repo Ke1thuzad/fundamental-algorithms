@@ -9,10 +9,33 @@ int main(int argc, char** argv) {
     if (!paths)
         return throw_err(MEMORY_NOT_ALLOCATED);
     for (int i = 1; i < 3; ++i) {
-        create_arr(2, &paths[i - 1]);
+        err = create_arr(2, &paths[i - 1]);
+        if (err) {
+            for (int j = 0; j < 2; ++j) {
+                destroy(&paths[j]);
+            }
+            free(paths);
+            return err;
+        }
         err = str_to_arr(argv[i], &paths[i - 1]);
+        if (err) {
+            for (int j = 0; j < 2; ++j) {
+                destroy(&paths[j]);
+            }
+            free(paths);
+            return err;
+        }
     }
-    handler(paths);
+
+    if (!is_unique(paths, 2)) {
+        for (int i = 0; i < 2; ++i) {
+            destroy(&paths[i]);
+        }
+        free(paths);
+        return throw_err(INCORRECT_ARGUMENTS);
+    }
+
+    err = handler(paths);
 
     for (int i = 0; i < 2; ++i) {
         destroy(&paths[i]);
@@ -20,21 +43,5 @@ int main(int argc, char** argv) {
     free(paths);
     if (err)
         return err;
-
-//    Array* arr = malloc(sizeof(Array));
-//    Array* arr2 = malloc(sizeof(Array));
-//    create_arr(5, arr);
-//    append(arr, '6');
-////    append(&arr, '9');
-//    Array *res = malloc(sizeof(Array));
-//    multiply(*arr, 25, res);
-//    copy(arr, res);
-//    print_arr(*res);
-//    print_arr(*arr);
-//    multiply(*arr, 12, res);
-//    print_arr(*res);
-//    print_arr(*arr);
-//    add_arrays(*arr, *res, arr2);
-//    print_arr(*arr2);
     return 0;
 }

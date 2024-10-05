@@ -1,5 +1,5 @@
 #include "array.h"
-#include "error_handler.h"
+#include "../error_handler.h"
 
 int create_arr(unsigned int length, Array* arr) {
     arr->capacity = length;

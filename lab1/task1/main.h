@@ -8,7 +8,7 @@
 #include <string.h>
 
 #include "../error_handler.h"
-#include "../array.h"
+#include "../arrays/array.h"
 
 typedef enum kOpts {
     OPT_S = -1,

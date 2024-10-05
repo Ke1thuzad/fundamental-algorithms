@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #include "../error_handler.h"
-#include "../array.h"
+#include "../arrays/array.h"
 
 int handler(Array* paths);
 int open_descriptors(Array* paths, char** flags, FILE** descriptors, int size);

@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../array.h"
+#include "../arrays/array.h"
 #include "../error_handler.h"
 
 typedef enum {
