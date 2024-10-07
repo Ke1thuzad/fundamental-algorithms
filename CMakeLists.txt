@@ -59,8 +59,3 @@ target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
 target_link_libraries(lab1t4 m)
 target_link_libraries(lab1t6 m)
-add_executable(test lab1/test/main.c
-        lab1/test/main.h
-        lab1/test/solution.c)
-
-target_link_libraries(test m)
