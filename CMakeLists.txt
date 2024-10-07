@@ -47,9 +47,20 @@ add_executable(lab1t9 lab1/task9/main.c lab1/task9/main.h
         lab1/error_handler.c
         lab1/error_handler.h
         lab1/task9/handlers.c)
+add_executable(lab1t10 lab1/task10/main.c lab1/task10/main.h
+        lab1/task10/handlers.c
+        lab1/arrays/array.c
+        lab1/arrays/array.h
+        lab1/error_handler.c
+        lab1/error_handler.h)
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
 target_link_libraries(lab1t4 m)
 target_link_libraries(lab1t6 m)
+add_executable(test lab1/test/main.c
+        lab1/test/main.h
+        lab1/test/solution.c)
+
+target_link_libraries(test m)

@@ -180,7 +180,7 @@ int add_arrays(const Array A, const Array B, Array* result) {
     return 0;
 }
 
-int multiply(const Array A, unsigned int B, Array* result) {
+int multiply(const Array A, float B, Array* result) {
     if (result)
         destroy(result);
     int err = create_arr(5, result);

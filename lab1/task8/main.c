@@ -43,5 +43,6 @@ int main(int argc, char** argv) {
     free(paths);
     if (err)
         return err;
+
     return 0;
 }
