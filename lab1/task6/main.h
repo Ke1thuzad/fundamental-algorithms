@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../error_handler.h"
+#include "../../utility/error_handler.h"
 
 int chrtoint(char, int*);
 int parse_double(char*, double*);

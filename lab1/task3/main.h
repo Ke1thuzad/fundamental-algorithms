@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "../error_handler.h"
+#include "../../utility/error_handler.h"
 
 typedef enum kOpts {
     OPT_Q,

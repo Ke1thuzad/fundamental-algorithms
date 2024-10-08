@@ -13,7 +13,7 @@ int create_arr(unsigned int length, Array* arr) {
 }
 
 int append(Array* arr, char value) {
-    if (arr->length >= (arr->capacity - 1)) {
+    if (arr->length >= (arr->capacity - 2)) {
         int err = extend(arr);
         if (err)
             return err;
@@ -51,6 +51,9 @@ void destroy(Array* arr) {
 int copy(Array* dst, Array* src) {
     destroy(dst);
     dst->val = calloc(src->capacity, sizeof(char));
+    if (!dst->val) {
+        return throw_err(MEMORY_NOT_ALLOCATED);
+    }
     dst->length = src->length;
     dst->capacity = src->capacity;
 
@@ -116,6 +119,14 @@ int str_to_arr(char* str, Array* result) {
     }
     return 0;
 
+}
+
+void arr_to_value(Array arr, unsigned int* result) {
+    *result = 0;
+    for (int i = 0; i < arr.length; ++i) {
+        *result *= 10;
+        *result += arr.val[i] - '0';
+    }
 }
 
 int add(const Array A, unsigned int B, Array* result) {
@@ -209,6 +220,29 @@ int multiply(const Array A, float B, Array* result) {
         shift /= 10;
     }
 
+
+    return 0;
+}
+
+// Concatenate B to A.
+int concat(Array* A, Array B) {
+    for (int i = 0; i < B.length; ++i) {
+        int err = append(A, B.val[i]);
+        if (err)
+            return err;
+    }
+
+    return 0;
+}
+
+// Concatenate B to A.
+int concat_str(Array* A, char* B) {
+    int i = 0;
+    while (B[i] != '\0') {
+        int err = append(A, B[i++]);
+        if (err)
+            return err;
+    }
 
     return 0;
 }

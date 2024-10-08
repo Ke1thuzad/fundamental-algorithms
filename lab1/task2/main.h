@@ -2,7 +2,7 @@
 #define FUNDAMENTAL_ALGORITHMS_MAIN_H
 #include <stdlib.h>
 #include <math.h>
-#include "../error_handler.h"
+#include "../../utility/error_handler.h"
 
 typedef long double (*limit_f)(int);
 typedef long double (*series_f)(long double, int);

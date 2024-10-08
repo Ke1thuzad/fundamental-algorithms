@@ -8,6 +8,66 @@ int is_str_equal(char* str1, char* str2) {
     return (*str1 == '\0' && *str2 == '\0');
 }
 
+int seek_char(FILE* f, int* result) {
+    if (!f)
+        return throw_err(FILE_ERROR);
+
+    while(!feof(f)) {
+        int cur = fgetc(f);
+        if (cur > ' ') {
+            *result = cur;
+            return 0;
+        }
+    }
+    *result = -1;
+    return 0;
+}
+
+int read_value(FILE* f, Array* result, char first) {
+    int err;
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+    int character = fgetc(f);
+    while (character > ' ') {
+        if (!is_num(character))
+            return throw_err(INCORRECT_ARGUMENTS);
+        err = append(result, (char)character);
+        if (err)
+            return err;
+        character = fgetc(f);
+    }
+
+    return 0;
+}
+
+int chrtoint(char x, int* num) {
+    int a = x - '0';
+    if (a < 0 || a > 9) return throw_err(OUT_OF_BOUNDS);
+    *num = a;
+    return 0;
+}
+
+int parse_int(char* str, int* res) {
+    int i = 0, result = 0, sign = 1;
+
+    if (str[0] == '-') i++, sign = -1;
+
+    while (str[i] != '\0') {
+        int temp, err = chrtoint(str[i], &temp);
+        if (err)
+            return err;
+        result *= 10;
+        result += temp;
+        i++;
+    }
+
+    *res = sign * result;
+    return 0;
+}
+
 int parse_str(Array* result) {
     if (result)
         destroy(result);
@@ -21,9 +81,16 @@ int parse_str(Array* result) {
     }
     int ch = getchar();
     while (ch > ' ') {
+        if (!is_alnum(ch))
+            return throw_err(INCORRECT_ARGUMENTS);
         char lower = (char) to_lower(ch);
-        temp[ind++] = lower;
-        append(result, lower);
+        if (ind < 4)
+            temp[ind++] = lower;
+        err = append(result, lower);
+        if (err) {
+            destroy(result);
+            return err;
+        }
         ch = getchar();
     }
     if (ind == 4) {
@@ -34,6 +101,10 @@ int parse_str(Array* result) {
     }
 
     return 0;
+}
+
+int is_alnum(int x) {
+    return is_num(x) || is_letter(x);
 }
 
 int is_num(int x) {
@@ -59,9 +130,9 @@ int base_char_to_dec(char x) {
 }
 
 int to_decimal(const Array x, unsigned char base, long long *result) {
-    int base_maxes[34] = {63, 40, 32, 28, 25, 23, 21, 20, 19, 19, 18, 18, 17, 17, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 13, 13, 13,
-                          13, 13, 13, 13};
-    if (x.length > base_maxes[base - 1]) {
+    int base_maxes[35] = {63, 40, 32, 28, 25, 23, 21, 20, 19, 19, 18, 18, 17, 17, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 13, 13, 13,
+                          13, 13, 13, 13, 13};
+    if (x.length > base_maxes[base - 2]) {
         return throw_err(OUT_OF_BOUNDS);
     }
     if (base < 2 || base > 36)

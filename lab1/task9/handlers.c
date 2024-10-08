@@ -24,14 +24,20 @@ int parse_int(char* str, int* res) {
         result += temp;
         i++;
     }
-    if (result == 0) return throw_err(INCORRECT_ARGUMENTS);
 
     *res = sign * result;
     return 0;
 }
 
 int part_one(int a, int b) {
-    int min = INT_MIN, max = INT_MAX, max_ind = -1, min_ind = -1;
+    if (a < 0 || b < 0)
+        return throw_err(INCORRECT_ARGUMENTS);
+    if (b < a) {
+        int temp = a;
+        a = b;
+        b = temp;
+    }
+    int min = INT_MAX, max = INT_MIN, max_ind = -1, min_ind = -1;
     int arr[1000], number;
     for (int i = 0; i < 1000; ++i) {
         number = a + rand() % (b - a);
@@ -49,14 +55,31 @@ int part_one(int a, int b) {
     arr[max_ind] = arr[min_ind];
     arr[min_ind] = temp;
 
+    for (int i = 0; i < 1000; ++i) {
+        printf("%d ", arr[i]);
+    }
+    printf("%d %d %d\n", arr[max_ind], arr[min_ind], max);
+
     return 0;
 }
 
 int part_two() {
     IntArray A, B, C;
-    int err = create_arr(10 + rand() % 9990, &A) | create_arr(10 + rand() % 9990, &B) | create_arr(5000, &C);
+    int err = create_arr(10 + rand() % 9990, &A);
     if (err)
         return err;
+
+    err = create_arr(10 + rand() % 9990, &B);
+    if (err) {
+        destroy(&A);
+        return err;
+    }
+    err = create_arr(5000, &C);
+    if (err) {
+        destroy(&A);
+        destroy(&B);
+        return err;
+    }
 
     err = fill_array(&A, -1000, 1000) | fill_array(&B, -1000, 1000);
     if (err)
@@ -68,10 +91,13 @@ int part_two() {
         append(&C, key + B.val[closest_id]);
     }
 
+    printf("Array A: \n");
     print_arr(A);
     printf("\n\n\n");
+    printf("Array B: \n");
     print_arr(B);
     printf("\n\n\n");
+    printf("Array C: \n");
     print_arr(C);
 
     destroy(&A);

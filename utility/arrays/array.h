@@ -17,9 +17,12 @@ int reverse(Array* arr);
 void print_arr(Array arr);
 void reverse_print_arr(Array arr);
 int value_to_arr(unsigned int value, Array* result);
+void arr_to_value(Array arr, unsigned int* result);
 int str_to_arr(char* str, Array* result);
 int add(Array A, unsigned int B, Array* result);
-int add_arrays(const Array A, const Array B, Array* result);
-int multiply(const Array A, float B, Array* result);
+int add_arrays(Array A, Array B, Array* result);
+int multiply(Array A, float B, Array* result);
+int concat(Array* A, Array B);
+int concat_str(Array* A, char* B);
 
 #endif //LAB1T1_ARRAY_H

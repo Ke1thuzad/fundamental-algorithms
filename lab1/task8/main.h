@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-#include "../error_handler.h"
-#include "../arrays/array.h"
+#include "../../utility/error_handler.h"
+#include "../../utility/arrays/array.h"
 
 int handler(Array* paths);
 int open_descriptors(Array* paths, char** flags, FILE** descriptors, int size);

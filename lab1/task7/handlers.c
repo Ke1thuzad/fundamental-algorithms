@@ -15,10 +15,16 @@ int handler_r(Array* paths) {
         if (err)
             return err;
         if (character != -1) {
+            Array arr;
+            err = create_arr(5, &arr);
+            if (err)
+                return err;
+            read_value(&descriptors[i], &arr, (char) character);
             i = (i + 1) % 2;
-            printf("%d ", character);
-            fputc(character, descriptors[2]);
+//            printf("%d ", character);
+            fputs(arr.val, descriptors[2]);
             fputc(' ', descriptors[2]);
+            destroy(&arr);
         } else
             break;
     }
@@ -30,10 +36,15 @@ int handler_r(Array* paths) {
             if (err)
                 return err;
 
-            printf("%d ", ch);
             if (ch != -1) {
-                fputc(ch, descriptors[2]);
+                Array arr;
+                err = create_arr(5, &arr);
+                if (err)
+                    return err;
+                read_value(&descriptors[i], &arr, (char) ch);
+                fputs(arr.val, descriptors[2]);
                 fputc(' ', descriptors[2]);
+                destroy(&arr);
             }
         }
     }
@@ -55,36 +66,58 @@ int handler_a(Array* paths) {
             return err;
         if (ch == -1)
             break;
+        Array arr;
+        err = create_arr(5, &arr);
+        if (err)
+            return err;
+        read_value(&descriptors[0], &arr, (char) ch);
 
         i = (i + 1) % 11;
         FILE *out = descriptors[1];
         if (i % 10 == 0) {
             if (!is_letter(ch))
-                fputc(ch, out);
+                fputs(arr.val, out);
             else {
-                char hex[6];
-                err = to_base(to_lower(ch), 4, hex, 6);
-                if (err)
-                    return err;
-                fputs(hex, out);
+                for (int j = 0; j < arr.length; ++j) {
+                    char hex[6];
+                    err = to_base(to_lower(arr.val[j]), 4, hex, 6);
+                    if (err) {
+                        destroy(&arr);
+                        return err;
+                    }
+                    fputs(hex, out);
+                }
             }
         } else if (i % 2 == 0) {
-            if (!is_letter(ch))
-                fputc(ch, out);
-            else
-                fputc(to_lower(ch), out);
+            for (int j = 0; j < arr.length; ++j) {
+                if (!is_letter(arr.val[j])) continue;
+                arr.val[j] = (char) to_lower(arr.val[j]);
+            }
+            fputs(arr.val, out);
         } else if (i % 5 == 0) {
-            char hex[4];
-            err = to_base(to_lower(ch), 8, hex, 4);
-            if (err)
-                return err;
-            fputs(hex, out);
+            for (int j = 0; j < arr.length; ++j) {
+                char hex[4] = {};
+                err = to_base(arr.val[j], 8, hex, 4);
+                if (err) {
+                    destroy(&arr);
+                    return err;
+                }
+                fputs(hex, out);
+            }
         } else
-            fputc(ch, out);
+            fputs(arr.val, out);
         fputc(' ', out);
+        destroy(&arr);
     }
-
     return 0;
+}
+
+int is_alnum(int x) {
+    return is_num(x) || is_letter(x);
+}
+
+int is_num(int x) {
+    return x >= '0' && x <= '9';
 }
 
 int is_letter(int x) {
@@ -122,6 +155,24 @@ int seek_char(FILE** f, int* result) {
         }
     }
     *result = -1;
+    return 0;
+}
+
+int read_value(FILE** f, Array* result, char first) {
+    int err;
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+    int character = fgetc(*f);
+    while (character > ' ') {
+        err = append(result, (char)character);
+        if (err)
+            return err;
+        character = fgetc(*f);
+    }
+
     return 0;
 }
 

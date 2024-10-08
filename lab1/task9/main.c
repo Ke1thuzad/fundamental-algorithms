@@ -7,7 +7,7 @@ int main(int argc, char** argv) {
     int a, b, err = parse_int(argv[1], &a) | parse_int(argv[2], &b);
     if (err)
         return err;
-//    part_one(a, b);
-    part_two();
+    part_one(a, b);
+//    part_two();
     return 0;
 }

@@ -7,8 +7,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "../error_handler.h"
-#include "../arrays/array.h"
+#include "../../utility/error_handler.h"
 
 typedef enum kOpts {
     OPT_S = -1,

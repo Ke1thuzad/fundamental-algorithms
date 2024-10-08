@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#include "../error_handler.h"
-#include "../arrays/intarray.h"
+#include "../../utility/error_handler.h"
+#include "../../utility/arrays/intarray.h"
 
 int chrtoint(char, int*);
 int parse_int(char*, int*);

@@ -10,9 +10,7 @@ int handler(Array* paths) {
     FILE* in = descriptors[0], *out = descriptors[1];
     while (!feof(in)) {
         int ch;
-        err = seek_char(&in, &ch);
-        if (err)
-            return err;
+        seek_char(&in, &ch);
         if (ch == -1)
             break;
 
@@ -27,6 +25,7 @@ int handler(Array* paths) {
         if (err)
             return err;
         fprintf(out, "%s\n", val.val);
+        destroy(&val);
     }
     fclose(in);
     fclose(out);
@@ -101,10 +100,11 @@ int read_value(FILE** f, Array* result, char first) {
         destroy(&arr);
         return throw_err(INCORRECT_ARGUMENTS);
     }
-    // TODO: Replace it with long arithmetic one.
+
     err = to_decimal(arr, max + 1, result);
 
     destroy(&arr);
+//    destroy(result);
     if (err)
         return err;
 
@@ -124,25 +124,22 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
     if (base < 2 || base > 36)
         return throw_err(OUT_OF_BOUNDS);
     printf("%d ", base);
-    if (result)
-        destroy(result);
+//    if (result)
+//        destroy(result);
     int ind = 0;
     Array* deleteOnExit[5];
 
-    int err;
-    err = create_arr(5, result);
-    if (err) {
-        destroy(result);
-        return err;
-    }
-    deleteOnExit[ind++] = result;
+//    int err;
+//    err = create_arr(5, result);
+//    if (err) {
+//        destroy(result);
+//        return err;
+//    }
+//    deleteOnExit[ind++] = result;
 
     Array* pwr = malloc(sizeof(Array));
-    err = create_arr(5, pwr);
+    int err = create_arr(5, pwr);
     if (err) {
-        for (int j = 0; j < ind; ++j) {
-            destroy(deleteOnExit[j]);
-        }
         free(pwr);
         return err;
     }
@@ -155,7 +152,8 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
     err |= create_arr(5, &temp);
     if (err) {
         for (int j = 0; j < ind; ++j) {
-            destroy(deleteOnExit[j]);
+            if (deleteOnExit[j])
+                destroy(deleteOnExit[j]);
         }
         free(pwr);
         return err;
@@ -171,7 +169,8 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         err = multiply(*pwr, ch, &temp);
         if (err) {
             for (int j = 0; j < ind; ++j) {
-                destroy(deleteOnExit[j]);
+                if (deleteOnExit[j])
+                    destroy(deleteOnExit[j]);
             }
             free(pwr);
             return err;
@@ -180,7 +179,8 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         err = add_arrays(temp2, temp, result);
         if (err) {
             for (int j = 0; j < ind; ++j) {
-                destroy(deleteOnExit[j]);
+                if (deleteOnExit[j])
+                    destroy(deleteOnExit[j]);
             }
             free(pwr);
             return err;
@@ -189,7 +189,8 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         err = copy(&temp2, result);
         if (err) {
             for (int j = 0; j < ind; ++j) {
-                destroy(deleteOnExit[j]);
+                if (deleteOnExit[j])
+                    destroy(deleteOnExit[j]);
             }
             free(pwr);
             return err;
@@ -198,7 +199,8 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         err = multiply(*pwr, base, &temp);
         if (err) {
             for (int j = 0; j < ind; ++j) {
-                destroy(deleteOnExit[j]);
+                if (deleteOnExit[j])
+                    destroy(deleteOnExit[j]);
             }
             free(pwr);
             return err;
@@ -206,14 +208,16 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
         err = copy(pwr, &temp);
         if (err) {
             for (int j = 0; j < ind; ++j) {
-                destroy(deleteOnExit[j]);
+                if (deleteOnExit[j])
+                    destroy(deleteOnExit[j]);
             }
             free(pwr);
             return err;
         }
     }
     for (int j = 0; j < ind; ++j) {
-        destroy(deleteOnExit[j]);
+        if (deleteOnExit[j])
+            destroy(deleteOnExit[j]);
     }
     free(pwr);
     reverse(result);
