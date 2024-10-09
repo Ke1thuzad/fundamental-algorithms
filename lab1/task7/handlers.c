@@ -72,7 +72,7 @@ int handler_a(Array* paths) {
             return err;
         read_value(&descriptors[0], &arr, (char) ch);
 
-        i = (i + 1) % 11;
+        i = (i + 1) % 10;
         FILE *out = descriptors[1];
         if (i % 10 == 0) {
             if (!is_letter(ch))

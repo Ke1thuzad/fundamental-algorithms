@@ -20,12 +20,12 @@ int to_upper(int x);
 int is_alnum(int x);
 int is_num(int x);
 int is_letter(int x);
-int handler_l(char **argv, Array *result);
-int handler_r(char **argv, Array *result);
-int handler_u(char **argv, Array *result);
-int handler_n(char **argv, Array *result);
-int handler_c(char **argv, Array *result);
+int handler_l(int argc, char **argv, Array *result);
+int handler_r(int argc, char **argv, Array *result);
+int handler_u(int argc, char **argv, Array *result);
+int handler_n(int argc, char **argv, Array *result);
+int handler_c(int argc, char **argv, Array *result);
 
-typedef int (*option)(char **argv, Array *result);
+typedef int (*option)(int argc, char **argv, Array *result);
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

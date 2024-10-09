@@ -34,7 +34,7 @@ int is_letter(int x) {
     return x >= 'A' && x <= 'Z' || x >= 'a' && x <= 'z';
 }
 
-int handler_l(char **argv, Array *result) {
+int handler_l(int argc, char **argv, Array *result) {
     Array str;
     create_arr(5, &str);
     str_to_arr(argv[0], &str);
@@ -48,7 +48,7 @@ int handler_l(char **argv, Array *result) {
     return 0;
 }
 
-int handler_r(char** argv, Array *result) {
+int handler_r(int argc, char** argv, Array *result) {
     Array str;
     create_arr(5, &str);
     str_to_arr(argv[0], &str);
@@ -60,7 +60,7 @@ int handler_r(char** argv, Array *result) {
     return 0;
 }
 
-int handler_u(char** argv, Array *result) {
+int handler_u(int argc, char** argv, Array *result) {
     Array str;
     create_arr(5, &str);
     str_to_arr(argv[0], &str);
@@ -77,7 +77,7 @@ int handler_u(char** argv, Array *result) {
     return 0;
 }
 
-int handler_n(char** argv, Array *result) {
+int handler_n(int argc, char** argv, Array *result) {
     Array str;
     create_arr(5, &str);
     str_to_arr(argv[0], &str);
@@ -101,7 +101,7 @@ int handler_n(char** argv, Array *result) {
     return 0;
 }
 
-int handler_c(char** argv, Array *result) {
+int handler_c(int argc, char **argv, Array *result) {
     Array str;
     int err = create_arr(5, &str);
     if (err)
@@ -114,22 +114,22 @@ int handler_c(char** argv, Array *result) {
         return err;
 
 
-    unsigned int count;
+    unsigned int count, amount = argc - 4;
     err = parse_uint32(argv[1], &count);
     if (err)
         return err;
-    if (argv[count + 2] || !argv[count + 1])
-        return throw_err(INCORRECT_ARGUMENTS);
+//    if (argv[count + 2] || !argv[count + 1])
+//        return throw_err(INCORRECT_ARGUMENTS);
 
 
     srand(count);
 
-    int str_list[count] = {}, rnd;
+    int str_list[amount] = {}, rnd;
 
-    for (int i = 0; i < count; ++i) {
-        rnd = rand() % count;
+    for (int i = 4; i < argc; ++i) {
+        rnd = rand() % amount;
         while (str_list[rnd]) {
-            rnd = rand() % count;
+            rnd = rand() % amount;
         }
         str_list[rnd] = 1;
         err = concat_str(result, argv[2 + rnd]);

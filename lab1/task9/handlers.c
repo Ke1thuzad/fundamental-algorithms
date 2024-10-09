@@ -91,7 +91,7 @@ int part_two() {
         append(&C, key + B.val[closest_id]);
     }
 
-    printf("Array A: \n");
+    printf("\n\nArray A: \n");
     print_arr(A);
     printf("\n\n\n");
     printf("Array B: \n");

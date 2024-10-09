@@ -67,11 +67,14 @@ add_executable(lab2t2 lab2/task2/main.c lab2/task2/main.h
         utility/error_handler.h
         utility/error_handler.c)
 
+add_executable(lab2t3 lab2/task3/main.c lab2/task3/main.h
+        lab2/task3/handlers.c
+        utility/error_handler.h
+        utility/error_handler.c)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
 target_link_libraries(lab1t4 m)
 target_link_libraries(lab1t6 m)
 target_link_libraries(lab2t2 m)
-add_executable(lab2t3 lab2/task3/main.c lab2/task3/main.h
-        lab2/task3/handlers.c)

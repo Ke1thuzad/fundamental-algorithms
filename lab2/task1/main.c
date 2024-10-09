@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
         destroy(&result);
         return err;
     }
-    err = handlers[opt](argv, &result);
+    err = handlers[opt](argc, argv, &result);
     if (err) {
         destroy(&result);
         return err;
