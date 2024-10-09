@@ -1,6 +1,7 @@
 #include "main.h"
 
 int main() {
+    printf("Please enter the base of the values: ");
     int ch;
     seek_char(stdin, &ch);
 

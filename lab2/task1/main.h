@@ -17,6 +17,7 @@ typedef enum kOpts {
 } kOpts;
 
 int to_upper(int x);
+int is_alnum(int x);
 int is_num(int x);
 int is_letter(int x);
 int handler_l(char **argv, Array *result);

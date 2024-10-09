@@ -1,6 +1,8 @@
 #include "main.h"
 
 int parse_uint32(char* str, unsigned int* result) {
+    if (!str)
+        return throw_err(INCORRECT_ARGUMENTS);
     unsigned int i = 0;
     *result = 0;
 
@@ -18,6 +20,10 @@ int to_upper(int x) {
     if (x >= 'a' && x <= 'z')
         return x + ('A' - 'a');
     return x;
+}
+
+int is_alnum(int x) {
+    return is_num(x) || is_letter(x);
 }
 
 int is_num(int x) {
@@ -86,6 +92,11 @@ int handler_n(char** argv, Array *result) {
             append(result, str.val[i]);
     }
 
+    for (int i = 0; i < str.length; ++i) {
+        if (!is_alnum(str.val[i]))
+            append(result, str.val[i]);
+    }
+
     destroy(&str);
     return 0;
 }
@@ -104,7 +115,9 @@ int handler_c(char** argv, Array *result) {
 
 
     unsigned int count;
-    parse_uint32(argv[1], &count);
+    err = parse_uint32(argv[1], &count);
+    if (err)
+        return err;
     if (argv[count + 2] || !argv[count + 1])
         return throw_err(INCORRECT_ARGUMENTS);
 
@@ -112,9 +125,6 @@ int handler_c(char** argv, Array *result) {
     srand(count);
 
     int str_list[count] = {}, rnd;
-    for (int i = 0; i < count; ++i) {
-        str_list[i] = 0;
-    }
 
     for (int i = 0; i < count; ++i) {
         rnd = rand() % count;

@@ -2,7 +2,7 @@
 
 int getOpts(int argc, char*** argv, kOpts *option) {
 
-    if (argc < 2) return throw_err(INCORRECT_ARGUMENTS);
+    if (argc < 3) return throw_err(INCORRECT_ARGUMENTS);
 
     const char *proceeding_option = (*argv)[1];
     if ((proceeding_option[0] == '/' || proceeding_option[0] == '-') && !proceeding_option[2]) {
