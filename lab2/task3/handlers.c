@@ -113,7 +113,7 @@ int file_handler(char *key, int m, char *filename) {
         content[i] = (char) fgetc(stream);
     }
 
-    int i = 0, ind = 1;
+    int i = 0, ind = 0;
 
     while (1) {
         i = substr(content + ind, size - ind, key, m);
