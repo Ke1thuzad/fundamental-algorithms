@@ -12,13 +12,21 @@ int handler_r(Array* paths) {
     while(!feof(descriptors[0]) && !feof(descriptors[1])) {
         int character;
         err = seek_char(&descriptors[i], &character);
-        if (err)
+        if (err) {
+            for (int k = 0; k < 3; ++k) {
+                fclose(descriptors[k]);
+            }
             return err;
+        }
         if (character != -1) {
             Array arr;
             err = create_arr(5, &arr);
-            if (err)
+            if (err) {
+                for (int k = 0; k < 3; ++k) {
+                    fclose(descriptors[k]);
+                }
                 return err;
+            }
             read_value(&descriptors[i], &arr, (char) character);
             i = (i + 1) % 2;
 //            printf("%d ", character);
@@ -33,20 +41,31 @@ int handler_r(Array* paths) {
             int ch;
 
             err = seek_char(&descriptors[j], &ch);
-            if (err)
+            if (err) {
+                for (int k = 0; k < 3; ++k) {
+                    fclose(descriptors[k]);
+                }
                 return err;
+            }
 
             if (ch != -1) {
                 Array arr;
                 err = create_arr(5, &arr);
-                if (err)
+                if (err) {
+                    for (int k = 0; k < 3; ++k) {
+                        fclose(descriptors[k]);
+                    }
                     return err;
+                }
                 read_value(&descriptors[i], &arr, (char) ch);
                 fputs(arr.val, descriptors[2]);
                 fputc(' ', descriptors[2]);
                 destroy(&arr);
             }
         }
+    }
+    for (int j = 0; j < 3; ++j) {
+        fclose(descriptors[j]);
     }
 
     return 0;
@@ -94,8 +113,11 @@ int handler_a(Array* paths) {
                 arr.val[j] = (char) to_lower(arr.val[j]);
             }
             fputs(arr.val, out);
-        } else if (i % 5 == 0) {
-            for (int j = 0; j < arr.length; ++j) {
+        }
+        else if (i % 5 == 0)
+        {
+            for (int j = 0; j < arr.length; ++j)
+            {
                 char hex[4] = {};
                 err = to_base(arr.val[j], 8, hex, 4);
                 if (err) {

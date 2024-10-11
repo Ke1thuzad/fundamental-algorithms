@@ -87,7 +87,8 @@ int handler_n(int argc, char** argv, Array *result) {
             append(result, str.val[i]);
     }
 
-    for (int i = 0; i < str.length; ++i) {
+    for (int i = 0; i < str.length; ++i)
+    {
         if (is_letter(str.val[i]))
             append(result, str.val[i]);
     }

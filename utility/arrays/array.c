@@ -2,9 +2,11 @@
 #include "../error_handler.h"
 
 int create_arr(unsigned int length, Array* arr) {
+
     arr->capacity = length;
     arr->length = 0;
-    arr->val = malloc(length);
+    arr->val = (char*) malloc(length);
+
 
     if (!arr->val) return throw_err(MEMORY_NOT_ALLOCATED);
     arr->val[0] = '\0';
@@ -25,10 +27,12 @@ int append(Array* arr, char value) {
 }
 
 int resize(Array* arr, int size_delta) {
-    char* new_addr = realloc(arr->val, arr->capacity + size_delta);
+    char* new_addr = (char*) realloc(arr->val, arr->capacity + size_delta);
 
-    if (!new_addr)
+    if (!new_addr) {
+        free(arr->val);
         return throw_err(MEMORY_NOT_ALLOCATED);
+    }
 
     arr->val = new_addr;
     arr->capacity += size_delta;
@@ -50,7 +54,7 @@ void destroy(Array* arr) {
 
 int copy(Array* dst, Array* src) {
     destroy(dst);
-    dst->val = calloc(src->capacity, sizeof(char));
+    dst->val = (char*) calloc(src->capacity, sizeof(char));
     if (!dst->val) {
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
@@ -170,6 +174,7 @@ int add_arrays(const Array A, const Array B, Array* result) {
         append(result, sum % 10 + '0');
         i++;
     }
+
     int j = i;
     while (A.val[i]) {
         sum = A.val[i] - '0' + shift;
@@ -188,6 +193,86 @@ int add_arrays(const Array A, const Array B, Array* result) {
         append(result, shift % 10 + '0');
         shift /= 10;
     }
+    return 0;
+}
+
+int is_num(int x) {
+    return x >= '0' && x <= '9';
+}
+
+int is_letter(int x) {
+    return x >= 'A' && x <= 'Z' || x >= 'a' && x <= 'z';
+}
+
+int to_lower(int x) {
+    if (x >= 'A' && x <= 'Z')
+        return x + ('a' - 'A');
+    return x;
+}
+
+int base_char_to_dec(char x) {
+    if (is_num(x))
+        return x - '0';
+    if (is_letter(x))
+        return to_lower(x) - 'a' + 10;
+    return throw_err(-2);
+}
+
+int add_arrays_base(Array A, Array B, Array* result, int base) {
+    if (result)
+        destroy(result);
+    int err = create_arr(5, result);
+    if (err)
+        return err;
+
+    reverse(&A);
+    reverse(&B);
+
+    char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    int i = 0, sum = 0, shift = 0;
+
+    while(A.val[i] && B.val[i]) {
+        int Adec = base_char_to_dec(A.val[i]);
+        int Bdec = base_char_to_dec(B.val[i]);
+        if (Adec >= base || Bdec >= base)
+            return throw_err(INCORRECT_ARGUMENTS);
+
+        sum = Adec + Bdec + shift;
+        shift = sum / base;
+        append(result, letters[sum % base]);
+        i++;
+    }
+
+    int j = i;
+    while (A.val[i]) {
+        int Adec = base_char_to_dec(A.val[i]);
+        if (Adec >= base)
+            return throw_err(INCORRECT_ARGUMENTS);
+
+        sum = Adec + shift;
+        shift = sum / base;
+        append(result, letters[sum % base]);
+        i++;
+    }
+    while (B.val[j]) {
+        int Bdec = base_char_to_dec(B.val[j]);
+        if (Bdec >= base)
+            return throw_err(INCORRECT_ARGUMENTS);
+
+        sum = Bdec + shift;
+        shift = sum / base;
+        append(result, letters[sum % base]);
+        j++;
+    }
+
+    while (shift > 0) {
+        append(result, letters[shift % base]);
+        shift /= base;
+    }
+
+    reverse(result);
+
     return 0;
 }
 

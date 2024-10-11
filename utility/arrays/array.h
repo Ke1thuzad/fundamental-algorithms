@@ -21,6 +21,7 @@ void arr_to_value(Array arr, unsigned int* result);
 int str_to_arr(char* str, Array* result);
 int add(Array A, unsigned int B, Array* result);
 int add_arrays(Array A, Array B, Array* result);
+int add_arrays_base(Array A, Array B, Array* result, int base);
 int multiply(Array A, float B, Array* result);
 int concat(Array* A, Array B);
 int concat_str(Array* A, char* B);

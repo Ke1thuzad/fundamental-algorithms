@@ -8,7 +8,7 @@ int main() {
 //    printf("%f", geometric_mean(argc - 1, arr[0], arr[1], arr[2]));
     printf("Geometric mean: %f\n\n", geometric_mean(3, 1.0, 2.0, 3.0));
 
-    printf("Fast exponentiation: %f\n", fast_exponentiation(4, 1));
+    printf("Fast exponentiation: %f\n", fast_exponentiation(2, -4));
 
     return 0;
 }

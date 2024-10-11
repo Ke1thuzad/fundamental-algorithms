@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
             handler_r,
             handler_a
     };
-    Array* paths = malloc(sizeof(Array) * 3);
+    Array* paths = (Array*) malloc(sizeof(Array) * 3);
 
     for (int i = 0; i < 3; ++i) {
         create_arr(1, &paths[i]);

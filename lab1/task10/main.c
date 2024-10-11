@@ -11,7 +11,9 @@ int main() {
         return err;
     }
 
-    read_value(stdin, &base_str, ch);
+    err = read_value(stdin, &base_str, ch);
+    if (err)
+        return err;
 
     unsigned int base, any = 0;
     arr_to_value(base_str, &base);

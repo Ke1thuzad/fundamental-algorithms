@@ -104,7 +104,6 @@ int read_value(FILE** f, Array* result, char first) {
     err = to_decimal(arr, max + 1, result);
 
     destroy(&arr);
-//    destroy(result);
     if (err)
         return err;
 
@@ -137,7 +136,11 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
 //    }
 //    deleteOnExit[ind++] = result;
 
-    Array* pwr = malloc(sizeof(Array));
+    Array* pwr = (Array*)malloc(sizeof(Array));
+    if(!pwr) {
+//        free(deleteOnExit);
+        return throw_err(MEMORY_NOT_ALLOCATED);
+    }
     int err = create_arr(5, pwr);
     if (err) {
         free(pwr);

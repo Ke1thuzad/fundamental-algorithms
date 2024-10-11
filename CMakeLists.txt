@@ -72,6 +72,22 @@ add_executable(lab2t3 lab2/task3/main.c lab2/task3/main.h
         utility/error_handler.h
         utility/error_handler.c)
 
+add_executable(lab2t4 lab2/task4/main.c lab2/task4/main.h
+        lab2/task4/handlers.c
+        utility/error_handler.h
+        utility/error_handler.c)
+
+add_executable(lab2t7 lab2/task7/main.c lab2/task7/main.h
+        lab2/task7/expressions.c
+        utility/error_handler.h
+        utility/error_handler.c)
+
+add_executable(lab2t8 lab2/task8/main.c lab2/task8/main.h
+        utility/arrays/array.c
+        utility/arrays/array.h
+        utility/error_handler.c
+        utility/error_handler.h)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)

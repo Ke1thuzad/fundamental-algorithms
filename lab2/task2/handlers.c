@@ -59,7 +59,7 @@ double fast_exponentiation(double x, int n) {
         return fast_exponentiation(1 / x, -n);
 
     if (n % 2 == 0)
-        return fast_exponentiation(x * x, n / 2);
+        return fast_exponentiation(x * x, n*0.5);
     else
         return x * fast_exponentiation(x * x, (n - 1) / 2);
 

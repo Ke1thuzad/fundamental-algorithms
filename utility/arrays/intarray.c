@@ -4,7 +4,7 @@
 int create_arr(unsigned int length, IntArray* arr) {
     arr->capacity = length;
     arr->length = 0;
-    arr->val = malloc(length * sizeof(int));
+    arr->val = (int*) malloc(length * sizeof(int));
 
     if (!arr->val)
         return throw_err(MEMORY_NOT_ALLOCATED);
@@ -24,10 +24,12 @@ int append(IntArray* arr, int value) {
 }
 
 int resize(IntArray* arr, int size_delta) {
-    int* new_addr = realloc(arr->val, (arr->capacity + size_delta) * sizeof(int));
+    int* new_addr = (int*) realloc(arr->val, (arr->capacity + size_delta) * sizeof(int));
 
-    if (!new_addr)
+    if (!new_addr) {
+        free(arr->val);
         return throw_err(MEMORY_NOT_ALLOCATED);
+    }
 
     arr->val = new_addr;
     arr->capacity += size_delta;
