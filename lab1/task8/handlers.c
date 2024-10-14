@@ -169,7 +169,7 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
 
     for (int i = 0; i < x.length; ++i) {
         int ch = base_char_to_dec(x.val[i]);
-        err = multiply(*pwr, ch, &temp);
+        err = multiply(*pwr, ch, 0, &temp);
         if (err) {
             for (int j = 0; j < ind; ++j) {
                 if (deleteOnExit[j])
@@ -199,7 +199,7 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
             return err;
         }
 
-        err = multiply(*pwr, base, &temp);
+        err = multiply(*pwr, base, 0, &temp);
         if (err) {
             for (int j = 0; j < ind; ++j) {
                 if (deleteOnExit[j])

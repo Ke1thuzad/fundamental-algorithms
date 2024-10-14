@@ -70,7 +70,7 @@ int copy(Array* dst, Array* src) {
 
 void print_arr(const Array arr) {
     for (int i = 0; i < arr.length; ++i) {
-        printf("%c ", arr.val[i]);
+        printf("%c", arr.val[i]);
     }
     printf("\n");
 }
@@ -105,6 +105,27 @@ int value_to_arr(unsigned int value, Array* result) {
             return err;
         }
         value /= 10;
+    }
+    reverse(result);
+    return 0;
+}
+
+int value_to_arr_base(unsigned int value, int base, Array* result) {
+    if (result)
+        destroy(result);
+    int err = create_arr(10, result);
+    if (err)
+        return err;
+
+    char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    while (value > 0) {
+        err = append(result, letters[value % base]);
+        if (err) {
+            destroy(result);
+            return err;
+        }
+        value /= base;
     }
     reverse(result);
     return 0;
@@ -219,6 +240,9 @@ int base_char_to_dec(char x) {
 }
 
 int add_arrays_base(Array A, Array B, Array* result, int base) {
+    if (base < 2 || base > 36)
+        return throw_err(INCORRECT_ARGUMENTS);
+
     if (result)
         destroy(result);
     int err = create_arr(5, result);
@@ -231,6 +255,8 @@ int add_arrays_base(Array A, Array B, Array* result, int base) {
     char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     int i = 0, sum = 0, shift = 0;
+    // 1000 0100 0010 0001
+    // 0001 0010 0100 1000
 
     while(A.val[i] && B.val[i]) {
         int Adec = base_char_to_dec(A.val[i]);
@@ -272,11 +298,13 @@ int add_arrays_base(Array A, Array B, Array* result, int base) {
     }
 
     reverse(result);
+    reverse(&A);
+    reverse(&B);
 
     return 0;
 }
 
-int multiply(const Array A, float B, Array* result) {
+int multiply(Array A, int B, int base, Array *result) {
     if (result)
         destroy(result);
     int err = create_arr(5, result);
@@ -284,12 +312,17 @@ int multiply(const Array A, float B, Array* result) {
         destroy(result);
         return err;
     }
+
+    reverse(&A);
+
+    char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
     int shift = 0;
 
     for (int i = 0; i < A.length; i++) {
-        int product = (A.val[i] - '0') * B + shift;
-        shift = product / 10;
-        err = append(result, product % 10 + '0');
+        int product = base_char_to_dec(A.val[i]) * B + shift;
+        shift = product / base;
+        err = append(result, letters[product % base]);
         if (err) {
             destroy(result);
             return err;
@@ -297,14 +330,82 @@ int multiply(const Array A, float B, Array* result) {
     }
 
     while (shift > 0) {
-        err = append(result, shift % 10 + '0');
+        err = append(result, letters[shift % base]);
         if (err) {
             destroy(result);
             return err;
         }
-        shift /= 10;
+        shift /= base;
     }
 
+    reverse(result);
+    reverse(&A);
+
+    return 0;
+}
+
+int multiply_arrays(Array A, Array B, int base, Array* result) {
+    if (base < 2 || base > 36)
+        return throw_err(INCORRECT_ARGUMENTS);
+
+    char letters[37] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    int i = 0, sum, shift = 0;
+    Array temp, temp2;
+    int err = create_arr(5, &temp);
+    if (err)
+        return err;
+
+    err = create_arr(5, &temp2);
+    if (err)
+        return err;
+    append(&temp2, '0');
+
+    // 120
+    // 210
+    // MULTIPLY EVERY DIGIT AND ADD THEM UP
+
+    while(B.val[i]) {
+        multiply(A, base_char_to_dec(B.val[i]), base, &temp);
+//        for (int j = 0; j < shift; ++j) {
+//        }
+//        if (i + 1 < B.length)
+        add_arrays_base(temp, temp2, result, base);
+        copy(&temp2, result);
+        append(&temp2, '0');
+//        shift++;
+        i++;
+    }
+
+//    int j = i;
+//    while (A.val[i]) {
+//        int Adec = base_char_to_dec(A.val[i]);
+//        if (Adec >= base)
+//            return throw_err(INCORRECT_ARGUMENTS);
+//
+//        sum = Adec + shift;
+//        shift = sum / base;
+//        append(result, letters[sum % base]);
+//        i++;
+//    }
+//    while (B.val[j]) {
+//        int Bdec = base_char_to_dec(B.val[j]);
+//        if (Bdec >= base)
+//            return throw_err(INCORRECT_ARGUMENTS);
+//
+//        sum = Bdec + shift;
+//        shift = sum / base;
+//        append(result, letters[sum % base]);
+//        j++;
+//    }
+//
+//    while (shift > 0) {
+//        append(result, letters[shift % base]);
+//        shift /= base;
+//    }
+
+    destroy(&temp);
+    destroy(&temp2);
 
     return 0;
 }

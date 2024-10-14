@@ -74,6 +74,8 @@ add_executable(lab2t3 lab2/task3/main.c lab2/task3/main.h
 
 add_executable(lab2t4 lab2/task4/main.c lab2/task4/main.h
         lab2/task4/handlers.c
+        utility/arrays/array.c
+        utility/arrays/array.h
         utility/error_handler.h
         utility/error_handler.c)
 

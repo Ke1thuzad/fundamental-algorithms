@@ -1,9 +1,8 @@
 #include "main.h"
 
 int GetOpts(int argc, char** argv, kOpts *option, int *number, int* minus_sign) {
-    if (argc != 3) {
+    if (argc != 3)
         return throw_err(INCORRECT_ARGUMENTS);
-    }
 
     for (int i = 1; i <= 2; ++i)
     {
