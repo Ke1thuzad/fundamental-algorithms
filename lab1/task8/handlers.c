@@ -123,22 +123,11 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
     if (base < 2 || base > 36)
         return throw_err(OUT_OF_BOUNDS);
     printf("%d ", base);
-//    if (result)
-//        destroy(result);
     int ind = 0;
     Array* deleteOnExit[5];
 
-//    int err;
-//    err = create_arr(5, result);
-//    if (err) {
-//        destroy(result);
-//        return err;
-//    }
-//    deleteOnExit[ind++] = result;
-
     Array* pwr = (Array*)malloc(sizeof(Array));
     if(!pwr) {
-//        free(deleteOnExit);
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
     int err = create_arr(5, pwr);
@@ -245,14 +234,14 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
 //        power *= from_base;
 //    }
 //
-//    destroy(result);
-//    int err = create_arr(10, result);
+//    destroy_int(result);
+//    int err = create_intarr(10, result);
 //    if (err) {
 //        return err;
 //    }
 //
 //    if (decimal_value == 0) {
-//        append(result, '0');
+//        append_int(result, '0');
 //        return 0;
 //    }
 //
@@ -262,14 +251,14 @@ int to_decimal(const Array x, unsigned char base, Array *result) {
 //        if (digit_char == '\0') {
 //            return throw_err(INCORRECT_ARGUMENTS);
 //        }
-//        err = append(result, digit_char);
+//        err = append_int(result, digit_char);
 //        if (err) {
 //            return err;
 //        }
 //        decimal_value /= to_base;
 //    }
 //
-//    reverse(result);
+//    reverse_int(result);
 //
 //    return 0;
 //}

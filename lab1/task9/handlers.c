@@ -65,19 +65,19 @@ int part_one(int a, int b) {
 
 int part_two() {
     IntArray A, B, C;
-    int err = create_arr(10 + rand() % 9990, &A);
+    int err = create_intarr(10 + rand() % 9990, &A);
     if (err)
         return err;
 
-    err = create_arr(10 + rand() % 9990, &B);
+    err = create_intarr(10 + rand() % 9990, &B);
     if (err) {
-        destroy(&A);
+        destroy_int(&A);
         return err;
     }
-    err = create_arr(5000, &C);
+    err = create_intarr(5000, &C);
     if (err) {
-        destroy(&A);
-        destroy(&B);
+        destroy_int(&A);
+        destroy_int(&B);
         return err;
     }
 
@@ -88,28 +88,28 @@ int part_two() {
     qsort(B.val, B.length, sizeof(int), compare);
     for (int i = 0; i < A.length; ++i) {
         int key = A.val[i], closest_id = binary_search_closest(B, key);
-        append(&C, key + B.val[closest_id]);
+        append_int(&C, key + B.val[closest_id]);
     }
 
     printf("\n\nArray A: \n");
-    print_arr(A);
+    print_intarr(A);
     printf("\n\n\n");
     printf("Array B: \n");
-    print_arr(B);
+    print_intarr(B);
     printf("\n\n\n");
     printf("Array C: \n");
-    print_arr(C);
+    print_intarr(C);
 
-    destroy(&A);
-    destroy(&B);
-    destroy(&C);
+    destroy_int(&A);
+    destroy_int(&B);
+    destroy_int(&C);
 
     return 0;
 }
 
 int fill_array(IntArray* arr, int a, int b) {
     for (int i = 0; i < arr->capacity; ++i) {
-        int err = append(arr, a + rand() % (b - a));
+        int err = append_int(arr, a + rand() % (b - a));
         if (err)
             return err;
     }

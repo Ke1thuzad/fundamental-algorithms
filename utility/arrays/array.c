@@ -180,7 +180,7 @@ int add(const Array A, unsigned int B, Array* result) {
     return 0;
 }
 
-int add_arrays(const Array A, const Array B, Array* result) {
+int add_arrays(Array A, Array B, Array* result) {
     if (result)
         destroy(result);
     int err = create_arr(5, result);
@@ -188,6 +188,8 @@ int add_arrays(const Array A, const Array B, Array* result) {
         return err;
 
     int i = 0, sum = 0, shift = 0;
+    reverse(&A);
+    reverse(&B);
 
     while(A.val[i] && B.val[i]) {
         sum = A.val[i] - '0' + B.val[i] - '0' + shift;
@@ -214,7 +216,16 @@ int add_arrays(const Array A, const Array B, Array* result) {
         append(result, shift % 10 + '0');
         shift /= 10;
     }
+
+    reverse(result);
+    reverse(&A);
+    reverse(&B);
+
     return 0;
+}
+
+int is_alnum(int x) {
+    return is_num(x) || is_letter(x);
 }
 
 int is_num(int x) {
@@ -385,7 +396,7 @@ int multiply_arrays(Array A, Array B, int base, Array* result) {
 //
 //        sum = Adec + shift;
 //        shift = sum / base;
-//        append(result, letters[sum % base]);
+//        append_int(result, letters[sum % base]);
 //        i++;
 //    }
 //    while (B.val[j]) {
@@ -395,12 +406,12 @@ int multiply_arrays(Array A, Array B, int base, Array* result) {
 //
 //        sum = Bdec + shift;
 //        shift = sum / base;
-//        append(result, letters[sum % base]);
+//        append_int(result, letters[sum % base]);
 //        j++;
 //    }
 //
 //    while (shift > 0) {
-//        append(result, letters[shift % base]);
+//        append_int(result, letters[shift % base]);
 //        shift /= base;
 //    }
 

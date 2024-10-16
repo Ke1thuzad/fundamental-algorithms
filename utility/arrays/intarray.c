@@ -1,7 +1,7 @@
 #include "intarray.h"
 #include "../error_handler.h"
 
-int create_arr(unsigned int length, IntArray* arr) {
+int create_intarr(unsigned int length, IntArray* arr) {
     arr->capacity = length;
     arr->length = 0;
     arr->val = (int*) malloc(length * sizeof(int));
@@ -12,9 +12,9 @@ int create_arr(unsigned int length, IntArray* arr) {
     return 0;
 }
 
-int append(IntArray* arr, int value) {
+int append_int(IntArray* arr, int value) {
     if (arr->length >= arr->capacity) {
-        int err = extend(arr);
+        int err = extend_int(arr);
         if (err)
             return err;
     }
@@ -23,7 +23,7 @@ int append(IntArray* arr, int value) {
     return 0;
 }
 
-int resize(IntArray* arr, int size_delta) {
+int resize_int(IntArray* arr, int size_delta) {
     int* new_addr = (int*) realloc(arr->val, (arr->capacity + size_delta) * sizeof(int));
 
     if (!new_addr) {
@@ -37,11 +37,11 @@ int resize(IntArray* arr, int size_delta) {
 }
 
 // Double array length.
-int extend(IntArray* arr) {
-    return resize(arr, arr->capacity);
+int extend_int(IntArray* arr) {
+    return resize_int(arr, arr->capacity);
 }
 
-void destroy(IntArray* arr) {
+void destroy_int(IntArray* arr) {
     if (arr->val)
         free(arr->val);
     arr->val = NULL;
@@ -49,7 +49,7 @@ void destroy(IntArray* arr) {
     arr->capacity = 0;
 }
 
-void print_arr(const IntArray arr) {
+void print_intarr(const IntArray arr) {
     for (int i = 0; i < arr.length; ++i) {
         printf("%d ", arr.val[i]);
     }
@@ -57,7 +57,7 @@ void print_arr(const IntArray arr) {
 }
 
 //int copy(IntArray* dst, IntArray* src) {
-//    destroy(dst);
+//    destroy_int(dst);
 //    dst->val = calloc(src->capacity, sizeof(char));
 //    dst->length = src->length;
 //    dst->capacity = src->capacity;
@@ -69,13 +69,13 @@ void print_arr(const IntArray arr) {
 //    return 0;
 //}
 //
-//int reverse(IntArray* arr) {
-//    int size = arr->length;
-//    for (int i = 0; i < size / 2; ++i) {
-//        char temp = arr->val[i];
-//        arr->val[i] = arr->val[size - i - 1];
-//        arr->val[size - i - 1] = temp;
-//    }
-//
-//    return 0;
-//}
+int reverse_int(IntArray* arr) {
+    int size = arr->length;
+    for (int i = 0; i < size / 2; ++i) {
+        char temp = arr->val[i];
+        arr->val[i] = arr->val[size - i - 1];
+        arr->val[size - i - 1] = temp;
+    }
+
+    return 0;
+}

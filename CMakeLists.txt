@@ -90,6 +90,15 @@ add_executable(lab2t8 lab2/task8/main.c lab2/task8/main.h
         utility/error_handler.c
         utility/error_handler.h)
 
+add_executable(lab2t5 lab2/task5/main.c lab2/task5/main.h
+        lab2/task5/handlers.c
+        utility/arrays/array.c
+        utility/arrays/array.h
+        utility/arrays/intarray.c
+        utility/arrays/intarray.h
+        utility/error_handler.c
+        utility/error_handler.h)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
