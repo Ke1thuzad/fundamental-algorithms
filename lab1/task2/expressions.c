@@ -14,8 +14,8 @@ long double equation_e(long double x) {
 }
 
 long double series_pi(long double prev, int n) {
-    if (n == 0) return -1;
-    return pow(-1.0, n - 1.0) / (2 * (double)n - 1);
+    if (n == 1) return 1;
+    return prev * (-1 + 2.0 / (2.0 * n - 1));
 }
 
 long double equation_pi(long double x) {
@@ -28,8 +28,8 @@ long double limit_ln2(int n) {
 }
 
 long double series_ln2(long double prev, int n) {
-    if (n == 0) return -1;
-    return pow(-1.0, n - 1.0) / (double)n;
+    if (n == 1) return 1;
+    return prev * (1.0 / n - 1);
 }
 
 long double equation_ln2(long double x) {
