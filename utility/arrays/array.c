@@ -138,6 +138,10 @@ int str_to_arr(char* str, Array* result) {
     if (err)
         return err;
     while (str[i]) {
+        if (str[i] == '0' && result->length == 0) {
+            i++;
+            continue;
+        }
         err = append(result, str[i++]);
         if (err)
             return err;

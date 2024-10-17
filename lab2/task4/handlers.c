@@ -92,9 +92,9 @@ int kaprekar_handler(int base, int n, ...) {
         str = va_arg(vals, char*);
         str_to_arr(str, &tmp);
         if (is_kaprekar(tmp, base)) {
-            printf("%s is a Kaprekar number in base %d.\n", str, base);
+            printf("%s is a Kaprekar number in base %d.\n", tmp.val, base);
         } else {
-            printf("%s is not a Kaprekar number in base %d.\n", str, base);
+            printf("%s is not a Kaprekar number in base %d.\n", tmp.val, base);
         }
     }
 
