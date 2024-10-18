@@ -99,9 +99,14 @@ add_executable(lab2t5 lab2/task5/main.c lab2/task5/main.h
         utility/error_handler.c
         utility/error_handler.h)
 
+add_executable(lab2t9 lab2/task9/main.c lab2/task9/main.h
+        utility/error_handler.c
+        utility/error_handler.h)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
 target_link_libraries(lab1t4 m)
 target_link_libraries(lab1t6 m)
 target_link_libraries(lab2t2 m)
+target_link_libraries(lab2t9 m)
