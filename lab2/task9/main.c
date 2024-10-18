@@ -49,9 +49,9 @@ int gcd(int a, int b) {
 }
 
 void reduce(int *numerator, int *denominator) {
-    int commonDivisor = gcd(*numerator, *denominator);
-    *numerator /= commonDivisor;
-    *denominator /= commonDivisor;
+    int divisor = gcd(*numerator, *denominator);
+    *numerator /= divisor;
+    *denominator /= divisor;
 }
 
 // https://stackoverflow.com/a/57967080
@@ -60,8 +60,8 @@ int fraction_approximation(double x, int* numerator, int* denominator) {
     *denominator = (int)round(1.0 / (x - (int)x));
 
     double eps = 0.00001;
-    double currentApproximation = (double)*numerator / *denominator;
-    double difference = currentApproximation - x;
+    double approximation = (double)*numerator / *denominator;
+    double difference = approximation - x;
 
     while (fabs(difference) >= eps) {
         if (difference > 0) {
@@ -78,8 +78,8 @@ int fraction_approximation(double x, int* numerator, int* denominator) {
             *denominator = newDenominator;
         }
 
-        currentApproximation = (double)*numerator / *denominator;
-        difference = currentApproximation - x;
+        approximation = (double)*numerator / *denominator;
+        difference = approximation - x;
     }
 
     reduce(numerator, denominator);
