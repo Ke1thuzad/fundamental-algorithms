@@ -31,6 +31,8 @@ int is_alnum(int x);
 int is_num(int x);
 int is_letter(int x);
 int to_lower(int x);
+int base_char_to_dec(char x);
+
 
 
 #endif //LAB1T1_ARRAY_H
