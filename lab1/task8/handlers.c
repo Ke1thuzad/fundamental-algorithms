@@ -101,7 +101,7 @@ int read_value(FILE** f, Array* result, char first) {
         return throw_err(INCORRECT_ARGUMENTS);
     }
 
-    err = to_decimal(arr, max + 1, result);
+    err = to_decimal(arr, max + 1, result, 0);
 
     destroy(&arr);
     if (err)
@@ -119,7 +119,7 @@ int base_char_to_dec(char x) {
 }
 
 // Base 2-36
-int to_decimal(const Array x, unsigned char base, Array *result) {
+int to_decimal(Array x, unsigned char base, Array *result, int lower) {
     if (base < 2 || base > 36)
         return throw_err(OUT_OF_BOUNDS);
     printf("%d ", base);

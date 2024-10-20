@@ -90,7 +90,9 @@ int overfprintf(FILE* stream, const char* format, ...) {
                 str_to_arr(va_arg(args, char*), &inp);
                 int base = va_arg(args, int);
 
-                err = to_decimal(inp, base, &arr);
+                int lower = flag[0] == 't' ? 1 : 0;
+
+                err = to_decimal(inp, base, &arr, lower);
                 if (err) {
                     destroy(&arr);
                     destroy(&inp);
@@ -224,7 +226,9 @@ int oversprintf(char* buf, const char* format, ...) {
                 str_to_arr(va_arg(args, char*), &inp);
                 int base = va_arg(args, int);
 
-                err = to_decimal(inp, base, &arr);
+                int lower = flag[0] == 't' ? 1 : 0;
+
+                err = to_decimal(inp, base, &arr, lower);
                 if (err) {
                     destroy(&arr);
                     destroy(&inp);
@@ -350,32 +354,72 @@ int to_roman_numeral(int a, Array* result) {
 
 int to_zeckendorf(unsigned int a, IntArray* result) {
     unsigned int nxt;
+
+    IntArray fibs;
+    int err = create_intarr(5, &fibs);
+    if (err)
+        return err;
+
+    if (max_fib(a, &fibs))
+        return throw_err(INCORRECT_ARGUMENTS);
+
+    a -= fibs.val[fibs.length - 1];
     append_int(result, 1);
-    do {
-        nxt = max_fib(a);
-        append_int(result, nxt);
-        a -= nxt;
-    } while(a > 0);
+
+    for (int i = fibs.length - 2; i > 0; --i) {
+        if (a <= 0) {
+            err = append_int(result,  0);
+            if (err)
+                return err;
+            continue;
+        }
+
+        nxt = fibs.val[i];
+        if (a >= nxt) {
+            a -= nxt;
+            err = append_int(result, 1);
+            if (err)
+                return err;
+        }
+        else {
+            err = append_int(result,  0);
+            if (err)
+                return err;
+        }
+    }
+    append_int(result, 0);
     reverse_int(result);
+    append_int(result, 1);
+
     return 0;
 }
 
-int max_fib(unsigned int n) {
+int max_fib(unsigned int n, IntArray *values) {
     if (n < 1)
-        return 0;
+        return 1;
 
     int a = 1, b = 1, i = 0;
+    append_int(values, 1);
+    append_int(values, 1);
     while (1) {
-        if (i % 2 == 0)
+        if (i % 2 == 0) {
             b += a;
-        else
+            append_int(values, b);
+        }
+        else {
             a += b;
+            append_int(values, a);
+        }
         i++;
-        if (a > n || b == n)
-            return b;
-        if (a == n || b > n)
-            return a;
+        if (a >= n || b >= n) {
+            if (a > n || b > n)
+                values->val[--values->length] = 0;
+
+            break;
+        }
     }
+
+    return 0;
 }
 
 // Base 2-36
@@ -407,7 +451,7 @@ int to_base(int x, unsigned char base, Array * result, int lower) {
     return 0;
 }
 
-int to_decimal(Array x, unsigned char base, Array *result) {
+int to_decimal(Array x, unsigned char base, Array *result, int lower) {
     if (base < 2 || base > 36)
         base = 10;
 
@@ -445,6 +489,11 @@ int to_decimal(Array x, unsigned char base, Array *result) {
     reverse(&x);
 
     for (int i = 0; i < x.length; ++i) {
+        if (lower) {
+            if (x.val[i] < 'a' || x.val[i] > 'z') {
+                return throw_err(INCORRECT_ARGUMENTS);
+            }
+        }
         int ch = base_char_to_dec(x.val[i]);
         err = multiply(*pwr, ch, 10, &temp);
         if (err) {
