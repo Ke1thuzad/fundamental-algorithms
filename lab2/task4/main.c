@@ -1,12 +1,9 @@
 #include "main.h"
 
 int test_polynomial() {
-    double res;
-    int err = polynomial(&res, 2.0, 3, 1.0, 1.0, 5.0);
-    if (err)
-        return err;
-    printf("%f\n", res);
-    err = polynomial(&res, 5.0, 6, 2.0, 1.0, 1.0, 2.0, 3.0, 4.0);
+    double res = 0;
+
+    int err = polynomial(&res, 5.0, 6, 2.0, 1.0, 1.0, 2.0, 3.0, 4.0);
     if (err)
         return err;
     printf("%f\n", res);
@@ -132,15 +129,15 @@ void test_kaprekar() {
 }
 
 int main() {
-    int err = test_polynomial();
-    if (err)
-        return err;
+//    int err = test_polynomial();
+//    if (err)
+//        return err;
 
 //    test_points();
 //    test_kaprekar();
 //    Point a = {0, 0}, b = {0}, c, d;
 
-    kaprekar_handler(3, 6, "00000001", "0000000000006", "4", "9", "123", "45");
+    kaprekar_handler(3, 6, "00000001", "0000000000006", "4", "9", "00123", "45");
 
     return 0;
 }

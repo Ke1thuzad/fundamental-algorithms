@@ -101,7 +101,9 @@ add_executable(lab2t5 lab2/task5/main.c lab2/task5/main.h
 
 add_executable(lab2t9 lab2/task9/main.c lab2/task9/main.h
         utility/error_handler.c
-        utility/error_handler.h)
+        utility/error_handler.h
+        utility/arrays/intarray.c
+        utility/arrays/intarray.h)
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)

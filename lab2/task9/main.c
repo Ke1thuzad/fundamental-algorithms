@@ -1,17 +1,33 @@
 #include "main.h"
 
 int main() {
+    int err;
+    err = has_finite_representation(2, 4, 0.5, 0.125, 0.375, 0.2);
+    if (err)
+        return err;
+    err = has_finite_representation(3, 3, 0.333333333333333333333333333, 0.666666666666667, 0.1);
+    if (err)
+        return err;
 
-    has_finite_representation(2, 3, 0.5, 0.125, 0.375);
-    has_finite_representation(3, 3, 0.333333333333333333333333333, 0.666666666666667, 0.1);
-    has_finite_representation(10, 3, 0.1, 0.2, 0.3);
-    has_finite_representation(12, 3, 0.083333333333333333, 0.16666666666666666, 0.25);
-    has_finite_representation(16, 3, 0.0625, 0.125, 0.1875);
+    err = has_finite_representation(10, 4, 0.1, 0.2, 0.3, 1.0/9);
+    if (err)
+        return err;
+
+    err = has_finite_representation(12, 3, 0.083333333333333333, 0.16666666666666666, 0.25);
+    if (err)
+        return err;
+
+    err = has_finite_representation(16, 3, 0.0625, -0.125, 0.1875);
+    if (err)
+        return err;
 
     return 0;
 }
 
 int has_finite_representation(int base, int n, ...) {
+    if (base < 2 || base > 36)
+        return throw_err(INCORRECT_ARGUMENTS);
+
     va_list args;
     va_start(args, n);
 
@@ -87,15 +103,55 @@ int fraction_approximation(double x, int* numerator, int* denominator) {
 }
 
 int is_prime_factors_base(int x, int base) {
-    for (int i = 2; i <= sqrt(x); ++i) {
-        if (x % i == 0) {
-            if (base % i != 0 || base % (x / i) != 0)
-                return 0;
+    IntArray xFactors, baseFactors;
+    int err = create_intarr(5, &xFactors);
+    if (err)
+        return err;
 
-            while (x % i == 0)
-                x /= i;
+    err = create_intarr(5, &baseFactors);
+    if (err) {
+        destroy_int(&xFactors);
+        return err;
+    }
+
+    prime_factors(x, &xFactors);
+    prime_factors(base, &baseFactors);
+
+    for (int i = 0; i < xFactors.length; ++i) {
+        int k = 0;
+        for (int j = 0; j < baseFactors.length; ++j) {
+            if (xFactors.val[i] == baseFactors.val[j]) {
+                k = 1;
+                break;
+            }
+        }
+        if (!k) {
+
+            destroy_int(&xFactors);
+            destroy_int(&baseFactors);
+            return 0;
         }
     }
+
+    destroy_int(&xFactors);
+    destroy_int(&baseFactors);
+
     return 1;
 
+}
+
+void prime_factors(int x, IntArray* result) {
+    int y = x;
+    for (int i = 2; i < sqrt(x) + 1; ++i) {
+        if (y % i == 0) {
+            while (y % i == 0) {
+                append_int(result, i);
+                y /= i;
+            }
+        }
+    }
+
+    if (y > 1) {
+        append_int(result, y);
+    }
 }
