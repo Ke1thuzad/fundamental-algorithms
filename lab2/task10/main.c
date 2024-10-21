@@ -10,17 +10,17 @@ unsigned long long factorial(int n) {
 
 int expansion_series(double eps, double a, double **result, int n, ...) {
     *result = (double *)malloc((n + 1) * sizeof(double));
-    if (*result == NULL) {
+    if (*result == NULL)
         return throw_err(MEMORY_NOT_ALLOCATED);
-    }
+
 
     va_list args;
     va_start(args, n);
 
     double *coefficients = (double *)malloc((n + 1) * sizeof(double));
-    if (coefficients == NULL) {
+    if (coefficients == NULL)
         return throw_err(MEMORY_NOT_ALLOCATED);
-    }
+
 
     for (int i = 0; i <= n; i++)
         coefficients[i] = va_arg(args, double);
