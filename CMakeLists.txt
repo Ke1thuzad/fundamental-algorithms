@@ -111,6 +111,12 @@ add_executable(lab2t6 lab2/task6/main.c lab2/task6/main.h
         utility/arrays/array.c
         utility/arrays/array.h
         lab2/task6/handlers.c)
+add_executable(lab2t10 lab2/task10/main.c
+        lab2/task10/main.h
+        utility/error_handler.c
+        utility/error_handler.h
+        utility/arrays/intarray.c
+        utility/arrays/intarray.h)
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
@@ -119,3 +125,4 @@ target_link_libraries(lab1t4 m)
 target_link_libraries(lab1t6 m)
 target_link_libraries(lab2t2 m)
 target_link_libraries(lab2t9 m)
+target_link_libraries(lab2t10 m)
