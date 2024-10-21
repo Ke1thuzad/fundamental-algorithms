@@ -26,6 +26,11 @@ int append(Array* arr, char value) {
     return 0;
 }
 
+void reset(Array* arr) {
+    arr->val[0] = '\0';
+    arr->length = 0;
+}
+
 int resize(Array* arr, int size_delta) {
     char* new_addr = (char*) realloc(arr->val, arr->capacity + size_delta);
 

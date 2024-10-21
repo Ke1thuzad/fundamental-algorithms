@@ -9,6 +9,7 @@ typedef struct Array {
 
 int create_arr(unsigned int length, Array* arr);
 int append(Array* arr, char value);
+void reset(Array* arr);
 int resize(Array* arr, int size_delta);
 int extend(Array* arr);
 void destroy(Array* arr);

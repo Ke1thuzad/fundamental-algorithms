@@ -5,134 +5,97 @@ int overfscanf(FILE* stream, const char* format, ...) {
     va_start(args, format);
 
     int i = 0, k = 0, err;
+    Array buffer;
+    err = create_arr(5, &buffer);
+    if (err)
+        return err;
+
     while (format[i]) {
         if (k) {
+            long int start_pos = ftell(stream);
+//            printf("%ld\n", ftell(stream));
+            for (int j = 0; j < buffer.length; ++j) {
+                if (buffer.val[j] != fgetc(stream)) {
+                    destroy(&buffer);
+                    return throw_err(INCORRECT_ARGUMENTS);
+                }
+            }
+
+//            fseek(stream, start_pos, SEEK_SET);
+//            printf("%ld\n", ftell(stream));
+
             char flaga[20];
             i += snread_value(format + i, flaga, 20, '%');
             char* flag = flaga + 1;
 
             if (is_str_equal(flag, "Ro")) {
-                Array arr;
-                err = create_arr(5, &arr);
-                if (err)
-                    return err;
+                char roman[100];
 
-                err = to_roman_numeral(va_arg(args, int), &arr);
-                if (err) {
-                    destroy(&arr);
-                    return err;
-                }
+                fscanf(stream, "%s", roman);
 
-                fputs(arr.val, stream);
-                destroy(&arr);
+                int* result = va_arg(args, int*);
+
+                unroman(roman, result);
             } else if (is_str_equal(flag, "Zr")) {
-                IntArray arr;
-                err = create_intarr(5, &arr);
-                if (err)
-                    return err;
+                unsigned int* result = va_arg(args, unsigned int*);
 
-                err = to_zeckendorf(va_arg(args, unsigned int), &arr);
-                if (err) {
-                    destroy_int(&arr);
-                    return err;
-                }
-
-                for (int j = 0; j < arr.length; ++j) {
-                    fprintf(stream, "%d", arr.val[j]);
-                    if (j < arr.length - 1)
-                        fputc(' ', stream);
-                }
-
-                destroy_int(&arr);
-            } else if (is_str_equal(flag, "Cv")) {
-                Array arr;
-                err = create_arr(5, &arr);
-                if (err)
-                    return err;
-
-                int x = va_arg(args, int), base = va_arg(args, int);
-
-                err = to_base(x, base, &arr, 1);
-                if (err) {
-                    destroy(&arr);
-                    return err;
-                }
-
-                fputs(arr.val, stream);
-                destroy(&arr);
-            } else if (is_str_equal(flag, "CV")) {
-                Array arr;
-                err = create_arr(5, &arr);
-                if (err)
-                    return err;
-
-                int x = va_arg(args, int), base = va_arg(args, int);
-
-                err = to_base(x, base, &arr, 0);
-                if (err) {
-                    destroy(&arr);
-                    return err;
-                }
-
-                fputs(arr.val, stream);
-                destroy(&arr);
-            } else if (is_str_equal(flag, "to") || is_str_equal(flag, "TO")) {
-
-                Array arr, inp;
-                err = create_arr(5, &arr);
-                if (err)
-                    return err;
-
-                err = create_arr(5, &inp);
-                if (err) {
-                    destroy(&arr);
-                    return err;
-                }
-                str_to_arr(va_arg(args, char*), &inp);
+                unzeckendorf(result, stream);
+            } else if (is_str_equal(flag, "Cv") || is_str_equal(flag, "CV")) {
+                int* result = va_arg(args, int*);
                 int base = va_arg(args, int);
-
-                int lower = flag[0] == 't' ? 1 : 0;
-
-                err = to_decimal(inp, base, &arr, lower);
+                int ch;
+                Array input;
+                err = create_arr(5, &input);
                 if (err) {
-                    destroy(&arr);
-                    destroy(&inp);
+                    destroy(&buffer);
                     return err;
                 }
 
-                fputs(arr.val, stream);
-                destroy(&arr);
-                destroy(&inp);
-            } else if (is_str_equal(flag, "mi")) {
-                int val = va_arg(args, int);
-                fprint_bits(sizeof(int), &val, stream);
-            } else if (is_str_equal(flag, "mu")) {
-                unsigned int val = va_arg(args, unsigned int);
-                fprint_bits(sizeof(unsigned int), &val, stream);
-            } else if (is_str_equal(flag, "md")) {
-                double val = va_arg(args, double);
-                fprint_bits(sizeof(double), &val, stream);
-            } else if (is_str_equal(flag, "mf")) {
-                float val = va_arg(args, double);
-                fprint_bits(sizeof(float), &val, stream);
-            } else {
-                vfprintf(stream, flaga, args);
+                seek_char(stream, &ch);
+                read_value(stream, &input, ch);
+
+                to_decimal(input, base, result);
+            }
+//            else if (is_str_equal(flag, "CV")) {
+////                Array arr;
+////                err = create_arr(5, &arr);
+////                if (err)
+////                    return err;
+////
+////                int x = va_arg(args, int), base = va_arg(args, int);
+////
+////                err = to_base(x, base, &arr, 0);
+////                if (err) {
+////                    destroy(&arr);
+////                    return err;
+////                }
+////
+////                fputs(arr.val, stream);
+////                destroy(&arr);
+//            }
+            else {
+//                concat_str(&buffer, flaga);
+                vfscanf(stream, flaga, args);
+                va_arg(args, void*);
             }
 
             k = 0;
+            reset(&buffer);
             continue;
         }
 
-        if (format[i] != '%')
-            fputc(format[i], stream);
-        else
+        if (format[i] != '%') {
+            append(&buffer, format[i]);
+        } else {
             k = 1;
-
+        }
 
         i++;
     }
 
     va_end(args);
+
+    destroy(&buffer);
 
     return 0;
 }
@@ -172,6 +135,40 @@ int snread_value(const char* str, char* result, int n, char first) {
     return i - 1;
 }
 
+int read_value(FILE* f, Array* result, char first) {
+    int err;
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+    int character = fgetc(f);
+    while (character > ' ') {
+        err = append(result, (char)character);
+        if (err)
+            return err;
+        character = fgetc(f);
+    }
+    fseek(f, -1, SEEK_CUR);
+
+    return 0;
+}
+
+int seek_char(FILE* f, int* result) {
+    if (!f)
+        return throw_err(FILE_ERROR);
+
+    while(!feof(f)) {
+        int cur = fgetc(f);
+        if (cur > ' ') {
+            *result = cur;
+            return 0;
+        }
+    }
+    *result = -1;
+    return 0;
+}
+
 int roman_value(char c) {
     switch (c) {
         case 'I': return 1;
@@ -208,24 +205,26 @@ int unroman(char *str, int *result) {
     return 0;
 }
 
-int zecken(unsigned int *result, ...) {
-    va_list args;
-    va_start(args, result);
+//int zecken(unsigned int *result, ...) {
+//    va_list args;
+//    va_start(args, result);
+//
+//    unzeckendorf(result, args);
+//
+//    va_end(args);
+//    return 0;
+//}
 
-    unzeckendorf(result, args);
-
-    va_end(args);
-    return 0;
-}
-
-int unzeckendorf(unsigned int *result, va_list args) {
+int unzeckendorf(unsigned int *result, FILE* stream) {
     *result = 0;
     unsigned int prev = 0, cur = 0;
-    unsigned int a = 0, b = 1, i = 0;
+    unsigned int a = 0, b = 1, i = 0, j = 0;
 
     while (1) {
         prev = cur;
-        cur = va_arg(args, unsigned int);
+        if(fscanf(stream, "%d", &cur) == 0)
+            return throw_err(INCORRECT_ARGUMENTS);
+
         if (prev == 1 && prev == cur)
             break;
 
