@@ -202,16 +202,6 @@ int unroman(char *str, int *result) {
     return 0;
 }
 
-//int zecken(unsigned int *result, ...) {
-//    va_list args;
-//    va_start(args, result);
-//
-//    unzeckendorf(result, args);
-//
-//    va_end(args);
-//    return 0;
-//}
-
 int unzeckendorf(unsigned int *result, FILE* stream) {
     *result = 0;
     unsigned int prev = 0, cur = 0;
