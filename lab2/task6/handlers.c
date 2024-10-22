@@ -12,17 +12,12 @@ int overfscanf(FILE* stream, const char* format, ...) {
 
     while (format[i]) {
         if (k) {
-            long int start_pos = ftell(stream);
-//            printf("%ld\n", ftell(stream));
             for (int j = 0; j < buffer.length; ++j) {
                 if (buffer.val[j] != fgetc(stream)) {
                     destroy(&buffer);
                     return throw_err(INCORRECT_ARGUMENTS);
                 }
             }
-
-//            fseek(stream, start_pos, SEEK_SET);
-//            printf("%ld\n", ftell(stream));
 
             char flaga[20];
             i += snread_value(format + i, flaga, 20, '%');
@@ -55,6 +50,7 @@ int overfscanf(FILE* stream, const char* format, ...) {
                 read_value(stream, &input, ch);
 
                 to_decimal(input, base, result);
+                destroy(&input);
             }
 //            else if (is_str_equal(flag, "CV")) {
 ////                Array arr;
@@ -96,6 +92,7 @@ int overfscanf(FILE* stream, const char* format, ...) {
     va_end(args);
 
     destroy(&buffer);
+//    destroy()
 
     return 0;
 }

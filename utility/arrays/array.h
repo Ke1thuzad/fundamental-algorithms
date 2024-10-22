@@ -28,6 +28,7 @@ int multiply(Array A, int B, int base, Array *result);
 int multiply_arrays(Array A, Array B, int base, Array* result);
 int concat(Array* A, Array B);
 int concat_str(Array* A, char* B);
+int slice(Array A, int start, int stop, int step, Array* result);
 int is_alnum(int x);
 int is_num(int x);
 int is_letter(int x);

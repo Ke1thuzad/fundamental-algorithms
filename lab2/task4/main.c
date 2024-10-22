@@ -134,10 +134,10 @@ int main() {
 //        return err;
 
 //    test_points();
-//    test_kaprekar();
+    test_kaprekar();
 //    Point a = {0, 0}, b = {0}, c, d;
 
-    kaprekar_handler(3, 6, "00000001", "0000000000006", "4", "9", "00123", "45");
+//    kaprekar_handler(3, 6, "00000001", "0000000000006", "4", "9", "00123", "45");
 
     return 0;
 }

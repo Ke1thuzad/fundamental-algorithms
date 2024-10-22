@@ -108,7 +108,7 @@ int kaprekar_handler(int base, int n, ...) {
 int is_kaprekar(Array val, int base) {
     // val ^ 2
 //    multiply_arrays();
-    Array temp, temp2, temp3;
+    Array temp, temp2, temp3, temp4;
     int err = create_arr(5, &temp);
     if (err)
         return err;
@@ -118,16 +118,7 @@ int is_kaprekar(Array val, int base) {
         destroy(&temp);
         return err;
     }
-    err = multiply_arrays(val, val, base, &temp);
-    if (err) {
-        destroy(&temp);
-        destroy(&temp2);
-        return err;
-    }
 
-    temp.length /= 2;
-    str_to_arr(&temp.val[temp.length], &temp2);
-    temp.val[temp.length] = '\0';
     err = create_arr(5, &temp3);
     if (err) {
         destroy(&temp);
@@ -135,19 +126,78 @@ int is_kaprekar(Array val, int base) {
         return err;
     }
 
-    add_arrays_base(temp, temp2, &temp3, base);
-    int res = is_str_equal(val.val, temp3.val);
-
-    if (temp.length > 0 && temp.val[temp.length - 1] == '0') {
-        temp.length--;
-        temp.val[temp.length] = '\0';
+    err = create_arr(5, &temp4);
+    if (err) {
+        destroy(&temp);
+        destroy(&temp2);
+        destroy(&temp3);
+        return err;
     }
-    add_arrays_base(temp, temp2, &temp3, base);
-    res += is_str_equal(val.val, temp3.val);
+    err = multiply_arrays(val, val, base, &temp);
+    if (err) {
+        destroy(&temp);
+        destroy(&temp2);
+        destroy(&temp3);
+        destroy(&temp4);
+        return err;
+    }
+
+    int res = 0;
+
+    if (temp.length == 1) {
+        copy(&temp2, &temp);
+        value_to_arr(0, &temp3);
+        add_arrays_base(temp2, temp3, &temp4, base);
+        res += is_str_equal(val.val, temp4.val);
+    }
+    int asd = 0;
+
+    arr_to_value(val, &asd);
+
+    for (int i = 1; i < temp.length; ++i) {
+        reset(&temp2);
+        reset(&temp3);
+        reset(&temp4);
+
+        slice(temp, 0, i, 1, &temp2);
+        slice(temp, i, temp.length, 1, &temp3);
+
+        unsigned int arrval = 0;
+        arr_to_value(temp2, &arrval);
+        if (arrval == 0)
+            continue;
+
+        arr_to_value(temp3, &arrval);
+        if (arrval == 0)
+            continue;
+
+        add_arrays_base(temp2, temp3, &temp4, base);
+        res += is_str_equal(val.val, temp4.val);
+    }
+//    temp.length /= 2;
+//    str_to_arr(&temp.val[temp.length], &temp2);
+//    temp.val[temp.length] = '\0';
+//    err = create_arr(5, &temp3);
+//    if (err) {
+//        destroy(&temp);
+//        destroy(&temp2);
+//        return err;
+//    }
+//
+//    add_arrays_base(temp, temp2, &temp3, base);
+//    int res = is_str_equal(val.val, temp3.val);
+//
+//    if (temp.length > 0 && temp.val[temp.length - 1] == '0') {
+//        temp.length--;
+//        temp.val[temp.length] = '\0';
+//    }
+//    add_arrays_base(temp, temp2, &temp3, base);
+//    res += is_str_equal(val.val, temp3.val);
 
     destroy(&temp);
     destroy(&temp2);
     destroy(&temp3);
+    destroy(&temp4);
 
     if (res)
         return 1;

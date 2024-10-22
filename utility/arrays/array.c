@@ -452,3 +452,15 @@ int concat_str(Array* A, char* B) {
 
     return 0;
 }
+
+int slice(Array A, int start, int stop, int step, Array* result) {
+    for (int i = start; i < stop; i += step) {
+        if (i >= A.length)
+            return throw_err(INCORRECT_ARGUMENTS);
+        if (result->length == 0 && A.val[i] == '0')
+            continue;
+        append(result, A.val[i]);
+    }
+
+    return 0;
+}
