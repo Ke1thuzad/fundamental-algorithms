@@ -47,10 +47,10 @@ int expansion_series(double eps, double a, double **result, int n, ...) {
 
 int main() {
     double *result;
+    int degree = 2;
+    expansion_series(0.00001, 2.0, &result, degree, 1.0, 2.0, 3.0);
 
-    expansion_series(0.00001, 2.0, &result, 2, 1.0, 2.0, 3.0);
-
-    for (int i = 0; i <= 3; i++) {
+    for (int i = 0; i <= degree; i++) {
         printf("g[%d] = %f\n", i, result[i]);
     }
 

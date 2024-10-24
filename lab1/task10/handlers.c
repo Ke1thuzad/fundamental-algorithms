@@ -8,7 +8,7 @@ int is_str_equal(char* str1, char* str2) {
     return (*str1 == '\0' && *str2 == '\0');
 }
 
-int seek_char(FILE* f, int* result) {
+int seek_char(FILE **f, int* result) {
     if (!f)
         return throw_err(FILE_ERROR);
 
@@ -23,7 +23,7 @@ int seek_char(FILE* f, int* result) {
     return 0;
 }
 
-int read_value(FILE* f, Array* result, char first) {
+int read_value(FILE **f, Array* result, char first) {
     int err;
     if (first) {
         err = append(result, first);

@@ -13,7 +13,9 @@ int overfscanf(FILE* stream, const char* format, ...) {
     while (format[i]) {
         if (k) {
             for (int j = 0; j < buffer.length; ++j) {
-                if (buffer.val[j] != fgetc(stream)) {
+                int ch1;
+                seek_char(&stream, &ch1);
+                if (buffer.val[j] != ch1 && ch1 > ' ') {
                     destroy(&buffer);
                     return throw_err(INCORRECT_ARGUMENTS);
                 }
@@ -46,31 +48,13 @@ int overfscanf(FILE* stream, const char* format, ...) {
                     return err;
                 }
 
-                seek_char(stream, &ch);
-                read_value(stream, &input, ch);
+                seek_char(&stream, &ch);
+                read_value(&stream, &input, ch);
 
                 to_decimal(input, base, result);
                 destroy(&input);
             }
-//            else if (is_str_equal(flag, "CV")) {
-////                Array arr;
-////                err = create_arr(5, &arr);
-////                if (err)
-////                    return err;
-////
-////                int x = va_arg(args, int), base = va_arg(args, int);
-////
-////                err = to_base(x, base, &arr, 0);
-////                if (err) {
-////                    destroy(&arr);
-////                    return err;
-////                }
-////
-////                fputs(arr.val, stream);
-////                destroy(&arr);
-//            }
             else {
-//                concat_str(&buffer, flaga);
                 vfscanf(stream, flaga, args);
                 va_arg(args, void*);
             }
@@ -81,7 +65,8 @@ int overfscanf(FILE* stream, const char* format, ...) {
         }
 
         if (format[i] != '%') {
-            append(&buffer, format[i]);
+            if (format[i] > ' ')
+                append(&buffer, format[i]);
         } else {
             k = 1;
         }
@@ -92,7 +77,101 @@ int overfscanf(FILE* stream, const char* format, ...) {
     va_end(args);
 
     destroy(&buffer);
-//    destroy()
+
+    return 0;
+}
+
+int oversscanf(char* str, const char* format, ...) {
+    va_list args;
+    va_start(args, format);
+
+    char* s = str;
+    int i = 0, k = 0, err;
+    Array buffer;
+    err = create_arr(5, &buffer);
+    if (err)
+        return err;
+
+    while (format[i]) {
+        if (k) {
+            for (int j = 0; j < buffer.length; ++j) {
+                if (*s++ <= ' ') {
+                    j--;
+                    continue;
+                }
+                s--;
+                if (buffer.val[j] != *s++) {
+                    destroy(&buffer);
+                    return throw_err(INCORRECT_ARGUMENTS);
+                }
+            }
+
+            char flaga[20];
+            i += snread_value(format + i, flaga, 20, '%');
+            char* flag = flaga + 1;
+
+            if (is_str_equal(flag, "Ro")) {
+                char roman[100];
+
+                sscanf(s, "%s", roman);
+
+                int* result = va_arg(args, int*);
+
+                unroman(roman, result);
+            } else if (is_str_equal(flag, "Zr")) {
+                unsigned int* result = va_arg(args, unsigned int*);
+
+                unzeckendorf_str(result, &s);
+            } else if (is_str_equal(flag, "Cv") || is_str_equal(flag, "CV")) {
+                int* result = va_arg(args, int*);
+                int base = va_arg(args, int);
+                char ch;
+                Array input;
+                err = create_arr(5, &input);
+                if (err) {
+                    destroy(&buffer);
+                    return err;
+                }
+
+                sseek_char(&s, &ch);
+                sread_value(&s, &input, ch);
+
+                to_decimal(input, base, result);
+                destroy(&input);
+            }
+            else {
+                char filler;
+                Array temp;
+                err = create_arr(5, &temp);
+                if (err)
+                    return err;
+
+                vsscanf(s, flaga, args);
+
+                sseek_char(&s, &filler);
+                sread_value(&s, &temp, 0);
+                va_arg(args, void*);
+                destroy(&temp);
+            }
+
+            k = 0;
+            reset(&buffer);
+            continue;
+        }
+
+        if (format[i] != '%') {
+            if (format[i] > ' ')
+                append(&buffer, format[i]);
+        } else {
+            k = 1;
+        }
+
+        i++;
+    }
+
+    va_end(args);
+
+    destroy(&buffer);
 
     return 0;
 }
@@ -132,31 +211,63 @@ int snread_value(const char* str, char* result, int n, char first) {
     return i - 1;
 }
 
-int read_value(FILE* f, Array* result, char first) {
+int read_value(FILE **f, Array* result, char first) {
     int err;
     if (first) {
         err = append(result, first);
         if (err)
             return err;
     }
-    int character = fgetc(f);
+    int character = fgetc(*f);
     while (character > ' ') {
         err = append(result, (char)character);
         if (err)
             return err;
-        character = fgetc(f);
+        character = fgetc(*f);
     }
-    fseek(f, -1, SEEK_CUR);
+    fseek(*f, -1, SEEK_CUR);
 
     return 0;
 }
 
-int seek_char(FILE* f, int* result) {
+int sread_value(char** s, Array* result, char first) {
+    int err, i = 0;
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+
+    char character = *(*s)++;
+    while (character > ' ') {
+        err = append(result, character);
+        if (err)
+            return err;
+        character = *(*s)++;
+    }
+    (*s)--;
+
+    return 0;
+}
+
+int seek_char(FILE **f, int* result) {
     if (!f)
         return throw_err(FILE_ERROR);
 
-    while(!feof(f)) {
-        int cur = fgetc(f);
+    while(!feof(*f)) {
+        int cur = fgetc(*f);
+        if (cur > ' ') {
+            *result = cur;
+            return 0;
+        }
+    }
+    *result = -1;
+    return 0;
+}
+
+int sseek_char(char** s, char* result) {
+    while (**s != '\0') {
+        char cur = *(*s)++;
         if (cur > ' ') {
             *result = cur;
             return 0;
@@ -225,6 +336,36 @@ int unzeckendorf(unsigned int *result, FILE* stream) {
 
         i++;
     }
+
+    return 0;
+}
+
+int unzeckendorf_str(unsigned int *result, char **s) {
+    *result = 0;
+    unsigned int prev = 0, cur = 0;
+    unsigned int a = 0, b = 1, i = 0;
+
+    while (1) {
+        prev = cur;
+        int scanned = sscanf(*s, "%d", &cur);
+        *s += 2;
+        if(scanned == 0)
+            return throw_err(INCORRECT_ARGUMENTS);
+
+        if (prev == 1 && prev == cur)
+            break;
+
+        if (i % 2) {
+            a += b;
+            *result += a * cur;
+        } else {
+            b += a;
+            *result += b * cur;
+        }
+
+        i++;
+    }
+//    (*s)--;
 
     return 0;
 }

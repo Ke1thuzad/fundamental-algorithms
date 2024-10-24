@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 project(fundamental_algorithms C)
 
-set(CMAKE_C_FLAGS  -fsanitize=address)
 set(CMAKE_C_STANDARD 11)
 
 file(GLOB utility/*.h utility/*.c)

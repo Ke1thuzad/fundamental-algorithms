@@ -133,6 +133,7 @@ int is_kaprekar(Array val, int base) {
         destroy(&temp3);
         return err;
     }
+
     err = multiply_arrays(val, val, base, &temp);
     if (err) {
         destroy(&temp);
@@ -174,25 +175,6 @@ int is_kaprekar(Array val, int base) {
         add_arrays_base(temp2, temp3, &temp4, base);
         res += is_str_equal(val.val, temp4.val);
     }
-//    temp.length /= 2;
-//    str_to_arr(&temp.val[temp.length], &temp2);
-//    temp.val[temp.length] = '\0';
-//    err = create_arr(5, &temp3);
-//    if (err) {
-//        destroy(&temp);
-//        destroy(&temp2);
-//        return err;
-//    }
-//
-//    add_arrays_base(temp, temp2, &temp3, base);
-//    int res = is_str_equal(val.val, temp3.val);
-//
-//    if (temp.length > 0 && temp.val[temp.length - 1] == '0') {
-//        temp.length--;
-//        temp.val[temp.length] = '\0';
-//    }
-//    add_arrays_base(temp, temp2, &temp3, base);
-//    res += is_str_equal(val.val, temp3.val);
 
     destroy(&temp);
     destroy(&temp2);

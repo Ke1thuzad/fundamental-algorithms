@@ -360,8 +360,10 @@ int to_zeckendorf(unsigned int a, IntArray* result) {
     if (err)
         return err;
 
-    if (max_fib(a, &fibs))
+    if (max_fib(a, &fibs)) {
+        destroy_int(&fibs);
         return throw_err(INCORRECT_ARGUMENTS);
+    }
 
     a -= fibs.val[fibs.length - 1];
     append_int(result, 1);

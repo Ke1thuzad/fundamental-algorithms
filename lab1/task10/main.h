@@ -8,8 +8,8 @@
 #include "../../utility/arrays/array.h"
 
 int is_str_equal(char* str1, char* str2);
-int seek_char(FILE* f, int* result);
-int read_value(FILE* f, Array* result, char first);
+int seek_char(FILE **f, int* result);
+int read_value(FILE **f, Array* result, char first);
 int chrtoint(char, int*);
 int parse_int(char*, int*);
 int parse_str(Array* result);

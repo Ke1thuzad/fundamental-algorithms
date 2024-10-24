@@ -53,7 +53,7 @@ void test_oversprintf() {
     printf("%s", buffer);
     assert(strcmp(buffer, "Roman numeral of 1984: MCMLXXXIV\n") == 0);
 
-    oversprintf(buffer, "Zeckendorf representation of 20: %Zr\n", 20);
+    oversprintf(buffer, "Zeckendorf representation of 20: %Zr\n", 2023456765433456787);
     printf("%s", buffer);
 
     oversprintf(buffer, "Base 16 representation of 255: %Cv\n", 255, 16);
@@ -84,11 +84,14 @@ void test_oversprintf() {
 }
 
 int main() {
-    test_overfprintf();
-    test_oversprintf();
-    int err = overfprintf(stdout, "%Zr%Ro%Zr %d\n\t%TO", 51, 3999, 50, 5123, "ASD", 36);
-    if (err)
-        return err;
+//    test_overfprintf();
+//    test_oversprintf();
+    int a = -57;
+    printf("%%\n");
+    overfprintf(stdout, "%%%d%Ro%1d%lld%Ro%mi%*d", 1, 1, 1, 1, 1, 1, 1);
+//    int err = overfprintf(stdout, "%Zr%Ro%Zr %d\n\t%TO", 51, 3999, 50, 5123, "ASD", 36);
+//    if (err)
+//        return err;
 
     return 0;
 }
