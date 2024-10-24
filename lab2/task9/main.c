@@ -21,6 +21,10 @@ int main() {
     if (err)
         return err;
 
+    err = has_finite_representation(25, 1, 0.0032);
+    if (err)
+        return err;
+
     return 0;
 }
 

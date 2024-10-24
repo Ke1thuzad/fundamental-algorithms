@@ -3,11 +3,18 @@
 int overfprintf(FILE* stream, const char* format, ...) {
     va_list args;
     va_start(args, format);
-    int i = 0, k = 0, err;
+    int i = 0, k = 0, err, pflag = 0;
     while (format[i]) {
         if (k) {
             char flaga[20];
-            i += snread_value(format + i, flaga, 20, '%');
+            int read_amount = snread_value(format + i, flaga, 20, '%');
+            if (read_amount == 0) {
+                k = 0;
+                pflag = 1;
+                continue;
+            }
+
+            i += read_amount;
             char* flag = flaga + 1;
 
             if (is_str_equal(flag, "Ro")) {
@@ -124,8 +131,16 @@ int overfprintf(FILE* stream, const char* format, ...) {
 
         if (format[i] != '%')
             fputc(format[i], stream);
-        else
-            k = 1;
+        else {
+            if (pflag == 1) {
+                fputc(format[i], stream);
+                pflag = 0;
+            } else {
+                pflag = 0;
+
+                k = 1;
+            }
+        }
 
 
         i++;
