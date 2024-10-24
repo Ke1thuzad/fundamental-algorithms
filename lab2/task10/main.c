@@ -1,13 +1,5 @@
 #include "main.h"
 
-unsigned long long factorial(int n) {
-    unsigned long long result = 1;
-    for (int i = 1; i <= n; i++) {
-        result *= i;
-    }
-    return result;
-}
-
 int expansion_series(double eps, double a, double **result, int n, ...) {
     *result = (double *)malloc((n + 1) * sizeof(double));
     if (*result == NULL)
@@ -27,18 +19,33 @@ int expansion_series(double eps, double a, double **result, int n, ...) {
 
     va_end(args);
 
+    double fact_i = 1;
+
     for (int i = 0; i <= n; i++) {
+        if (i > 0)
+            fact_i *= i;
+
         double derivative = 0.0;
+        double fact_j = fact_i;
+        double fact_jmi = 1;
+        double apow = 1;
         for (int j = i; j <= n; j++) {
             // 1 + 2x + 3x^2
             // g[0] = (1 * a ^ 0 * 1 / 1 + 2 * a ^ 1 * 1 / 1 + 3 * a ^ 2 * 2 / 2) / 0! = 17
-            double b = coefficients[j] * pow(a, j - i) * (double)factorial(j) / (double)factorial(j - i);
-            if (fabs(b) < eps)
+            if (j > i) {
+                fact_j *= j;
+                fact_jmi *= j - i;
+                apow *= a;
+            }
+
+            double b = coefficients[j] * apow * fact_j / fact_jmi;
+            if (fabs(b) < eps) {
                 break;
+            }
 
             derivative += b;
         }
-        (*result)[i] = derivative / (double)factorial(i);
+        (*result)[i] = derivative / fact_i;
     }
 
     free(coefficients);
@@ -47,11 +54,14 @@ int expansion_series(double eps, double a, double **result, int n, ...) {
 
 int main() {
     double *result;
-    int degree = 2;
-    expansion_series(0.00001, 2.0, &result, degree, 1.0, 2.0, 3.0);
+    int degree = 5;
+    double a = 0.1;
+    expansion_series(0.00001, a, &result, degree, 123.0, 5895.234, 95.9513, 5.0, 41.2, 5.99);
 
     for (int i = 0; i <= degree; i++) {
-        printf("g[%d] = %f\n", i, result[i]);
+        printf("%f(x - %f)^%d ", result[i], a, i);
+        if (i != degree)
+            printf("+ ");
     }
 
     free(result);
