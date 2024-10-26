@@ -154,11 +154,18 @@ int oversprintf(char* buf, const char* format, ...) {
     buf[0] = '\0';
     va_list args;
     va_start(args, format);
-    int i = 0, k = 0, err;
+    int i = 0, k = 0, err, pflag = 0;
     while (format[i]) {
         if (k) {
             char flaga[20];
-            i += snread_value(format + i, flaga, 20, '%');
+            int read_amount = snread_value(format + i, flaga, 20, '%');
+            if (read_amount == 0) {
+                k = 0;
+                pflag = 1;
+                continue;
+            }
+
+            i += read_amount;
             char* flag = flaga + 1;
 
             if (is_str_equal(flag, "Ro")) {
@@ -273,12 +280,25 @@ int oversprintf(char* buf, const char* format, ...) {
             continue;
         }
 
-        if (format[i] != '%') {
+//        if (format[i] != '%') {
+//            sprintf(buf + len(buf) - 1, "%c", format[i]);
+////            string_concat(buf, &format[i]);
+//        }
+//        else
+//            k = 1;
+
+        if (format[i] != '%')
             sprintf(buf + len(buf) - 1, "%c", format[i]);
-//            string_concat(buf, &format[i]);
+        else {
+            if (pflag == 1) {
+                sprintf(buf + len(buf) - 1, "%c", format[i]);
+                pflag = 0;
+            } else {
+                pflag = 0;
+
+                k = 1;
+            }
         }
-        else
-            k = 1;
 
 
         i++;
