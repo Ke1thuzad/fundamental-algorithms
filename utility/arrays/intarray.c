@@ -56,7 +56,7 @@ void print_intarr(const IntArray arr) {
     printf("\n");
 }
 
-//int copy(IntArray* dst, IntArray* src) {
+//int copystr(IntArray* dst, IntArray* src) {
 //    destroy_int(dst);
 //    dst->val = calloc(src->capacity, sizeof(char));
 //    dst->length = src->length;

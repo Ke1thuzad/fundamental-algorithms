@@ -31,7 +31,7 @@ int expansion_series(double eps, double a, double **result, int n, ...) {
         double apow = 1;
         for (int j = i; j <= n; j++) {
             // 1 + 2x + 3x^2
-            // g[0] = (1 * a ^ 0 * 1 / 1 + 2 * a ^ 1 * 1 / 1 + 3 * a ^ 2 * 2 / 2) / 0! = 17
+            // g[0] = ((1 * a ^ 0 * 1 / 1) + (2 * a ^ 1 * 1 / 1) + (3 * a ^ 2 * 2 / 2)) / 0! = 17
             if (j > i) {
                 fact_j *= j;
                 fact_jmi *= j - i;

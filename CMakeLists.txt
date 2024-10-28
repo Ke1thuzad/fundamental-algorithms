@@ -120,13 +120,21 @@ add_executable(lab2t10 lab2/task10/main.c
 
 add_executable(lab3t3 lab3/task3/main.c lab3/task3/main.h
         utility/error_handler.c
-        utility/error_handler.h)
+        utility/error_handler.h
+        utility/arrays/array.c
+        utility/arrays/array.h)
 
 add_executable(lab3t1 lab3/task1/main.c lab3/task1/main.h
         utility/error_handler.c
         utility/error_handler.h)
 
-add_executable(lab3t4 lab3/task4/main.c lab3/task4/main.h)
+add_executable(lab3t4 lab3/task4/main.c lab3/task4/main.h
+        lab3/task4/mystring.c
+        utility/error_handler.c
+        utility/error_handler.h
+        lab3/task4/mystring.h
+        lab3/task4/mail.c
+        lab3/task4/mail.h)
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)

@@ -7,7 +7,6 @@ int create_arr(unsigned int length, Array* arr) {
     arr->length = 0;
     arr->val = (char*) malloc(length);
 
-
     if (!arr->val) return throw_err(MEMORY_NOT_ALLOCATED);
     arr->val[0] = '\0';
 

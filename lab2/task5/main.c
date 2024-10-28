@@ -84,14 +84,12 @@ void test_oversprintf() {
 }
 
 int main() {
-//    test_overfprintf();
-//    test_oversprintf();
     int a = -57;
-    printf("%%%%d\n", 1);
-    overfprintf(stdout, "%%%%d%Ro%1d%lld%Ro%mi%*d", 1, 1, 1, 1, 1, 1, 1);
-//    int err = overfprintf(stdout, "%Zr%Ro%Zr %d\n\t%TO", 51, 3999, 50, 5123, "ASD", 36);
-//    if (err)
-//        return err;
+    printf("%%%%%d\n", 1);
+    //int err = overfprintf(stdout, "%d %*d", 1, 100, 45, 1, 1, 1, 1, 1);
+    int err = overfprintf(stdout, "%Zr %Ro%Zr %d\n\t%TO", 55, 3999, 50, 5123, "ASDZZZZZZZZZZZZZZZZZZZZZZZZZZZ", 36);
+    if (err)
+        return err;
 
-    return 0;
+    return err;
 }

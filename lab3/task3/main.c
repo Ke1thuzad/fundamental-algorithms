@@ -1,79 +1,102 @@
 #include "main.h"
 
-int is_str_equal(char *str1, char *str2) {
+int seek_char(FILE **f, int *result) {
+    if (!(*f))
+        return throw_err(FILE_ERROR);
+
+    while (!feof(*f)) {
+        int cur = fgetc(*f);
+        if (cur > ' ') {
+            *result = cur;
+            return 0;
+        }
+    }
+    *result = -1;
+    return 0;
+}
+
+int read_value(FILE **f, Array *result, char first) {
+    int err;
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+    int character = fgetc(*f);
+    while (character > ' ') {
+        err = append(result, (char) character);
+        if (err)
+            return err;
+        character = fgetc(*f);
+    }
+    fseek(*f, -1, SEEK_CUR);
+
+    return 0;
+}
+
+int is_str_equal(char* str1, char* str2) {
     while (*str1 && *str1 == *str2++)
         if (*str1++ == '\0') return 1;
     return !*str1 && !*str2;
 }
 
-
-int str_compare(char *str1, char *str2) {
-    while (*str1 && *str2) {
-        if (*str1 < *str2) return -1;
-        if (*str1 > *str2) return 1;
-        str1++;
-        str2++;
+int is_arr_equal(Array str1, Array str2) {
+    if (str1.length != str2.length) return 0;
+    for (int i = 0; i < str1.length; ++i) {
+        if (str1.val[i] != str2.val[i]) return 0;
     }
-    if (*str1) return 1;
-    if (*str2) return -1;
+    return 1;
+}
+
+int arr_compare(Array str1, Array str2) {
+    int min_length = str1.length < str2.length ? str1.length : str2.length;
+    for (int i = 0; i < min_length; ++i) {
+        if (str1.val[i] < str2.val[i]) return -1;
+        if (str1.val[i] > str2.val[i]) return 1;
+    }
+    if (str1.length < str2.length) return -1;
+    if (str1.length > str2.length) return 1;
     return 0;
 }
 
-char *string_copy(char *dst, const char *src) {
-    char *dstaddr = dst;
-    while ((*dstaddr++ = *src++));
-    return dstaddr;
-}
-
-int create_arr(unsigned int length, EmployeeArr *arr) {
-
+int create_emparr(unsigned int length, EmployeeArr *arr) {
     arr->capacity = length;
     arr->length = 0;
     arr->val = (Employee *) malloc(length * sizeof(Employee));
-
-
     if (!arr->val) return throw_err(MEMORY_NOT_ALLOCATED);
-
     return 0;
 }
 
-int resize(EmployeeArr *arr, int size_delta) {
+int resize_emp(EmployeeArr *arr, int size_delta) {
     Employee *new_addr = (Employee *) realloc(arr->val, (arr->capacity + size_delta) * sizeof(Employee));
-
     if (!new_addr) {
         free(arr->val);
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
-
     arr->val = new_addr;
     arr->capacity += size_delta;
     return 0;
 }
 
-int extend(EmployeeArr *arr) {
-    return resize(arr, arr->capacity);
+int extend_emp(EmployeeArr *arr) {
+    return resize_emp(arr, arr->capacity);
 }
 
-int append(EmployeeArr *arr, Employee value) {
-    if (arr->length >= (arr->capacity - 1)) {
-        int err = extend(arr);
-        if (err)
-            return err;
+int append_emp(EmployeeArr *arr, Employee value) {
+    if (arr->length >= arr->capacity) {
+        int err = extend_emp(arr);
+        if (err) return err;
     }
-
-    char tempname[1024], tempsurname[1024];
-
-    Employee cur = {value.id, "", "", value.salary};
-    string_copy(cur.name, value.name);
-    string_copy(cur.surname, value.surname);
-
-    arr->val[arr->length++] = cur;
+    arr->val[arr->length++] = value;
     return 0;
 }
 
-void destroy(EmployeeArr *arr) {
-    if (arr->val)
-        free(arr->val);
+void destroy_emp(EmployeeArr *arr) {
+    for (int i = 0; i < arr->length; ++i) {
+        destroy(&arr->val[i].name);
+        destroy(&arr->val[i].surname);
+    }
+    if (arr->val) free(arr->val);
     arr->val = NULL;
     arr->length = 0;
     arr->capacity = 0;
@@ -89,12 +112,12 @@ int compare_employee_descending(const void *a, const void *b) {
         return a1->salary - b1->salary < eps;
     }
 
-    if (!is_str_equal(a1->surname, b1->surname)) {
-        return -str_compare(a1->surname, b1->surname);
+    if (!is_arr_equal(a1->surname, b1->surname)) {
+        return -arr_compare(a1->surname, b1->surname);
     }
 
-    if (!is_str_equal(a1->name, b1->name)) {
-        return -str_compare(a1->name, b1->name);
+    if (!is_arr_equal(a1->name, b1->name)) {
+        return -arr_compare(a1->name, b1->name);
     }
 
     return a1->id < b1->id;
@@ -110,20 +133,19 @@ int compare_employee_ascending(const void *a, const void *b) {
         return a1->salary - b1->salary > eps;
     }
 
-    if (!is_str_equal(a1->surname, b1->surname)) {
-        return str_compare(a1->surname, b1->surname);
+    if (!is_arr_equal(a1->surname, b1->surname)) {
+        return arr_compare(a1->surname, b1->surname);
     }
 
-    if (!is_str_equal(a1->name, b1->name)) {
-        return str_compare(a1->name, b1->name);
+    if (!is_arr_equal(a1->name, b1->name)) {
+        return arr_compare(a1->name, b1->name);
     }
 
     return a1->id > b1->id;
 }
 
 int GetOpts(int argc, char **argv, option *opt, char **filenames) {
-    if (argc != 4)
-        return throw_err(INCORRECT_ARGUMENTS);
+    if (argc != 4) return throw_err(INCORRECT_ARGUMENTS);
 
     int findex = 0;
 
@@ -150,26 +172,80 @@ int GetOpts(int argc, char **argv, option *opt, char **filenames) {
 int read_employees(FILE *in, EmployeeArr *all) {
     Employee cur = {};
     int read = 1;
+    int ch;
 
     while (1) {
-        read = fscanf(in, "%d %s %s %f\n", &cur.id, cur.name, cur.surname, &cur.salary);
-        if (read <= 0)
+        int err = create_arr(5, &cur.name);
+        if (err) return err;
+
+        err = create_arr(5, &cur.surname);
+        if (err) {
+            destroy(&cur.name);
+            return err;
+        }
+
+        read = fscanf(in, "%u", &cur.id);
+        if (read == -1)
             break;
 
-        if (read != 4 || cur.name[0] == ' ' || cur.surname[0] == ' ' || cur.salary < 0) {
+        err = seek_char(&in, &ch);
+        if (ch == -1)
+            break;
+
+        if (err || !is_letter(ch)) {
+            destroy(&cur.name);
+            destroy(&cur.surname);
             return throw_err(INCORRECT_ARGUMENTS);
         }
 
-        append(all, cur);
+        err = read_value(&in, &cur.name, ch);
+        if (err) {
+            destroy(&cur.name);
+            destroy(&cur.surname);
+            return err;
+        }
+        read++;
+
+        err = seek_char(&in, &ch);
+        if (err || !is_letter(ch)) {
+            destroy(&cur.name);
+            destroy(&cur.surname);
+            return throw_err(INCORRECT_ARGUMENTS);
+        }
+
+        err = read_value(&in, &cur.surname, ch);
+        if (err) {
+            destroy(&cur.name);
+            destroy(&cur.surname);
+            return err;
+        }
+        read++;
+
+        read += fscanf(in, "%f\n", &cur.salary);
+        if (read <= 0)
+            break;
+
+        if (read != 4 || cur.salary < 0) {
+            destroy(&cur.name);
+            destroy(&cur.surname);
+            return throw_err(INCORRECT_ARGUMENTS);
+        }
+
+        append_emp(all, cur);
     }
+
+    destroy(&cur.name);
+    destroy(&cur.surname);
+
+    if (!feof(in)) return throw_err(INCORRECT_ARGUMENTS);
 
     return 0;
 }
 
 int write_employees(FILE *out, EmployeeArr all) {
     for (int i = 0; i < all.length; ++i) {
-        fprintf(out, "ID: %3u | Full name: %s %s | Salary: %f.\n", all.val[i].id, all.val[i].surname, all.val[i].name,
-                all.val[i].salary);
+        fprintf(out, "ID: %3u | Full name: %s %s | Salary: %f.\n", all.val[i].id, all.val[i].surname.val,
+                all.val[i].name.val, all.val[i].salary);
     }
 
     return 0;
@@ -177,19 +253,18 @@ int write_employees(FILE *out, EmployeeArr all) {
 
 int handler(char **filenames, const option *opt) {
     FILE *in = fopen(filenames[0], "r");
-    if (!in)
-        return throw_err(FILE_ERROR);
+    if (!in) return throw_err(FILE_ERROR);
 
     EmployeeArr all;
 
-    int err = create_arr(5, &all);
-    if (err)
-        return err;
+    int err = create_emparr(5, &all);
+    if (err) return err;
 
     err = read_employees(in, &all);
-    if (err)
+    if (err) {
+        destroy_emp(&all);
         return err;
-
+    }
 
     fclose(in);
 
@@ -199,10 +274,14 @@ int handler(char **filenames, const option *opt) {
         qsort(all.val, all.length, sizeof(Employee), compare_employee_descending);
 
     FILE *out = fopen(filenames[1], "w");
-    if (!out)
+    if (!out) {
+        destroy_emp(&all);
         return throw_err(FILE_ERROR);
+    }
 
     write_employees(out, all);
+
+    destroy_emp(&all);
 
     fclose(out);
 
@@ -214,10 +293,24 @@ int main(int argc, char **argv) {
 
     char *filenames[2] = {};
 
-    GetOpts(argc, argv, &opt, filenames);
+    int err = GetOpts(argc, argv, &opt, filenames);
+    if (err) return err;
 
-    handler(filenames, &opt);
+    char *realnames[2] = {};
 
-    return 0;
+    realnames[0] = realpath(filenames[0], NULL);
+    realnames[1] = realpath(filenames[1], NULL);
+
+    if (is_str_equal(realnames[0], realnames[1])) {
+        free(realnames[0]);
+        free(realnames[1]);
+        return throw_err(INCORRECT_ARGUMENTS);
+    }
+
+    free(realnames[0]);
+    free(realnames[1]);
+
+    err = handler(filenames, &opt);
+
+    return err;
 }
-

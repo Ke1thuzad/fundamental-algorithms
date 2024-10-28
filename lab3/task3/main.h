@@ -2,6 +2,7 @@
 #define FUNDAMENTAL_ALGORITHMS_MAIN_H
 
 #include "../../utility/error_handler.h"
+#include "../../utility/arrays/array.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,8 +10,8 @@
 
 typedef struct {
     unsigned int id;
-    char name[1024];
-    char surname[1024];
+    Array name;
+    Array surname;
     float salary;
 } Employee;
 
