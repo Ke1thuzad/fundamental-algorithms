@@ -1,23 +1,28 @@
-#include "main.h"
+#include "overio.h"
 
-int overfscanf(FILE* stream, const char* format, ...) {
+int overfscanf(FILE *stream, const char *format, ...) {
     va_list args;
     va_start(args, format);
 
-    int i = 0, k = 0, err;
+    int i = 0, k = 0, err, read = 0;
     Array buffer;
     err = create_arr(5, &buffer);
     if (err)
-        return err;
+        return -err;
 
     while (format[i]) {
         if (k) {
             for (int j = 0; j < buffer.length; ++j) {
                 int ch1;
                 seek_char(&stream, &ch1);
+                if (ch1 == EOF) {
+                    destroy(&buffer);
+
+                    return -1;
+                }
                 if (buffer.val[j] != ch1 && ch1 > ' ') {
                     destroy(&buffer);
-                    return throw_err(INCORRECT_ARGUMENTS);
+                    return -throw_err(INCORRECT_ARGUMENTS);
                 }
             }
 
@@ -33,10 +38,12 @@ int overfscanf(FILE* stream, const char* format, ...) {
                 int* result = va_arg(args, int*);
 
                 unroman(roman, result);
+                read++;
             } else if (is_str_equal(flag, "Zr")) {
                 unsigned int* result = va_arg(args, unsigned int*);
 
                 unzeckendorf(result, stream);
+                read++;
             } else if (is_str_equal(flag, "Cv") || is_str_equal(flag, "CV")) {
                 int* result = va_arg(args, int*);
                 int base = va_arg(args, int);
@@ -45,7 +52,7 @@ int overfscanf(FILE* stream, const char* format, ...) {
                 err = create_arr(5, &input);
                 if (err) {
                     destroy(&buffer);
-                    return err;
+                    return -err;
                 }
 
                 seek_char(&stream, &ch);
@@ -53,9 +60,29 @@ int overfscanf(FILE* stream, const char* format, ...) {
 
                 to_decimal(input, base, result);
                 destroy(&input);
+                read++;
+            } else if (is_str_equal(flag, "S")) {
+                Array* result = va_arg(args, Array*);
+                int ch;
+
+                seek_char(&stream, &ch);
+                if (ch == EOF) {
+                    destroy(&buffer);
+                    return -1;
+                }
+
+                read_value(&stream, result, ch);
+                read++;
             }
             else {
-                vfscanf(stream, flaga, args);
+                int cur_read = vfscanf(stream, flaga, args);
+                if (cur_read == EOF) {
+                    destroy(&buffer);
+                    return -1;
+                }
+
+                read += cur_read;
+
                 va_arg(args, void*);
             }
 
@@ -78,10 +105,10 @@ int overfscanf(FILE* stream, const char* format, ...) {
 
     destroy(&buffer);
 
-    return 0;
+    return read;
 }
 
-int oversscanf(char* str, const char* format, ...) {
+int oversscanf(char *str, const char *format, ...) {
     va_list args;
     va_start(args, format);
 
@@ -95,7 +122,7 @@ int oversscanf(char* str, const char* format, ...) {
     while (format[i]) {
         if (k) {
             for (int j = 0; j < buffer.length; ++j) {
-                if (*s++ <= ' ') {
+                if (*s++ <= ' ') {  // TODO: fix that
                     j--;
                     continue;
                 }
@@ -138,6 +165,12 @@ int oversscanf(char* str, const char* format, ...) {
 
                 to_decimal(input, base, result);
                 destroy(&input);
+            } else if (is_str_equal(flag, "S")) {
+                Array* result = va_arg(args, Array*);
+                char ch;
+
+                sseek_char(&s, &ch);
+                sread_value(&s, result, ch);
             }
             else {
                 char filler;
@@ -176,13 +209,13 @@ int oversscanf(char* str, const char* format, ...) {
     return 0;
 }
 
-int len(const char* str) {
+int len(const char *str) {
     int i = 0;
     while(str[i++] != '\0');
     return i;
 }
 
-void string_concat(char* str1, const char* str2) {
+void string_concat(char *str1, const char *str2) {
     int i = 0, ln = len(str1) - 1;
     while (str2[i]) {
         str1[ln++] = str2[i++];
@@ -190,13 +223,25 @@ void string_concat(char* str1, const char* str2) {
     str1[ln] = '\0';
 }
 
-int is_str_equal(char* str1, char* str2) {
+int is_str_equal(char *str1, char *str2) {
     while (*str1 && *str1 == *str2++)
         if (*str1++ == '\0') return 1;
     return !*str1 && !*str2;
 }
 
-int snread_value(const char* str, char* result, int n, char first) {
+int sseek_char(char **s, char *result) {
+    while (**s != '\0') {
+        char cur = *(*s)++;
+        if (cur > ' ') {
+            *result = cur;
+            return 0;
+        }
+    }
+    *result = -1;
+    return 0;
+}
+
+int snread_value(const char *str, char *result, int n, char first) {
     int i = 0, j = 0;
     if (first)
         result[i++] = first;
@@ -211,27 +256,8 @@ int snread_value(const char* str, char* result, int n, char first) {
     return i - 1;
 }
 
-int read_value(FILE **f, Array* result, char first) {
+int sread_value(char **s, Array *result, char first) {
     int err;
-    if (first) {
-        err = append(result, first);
-        if (err)
-            return err;
-    }
-    int character = fgetc(*f);
-    while (character > ' ') {
-        err = append(result, (char)character);
-        if (err)
-            return err;
-        character = fgetc(*f);
-    }
-    fseek(*f, -1, SEEK_CUR);
-
-    return 0;
-}
-
-int sread_value(char** s, Array* result, char first) {
-    int err, i = 0;
     if (first) {
         err = append(result, first);
         if (err)
@@ -247,33 +273,6 @@ int sread_value(char** s, Array* result, char first) {
     }
     (*s)--;
 
-    return 0;
-}
-
-int seek_char(FILE **f, int* result) {
-    if (!f)
-        return throw_err(FILE_ERROR);
-
-    while(!feof(*f)) {
-        int cur = fgetc(*f);
-        if (cur > ' ') {
-            *result = cur;
-            return 0;
-        }
-    }
-    *result = -1;
-    return 0;
-}
-
-int sseek_char(char** s, char* result) {
-    while (**s != '\0') {
-        char cur = *(*s)++;
-        if (cur > ' ') {
-            *result = cur;
-            return 0;
-        }
-    }
-    *result = -1;
     return 0;
 }
 
@@ -313,10 +312,10 @@ int unroman(char *str, int *result) {
     return 0;
 }
 
-int unzeckendorf(unsigned int *result, FILE* stream) {
+int unzeckendorf(unsigned int *result, FILE *stream) {
     *result = 0;
     unsigned int prev = 0, cur = 0;
-    unsigned int a = 0, b = 1, i = 0, j = 0;
+    unsigned int a = 0, b = 1, i = 0;
 
     while (1) {
         prev = cur;
@@ -386,3 +385,23 @@ int to_decimal(const Array x, unsigned char base, int *result) {
     }
     return 0;
 }
+
+
+//int read_value(FILE **f, Array *result, char first) {
+//    int err;
+//    if (first) {
+//        err = append(result, first);
+//        if (err)
+//            return err;
+//    }
+//    int character = fgetc(*f);
+//    while (character > ' ') {
+//        err = append(result, (char)character);
+//        if (err)
+//            return err;
+//        character = fgetc(*f);
+//    }
+//    fseek(*f, -1, SEEK_CUR);
+//
+//    return 0;
+//}

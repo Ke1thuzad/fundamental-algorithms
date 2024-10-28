@@ -1,6 +1,8 @@
 #ifndef LAB1T1_ARRAY_H
 #define LAB1T1_ARRAY_H
 
+#include <stdio.h>
+
 typedef struct Array {
     char* val;
     unsigned int length;
@@ -13,7 +15,7 @@ void reset(Array* arr);
 int resize(Array* arr, int size_delta);
 int extend(Array* arr);
 void destroy(Array* arr);
-int copy(Array* dst, Array* src);
+int copy(Array* dst, const Array *src);
 int reverse(Array* arr);
 void print_arr(Array arr);
 void reverse_print_arr(Array arr);
@@ -34,6 +36,10 @@ int is_num(int x);
 int is_letter(int x);
 int to_lower(int x);
 int base_char_to_dec(char x);
+int seek_char(FILE **f, int *result);
+int read_value(FILE **f, Array *result, char first);
+int is_arr_equal(Array str1, Array str2);
+int arr_compare(Array str1, Array str2);
 
 
 

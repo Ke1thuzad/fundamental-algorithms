@@ -56,7 +56,7 @@ void destroy(Array* arr) {
     arr->capacity = 0;
 }
 
-int copy(Array* dst, Array* src) {
+int copy(Array* dst, const Array *src) {
     destroy(dst);
     dst->val = (char*) calloc(src->capacity, sizeof(char));
     if (!dst->val) {
@@ -66,9 +66,9 @@ int copy(Array* dst, Array* src) {
     dst->capacity = src->capacity;
 
     char* tempdst = dst->val, *tempsrc = src->val;
-    while ((*dst->val++ = *src->val++));
-    dst->val = tempdst;
-    src->val = tempsrc;
+    while ((*tempdst++ = *tempsrc++));
+//    dst->val = tempdst;
+//    src->val = tempsrc;
     return 0;
 }
 
@@ -461,5 +461,58 @@ int slice(Array A, int start, int stop, int step, Array* result) {
         append(result, A.val[i]);
     }
 
+    return 0;
+}
+
+int seek_char(FILE **f, int *result) {
+    if (!(*f))
+        return throw_err(FILE_ERROR);
+
+    while (!feof(*f)) {
+        int cur = fgetc(*f);
+        if (cur > ' ') {
+            *result = cur;
+            return 0;
+        }
+    }
+    *result = -1;
+    return 0;
+}
+
+int read_value(FILE **f, Array *result, char first) {
+    int err;
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+    int character = fgetc(*f);
+    while (character > ' ') {
+        err = append(result, (char) character);
+        if (err)
+            return err;
+        character = fgetc(*f);
+    }
+    fseek(*f, -1, SEEK_CUR);
+
+    return 0;
+}
+
+int is_arr_equal(Array str1, Array str2) {
+    if (str1.length != str2.length) return 0;
+    for (int i = 0; i < str1.length; ++i) {
+        if (str1.val[i] != str2.val[i]) return 0;
+    }
+    return 1;
+}
+
+int arr_compare(Array str1, Array str2) {
+    int min_length = str1.length < str2.length ? str1.length : str2.length;
+    for (int i = 0; i < min_length; ++i) {
+        if (str1.val[i] < str2.val[i]) return -1;
+        if (str1.val[i] > str2.val[i]) return 1;
+    }
+    if (str1.length < str2.length) return -1;
+    if (str1.length > str2.length) return 1;
     return 0;
 }

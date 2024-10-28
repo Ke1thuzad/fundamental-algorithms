@@ -2,6 +2,7 @@
 
 int throw_err(errcode err) {
     char* err_msg;
+
     switch(err) {
         case OUT_OF_BOUNDS:
             err_msg = "Option is out of allowed bounds.";
@@ -21,10 +22,14 @@ int throw_err(errcode err) {
         case FILE_ERROR:
             err_msg = "Failed to open file.";
             break;
+        case INCORRECT_INPUT_DATA:
+            err_msg = "Input data is not valid.";
+            break;
         default:
             err_msg = "An unknown message has occurred.";
             break;
     }
+
     fprintf(stderr, "%s\n", err_msg);
     return (err);
 }
