@@ -10,27 +10,19 @@ int main(int argc, char **argv) {
     if (check_paths(in, out))
         return throw_err(INCORRECT_ARGUMENTS);
 
-    StudentArr studentArr;
-    create_studarr(5, &studentArr);
-
     FILE* inp = fopen(in, "r");
+    if (!inp)
+        return throw_err(FILE_ERROR);
 
-    int err = read_students(inp, &studentArr);
-
-    StudentArr res;
-    create_studarr(5, &res);
-    SearchParameter searchType;
-//    searchType.str = str;
-    str_to_arr("danil", &searchType.str);
-
-    student_search(studentArr, NAME, searchType, &res);
-    for (int i = 0; i < res.length; ++i) {
-        printf("%d\n", res.val[i].id);
+    FILE* outfile = fopen(out, "w");
+    if (!outfile) {
+        fclose(inp);
+        return throw_err(FILE_ERROR);
     }
-//    if (err)
-//        return err;
-    destroy_stud(&studentArr);
-    destroy_stud(&res);
+
+    int err = dialog_manager(inp, outfile);
+
+    fclose(outfile);
 
     return err;
 }

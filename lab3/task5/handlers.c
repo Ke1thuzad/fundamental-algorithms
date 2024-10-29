@@ -2,27 +2,20 @@
 
 char *string_copy(char *dst, const char *src) {
     char *dstaddr = dst;
-    while ((*dst++ = *src++));
+    char *srcaddr = src;
+    while ((*dstaddr++ = *srcaddr++));
     return dstaddr;
 }
 
 int check_paths(char *in, char *out) {
-    char *real_in = realpath(in, NULL);
-    char *real_out = realpath(out, NULL);
-    if (!(real_in && real_out)) {
-        free(real_in);
-        free(real_out);
-        return 1;  // TODO CHANGE TO 1
-    }
+    char inbuf[1000], outbuf[1000];
 
-    if (is_str_equal(real_in, real_out)) {
-        free(real_in);
-        free(real_out);
+    realpath(in, inbuf);
+    realpath(out, outbuf);
+
+    if (is_str_equal(inbuf, outbuf)) {
         return 1;
     }
-
-    free(real_in);
-    free(real_out);
 
     return 0;
 }
@@ -77,13 +70,14 @@ int read_students(FILE *in, StudentArr *students) {
 
         cur.grades = cur_grades;
 
-        if (length > 5) {
+        if (length != 5) {
             destroy_student(&cur);
             return throw_err(INCORRECT_INPUT_DATA);
         }
 
         append_stud(students, cur);
         read++;
+        free(cur.grades);
 
         reset_student(&cur);
     }
@@ -91,6 +85,54 @@ int read_students(FILE *in, StudentArr *students) {
     destroy_student(&cur);
 
     return 0;
+}
+
+int write_students(FILE *out, StudentArr students, int mean) {
+    for (int i = 0; i < students.length; ++i) {
+        Student cur = students.val[i];
+        fprintf(out, "%.3d | %s %s | %s | ", cur.id, cur.name.val, cur.surname.val, cur.group.val);
+        fprintf(stdout, "%.3d | %s %s | %s | ", cur.id, cur.name.val, cur.surname.val, cur.group.val);
+        if (mean) {
+            fprintf(out, "%f", student_mean(cur));
+            fprintf(stdout, "%f", student_mean(cur));
+        }
+        else {
+            for (int j = 0; j < 5; ++j) {
+                fprintf(out, "%hhu ", cur.grades[j]);
+                fprintf(stdout, "%hhu ", cur.grades[j]);
+            }
+        }
+
+        fprintf(out, "\n");
+        fprintf(stdout, "\n");
+    }
+    fprintf(out, "\n");
+
+    return 0;
+}
+
+int cmp_student_id(const void *a, const void *b) {
+    Student *student1 = (Student *) a;
+    Student *student2 = (Student *) b;
+    return student1->id > student2->id;
+}
+
+int cmp_student_name(const void *a, const void *b) {
+    Student *student1 = (Student *) a;
+    Student *student2 = (Student *) b;
+    return arr_compare(student1->name, student2->name);
+}
+
+int cmp_student_surname(const void *a, const void *b) {
+    Student *student1 = (Student *) a;
+    Student *student2 = (Student *) b;
+    return arr_compare(student1->surname, student2->surname);
+}
+
+int cmp_student_group(const void *a, const void *b) {
+    Student *student1 = (Student *) a;
+    Student *student2 = (Student *) b;
+    return arr_compare(student1->group, student2->group);
 }
 
 float student_mean(Student student) {
@@ -103,9 +145,19 @@ float student_mean(Student student) {
     return mean;
 }
 
-// 0 - By ID, 1 - Name, 2 - Surname, 3 - Group
+float all_student_mean(StudentArr students) {
+    float mean = 0;
+
+    for (int i = 0; i < students.length; ++i) {
+        mean += student_mean(students.val[i]);
+    }
+
+    return mean / (float) students.length;
+}
+
+// 0 - By ID, 1 - Name, 2 - Surname, 3 - Group, 4 - Mean of grades
 int student_search(const StudentArr students, int criteria, SearchParameter param, StudentArr *result) {
-    double eps = 0.0001;
+    double eps = 0.0000001;
 
     for (int i = 0; i < students.length; ++i) {
         Student cur = students.val[i];
@@ -142,6 +194,4 @@ int student_search(const StudentArr students, int criteria, SearchParameter para
 
     return 0;
 }
-
-// TODO: add sort and interactive dialog
 

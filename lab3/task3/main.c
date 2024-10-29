@@ -98,7 +98,10 @@ int GetOpts(int argc, char **argv, option *opt, char **filenames) {
 
     for (int i = 1; i <= 3; ++i) {
         char *proceeding_option = argv[i];
-        if ((proceeding_option[0] == '/' || proceeding_option[0] == '-') && !proceeding_option[2]) {
+        if ((proceeding_option[0] == '/' || proceeding_option[0] == '-')) {
+            if (proceeding_option[2])
+                return throw_err(INCORRECT_OPTION);
+
             switch (proceeding_option[1]) {
                 case 'a':
                     *opt = ASCENDING;
@@ -142,7 +145,7 @@ int read_employees(FILE *in, EmployeeArr *all) {
         if (err || !is_letter(ch)) {
             destroy(&cur.name);
             destroy(&cur.surname);
-            return throw_err(INCORRECT_ARGUMENTS);
+            return throw_err(INCORRECT_INPUT_DATA);
         }
 
         err = read_value(&in, &cur.name, ch);
@@ -157,7 +160,7 @@ int read_employees(FILE *in, EmployeeArr *all) {
         if (err || !is_letter(ch)) {
             destroy(&cur.name);
             destroy(&cur.surname);
-            return throw_err(INCORRECT_ARGUMENTS);
+            return throw_err(INCORRECT_INPUT_DATA);
         }
 
         err = read_value(&in, &cur.surname, ch);
@@ -175,7 +178,7 @@ int read_employees(FILE *in, EmployeeArr *all) {
         if (read != 4 || cur.salary < 0) {
             destroy(&cur.name);
             destroy(&cur.surname);
-            return throw_err(INCORRECT_ARGUMENTS);
+            return throw_err(INCORRECT_INPUT_DATA);
         }
 
         append_emp(all, cur);
@@ -241,21 +244,28 @@ int main(int argc, char **argv) {
     char *filenames[2] = {};
 
     int err = GetOpts(argc, argv, &opt, filenames);
-    if (err) return err;
+    if (err)
+        return err;
 
     char *realnames[2] = {};
+    for (int i = 0; i < 2; ++i) {
+        realnames[i] = malloc(sizeof(char) * 512);
+    }
 
-    realnames[0] = realpath(filenames[0], NULL);
-    realnames[1] = realpath(filenames[1], NULL);
+    realpath(filenames[0], realnames[0]);
+    realpath(filenames[1], realnames[1]);
 
     if (is_str_equal(realnames[0], realnames[1])) {
-        free(realnames[0]);
-        free(realnames[1]);
+        for (int i = 0; i < 2; ++i) {
+            free(realnames[i]);
+        }
+
         return throw_err(INCORRECT_ARGUMENTS);
     }
 
-    free(realnames[0]);
-    free(realnames[1]);
+    for (int i = 0; i < 2; ++i) {
+        free(realnames[i]);
+    }
 
     err = handler(filenames, &opt);
 

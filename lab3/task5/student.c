@@ -33,7 +33,11 @@ int append_stud(StudentArr *arr, const Student value) {
     create_student(cur);
 
     cur->id = value.id;
-    cur->grades = value.grades;
+
+    cur->grades = malloc(sizeof(unsigned char) * 5);
+    for (int i = 0; i < 5; ++i) {
+        cur->grades[i] = value.grades[i];
+    }
     copy(&cur->name, &value.name);
     copy(&cur->surname, &value.surname);
     copy(&cur->group, &value.group);
@@ -113,6 +117,8 @@ void destroy_student(Student *student) {
     destroy(&student->surname);
     destroy(&student->group);
 
-    if (student->grades)
+    if (student->grades != NULL)
         free(student->grades);
+
+    student->grades = NULL;
 }
