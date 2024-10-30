@@ -1,14 +1,27 @@
 #include "mystring.h"
 
-int create_str(unsigned int length, String *arr) {
+int len(const char* str) {
+    int i = 0;
+    while (str[i] != '\0') {
+        ++i;
+    }
+    return i;
+}
 
-    arr->capacity = length;
-    arr->length = 0;
-    arr->val = (char *) malloc(sizeof(char) * length);
-
+int create_str(String *arr, char *str) {
+    arr->length = len(str);
+    arr->capacity = arr->length + 5;
+    arr->val = (char *) malloc(sizeof(char) * arr->capacity);
 
     if (!arr->val) return throw_err(MEMORY_NOT_ALLOCATED);
-    arr->val[0] = '\0';
+
+    int i = 0;
+
+    for (i = 0; i < arr->length; ++i) {
+        arr->val[i] = str[i];
+    }
+
+    arr->val[i] = '\0';
 
     return 0;
 }
@@ -50,6 +63,7 @@ int extend_str(String *arr) {
 void destroy_str(String *arr) {
     if (arr->val)
         free(arr->val);
+
     arr->val = NULL;
     arr->length = 0;
     arr->capacity = 0;
@@ -73,7 +87,7 @@ int copystr(String *dst, String *src) {
 }
 
 int copy_newstr(String *dst, String *src) {
-    int err = create_str(src->capacity, dst);
+    int err = create_str(dst, NULL);
     if (err)
         return err;
 
@@ -86,15 +100,15 @@ int copy_newstr(String *dst, String *src) {
     return 0;
 }
 
-int concat_str(String *A, String B) {
-    for (int i = 0; i < B.length; ++i) {
-        int err = append_str(A, B.val[i]);
-        if (err)
-            return err;
-    }
-
-    return 0;
-}
+//int concat_str(String *A, String B) {
+//    for (int i = 0; i < B.length; ++i) {
+//        int err = append_str(A, B.val[i]);
+//        if (err)
+//            return err;
+//    }
+//
+//    return 0;
+//}
 
 int compare_str(String a, String b) {
     if (a.length > b.length)

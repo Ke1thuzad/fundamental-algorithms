@@ -118,6 +118,7 @@ add_executable(lab2t10 lab2/task10/main.c
         utility/arrays/intarray.c
         utility/arrays/intarray.h)
 
+
 add_executable(lab3t3 lab3/task3/main.c lab3/task3/main.h
         utility/error_handler.c
         utility/error_handler.h
@@ -135,6 +136,7 @@ add_executable(lab3t4 lab3/task4/main.c lab3/task4/main.h
         lab3/task4/mystring.h
         lab3/task4/mail.c
         lab3/task4/mail.h)
+
 add_executable(lab3t5 lab3/task5/main.c lab3/task5/main.h
         lab3/task5/handlers.c
         utility/overio.c

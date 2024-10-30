@@ -9,7 +9,7 @@ typedef struct String {
     unsigned int capacity;
 } String;
 
-int create_str(unsigned int length, String *arr);
+int create_str(String *arr, char *str);
 
 int append_str(String *arr, char value);
 
@@ -26,5 +26,9 @@ int copystr(String *dst, String *src);
 int copy_newstr(String *dst, String *src);
 
 int concat_str(String *A, String B);
+
+int compare_str(String a, String b);
+
+int equiv_str(String a, String b);
 
 #endif //FUNDAMENTAL_ALGORITHMS_MYSTRING_H
