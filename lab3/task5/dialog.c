@@ -16,7 +16,8 @@ int dialog_manager(FILE* in, FILE* out) {
         destroy_stud(&students);
         return err;
     }
-//    printf("%f\n\n\n\n", all_student_mean(students));
+
+    printf("Please input your command (or type 'help' for info).\n");
 
     while (1) {
         switch (state) {
@@ -49,8 +50,8 @@ int dialog_manager(FILE* in, FILE* out) {
         }
     }
 
-    destroy_stud(&students);
-    return 0;
+//    destroy_stud(&students);
+//    return 0;
 }
 
 int wait_command(Command *result) {
@@ -58,11 +59,11 @@ int wait_command(Command *result) {
     int err = create_arr(5, &buf);
     if (err)
         return err;
-//    char buf[100], ch;
 
     while (1) {
-        printf("> ");
-        overfscanf(stdin, "%S", &buf);
+        printf("> %s", "\0");
+        overfscanf(stdin, " %S", &buf);
+        printf("\n");
 
         if (is_str_equal(buf.val, "^Z")) {
             destroy(&buf);
@@ -84,7 +85,7 @@ int wait_command(Command *result) {
 
             break;
         } else {
-            printf("Incorrect command. Please try again.\n");
+            printf("Incorrect command. Please try again or use 'help' command.\n");
         }
         reset(&buf);
     }
@@ -212,7 +213,7 @@ int wait_param(Command cmd, int *param) {
     }
 
 
-    printf("Please enter function parameter: ");
+    printf("Please enter function parameter: \n");
 
     int scan_read = scanf("%d", param);
 
@@ -228,7 +229,7 @@ int wait_param(Command cmd, int *param) {
 }
 
 int wait_search_param(SearchCriteria criteria, SearchParameter *searchParam) {
-    printf("Please enter parameter to search for: ");
+    printf("Please enter parameter to search for: \n");
     int scan_read = 0;
     int err;
 
@@ -267,10 +268,10 @@ void cmd_description(Command cmd) {
     int j = 1;
 
     char* cmd_descriptions[4][10] = {
-            {"Print all available commands and their options"},
-            {"Print information about students", "All grades", "Mean grade only", NULL},
-            {"Search students by parameters", "ID", "Name", "Surname", "Group", "Mean", NULL},
-            {"Sort students by parameters", "ID", "Name", "Surname", "Group", NULL},
+            {"'help' - Print all available commands and their options"},
+            {"'print' - Print information about students", "All grades", "Mean grade only", NULL},
+            {"'search' - Search students by parameters", "ID", "Name", "Surname", "Group", "Mean", NULL},
+            {"'sort' - Sort students by parameters", "ID", "Name", "Surname", "Group", NULL},
     };
 
     printf("%*d. %s.\n", level * 2, cmd + 1, cmd_descriptions[cmd][0]);
@@ -286,7 +287,7 @@ void cmd_description(Command cmd) {
 void help_cmd() {
     int cmd_amount = 4;
 
-    printf("Available commands:\n");
+    printf("Available commands (you can use them by typing numbers corresponding or command strings):\n");
     for (int i = 1; i <= cmd_amount; ++i) {
         cmd_description(i - 1);
     }
@@ -303,7 +304,9 @@ int print_cmd(FILE* out, StudentArr students, int param) {
 }
 
 int search_cmd(StudentArr students, SearchCriteria criteria, SearchParameter searchParam, StudentArr *found_students) {
-    student_search(students, criteria, searchParam, found_students);
+    int read = student_search(students, criteria, searchParam, found_students);
+
+    printf("\nFound %d occurrences:\n", read);
 
     return 0;
 }

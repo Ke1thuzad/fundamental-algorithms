@@ -7,18 +7,18 @@ char *string_copy(char *dst, const char *src) {
     return dstaddr;
 }
 
-int check_paths(char *in, char *out) {
-    char inbuf[1000], outbuf[1000];
-
-    realpath(in, inbuf);
-    realpath(out, outbuf);
-
-    if (is_str_equal(inbuf, outbuf)) {
-        return 1;
-    }
-
-    return 0;
-}
+//int check_paths(char *in, char *out) {
+//    char inbuf[1000], outbuf[1000];
+//
+//    realpath(in, inbuf);
+//    realpath(out, outbuf);
+//
+//    if (is_str_equal(inbuf, outbuf)) {
+//        return 1;
+//    }
+//
+//    return 0;
+//}
 
 int read_students(FILE *in, StudentArr *students) {
     Student cur = {};
@@ -91,22 +91,23 @@ int write_students(FILE *out, StudentArr students, int mean) {
     for (int i = 0; i < students.length; ++i) {
         Student cur = students.val[i];
         fprintf(out, "%.3d | %s %s | %s | ", cur.id, cur.name.val, cur.surname.val, cur.group.val);
-        fprintf(stdout, "%.3d | %s %s | %s | ", cur.id, cur.name.val, cur.surname.val, cur.group.val);
+        printf("%.3d | %s %s | %s | ", cur.id, cur.name.val, cur.surname.val, cur.group.val);
         if (mean) {
             fprintf(out, "%f", student_mean(cur));
-            fprintf(stdout, "%f", student_mean(cur));
+            printf("%f", student_mean(cur));
         }
         else {
             for (int j = 0; j < 5; ++j) {
                 fprintf(out, "%hhu ", cur.grades[j]);
-                fprintf(stdout, "%hhu ", cur.grades[j]);
+                printf("%hhu ", cur.grades[j]);
             }
         }
 
         fprintf(out, "\n");
-        fprintf(stdout, "\n");
+        printf("\n");
     }
     fprintf(out, "\n");
+    printf("\n");
 
     return 0;
 }
@@ -158,33 +159,44 @@ float all_student_mean(StudentArr students) {
 // 0 - By ID, 1 - Name, 2 - Surname, 3 - Group, 4 - Mean of grades
 int student_search(const StudentArr students, int criteria, SearchParameter param, StudentArr *result) {
     double eps = 0.0000001;
+    int read = 0;
 
     for (int i = 0; i < students.length; ++i) {
         Student cur = students.val[i];
         switch (criteria) {
             case 0:
-                if (cur.id == param.id)
+                if (cur.id == param.id) {
+                    read++;
                     append_stud(result, cur);
+                }
 
                 break;
             case 1:
-                if (is_arr_equal(cur.name, param.str))
+                if (is_arr_equal(cur.name, param.str)) {
+                    read++;
                     append_stud(result, cur);
+                }
 
                 break;
             case 2:
-                if (is_arr_equal(cur.surname, param.str))
+                if (is_arr_equal(cur.surname, param.str)) {
+                    read++;
                     append_stud(result, cur);
+                }
 
                 break;
             case 3:
-                if (is_arr_equal(cur.group, param.str))
+                if (is_arr_equal(cur.group, param.str)) {
+                    read++;
                     append_stud(result, cur);
+                }
 
                 break;
             case 4:
-                if (student_mean(cur) - param.mean > eps)
+                if (student_mean(cur) - param.mean > eps) {
+                    read++;
                     append_stud(result, cur);
+                }
 
                 break;
             default:
@@ -192,6 +204,6 @@ int student_search(const StudentArr students, int criteria, SearchParameter para
         }
     }
 
-    return 0;
+    return read;
 }
 
