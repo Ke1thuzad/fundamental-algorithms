@@ -154,6 +154,11 @@ add_executable(lab3t5 lab3/task5/main.c lab3/task5/main.h
         lab3/task5/handlers.c
         lab3/task5/dialog.c)
 
+add_executable(lab3t2 lab3/task2/main.c lab3/task2/main.h
+        lab3/task2/vectorarray.c
+        utility/error_handler.c
+        utility/error_handler.h)
+
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
@@ -164,4 +169,4 @@ target_link_libraries(lab2t2 m)
 target_link_libraries(lab2t9 m)
 target_link_libraries(lab2t10 m)
 target_link_libraries(lab3t3 m)
-add_executable(lab3t2 lab3/task2/main.c lab3/task2/main.h)
+target_link_libraries(lab3t2 m)
