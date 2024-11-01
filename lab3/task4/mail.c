@@ -1,8 +1,9 @@
 #include "mail.h"
 
-int is_num(int x) {
-    return x >= '0' && x <= '9';
-}
+//int is_num(int x) {
+//    return x >= '0' && x <= '9';
+//}
+
 
 int compare_mail(const void *a, const void *b) {
     Mail *mail1 = (Mail *) a;
@@ -18,7 +19,7 @@ int compare_mail(const void *a, const void *b) {
 
 int parse_time(const String *str, Time *time) {
     int day, month, year, hour, minute, second;
-    if (sscanf(str->val, "%d:%d:%d %d:%d:%d", &day, &month, &year, &hour, &minute, &second) != 6) {
+    if (sscanf(str->val, "%2d:%2d:%4d %2d:%2d:%2d", &day, &month, &year, &hour, &minute, &second) != 6) {
         return 1;
     }
 
@@ -37,14 +38,28 @@ int parse_time(const String *str, Time *time) {
     return 0;
 }
 
-int compare_time(const void *a, const void *b) {
+int compare_creation_date(const void *a, const void *b) {
+    Mail *m1 = (Mail *)a;
+    Mail *m2 = (Mail *)b;
+
+    return compare_time_str(&m1->creation_date, &m2->creation_date);
+}
+
+int compare_time_str(const void *a, const void *b) {
     String *time1 = (String *) a;
     String *time2 = (String *) b;
 
     Time t1, t2;
-    if (!parse_time(time1, &t1) || !parse_time(time2, &t2)) {
-        return 0;
+    if (parse_time(time1, &t1) || parse_time(time2, &t2)) {
+        return throw_err(INCORRECT_INPUT_DATA);
     }
+
+    return compare_time(&t1, &t2);
+}
+
+int compare_time(const void *a, const void *b) {
+    Time t1 = *((Time *) a);
+    Time t2 = *((Time *) b);
 
     if (t1.year != t2.year) return t1.year - t2.year;
 
@@ -61,10 +76,6 @@ int compare_time(const void *a, const void *b) {
 
 int create_address(Address *addr, char *post_index, char *building, char *city, char *street, unsigned int apartment,
                    unsigned int house) {
-    addr = (Address *) malloc(sizeof(Address));
-    if (!addr)
-        return throw_err(MEMORY_NOT_ALLOCATED);
-
     int err = create_str(&addr->post_index, post_index);
     if (err)
         return err;
@@ -91,6 +102,29 @@ int create_address(Address *addr, char *post_index, char *building, char *city, 
     return 0;
 }
 
+int copy_address(Address *dst, const Address *src) {
+    int err = copy_newstr(&dst->post_index, &src->post_index);
+    if (err)
+        return err;
+
+    err = copy_newstr(&dst->city, &src->city);
+    if (err)
+        return err;
+
+    err = copy_newstr(&dst->street, &src->street);
+    if (err)
+        return err;
+
+    err = copy_newstr(&dst->building, &src->building);
+    if (err)
+        return err;
+
+    dst->apartment = src->apartment;
+    dst->house = src->house;
+
+    return 0;
+}
+
 void print_address(Address addr) {
     printf("Address:\n\tPost Index: %s\n\tCity: %s\n\tStreet: %s\n\tBuilding: %s\n\tHouse: %u\n\tApartment: %u\n",
            addr.post_index.val, addr.city.val, addr.street.val, addr.building.val, addr.house, addr.apartment);
@@ -107,10 +141,6 @@ void destroy_address(Address *addr) {
 }
 
 int create_mail(Mail *mail, Address addr, float weight, char *id, char *creation_date, char *delivery_date) {
-    mail = (Mail *) malloc(sizeof(Mail));
-    if (!mail)
-        return throw_err(MEMORY_NOT_ALLOCATED);
-
     int err = create_str(&mail->id, id);
     if (err)
         return err;
@@ -123,7 +153,7 @@ int create_mail(Mail *mail, Address addr, float weight, char *id, char *creation
     if (err)
         return err;
 
-    mail->address = addr;
+    copy_address(&mail->address, &addr);
     mail->weight = weight;
 
     Time t1;
@@ -163,18 +193,18 @@ void destroy_mail(Mail *mail) {
 }
 
 int create_post(Post *post, Address *addr) {
-    post = (Post *) malloc(sizeof(Post));
-    if (!post)
-        return throw_err(MEMORY_NOT_ALLOCATED);
-
     if (!addr)
         return throw_err(INCORRECT_INPUT_DATA);
 
+//    copy_address(&post->address)
     post->address = addr;
 
     post->mails = (Mail *) malloc(sizeof(Mail) * STANDARD_CAPACITY);
     if (!post->mails)
         return throw_err(MEMORY_NOT_ALLOCATED);
+
+    post->length = 0;
+    post->capacity = STANDARD_CAPACITY;
 
     return 0;
 }
@@ -206,14 +236,23 @@ int append_post(Post *post, Mail mail) {
             return err;
     }
 
-    post->mails[post->length++] = mail;
+    Mail *cur = &post->mails[post->length++];
+
+//    post->mails[post->length++] = mail;
+    copy_newstr(&cur->id, &mail.id);
+    copy_newstr(&cur->creation_date, &mail.creation_date);
+    copy_newstr(&cur->delivery_date, &mail.delivery_date);
+
+    copy_address(&cur->address, &mail.address);
+    cur->weight = mail.weight;
+//    copy_newstr(&cur.id, &mail.id);
 
     return 0;
 }
 
-int search_mail(Post *post, String mail_id, Mail **found, int *index) {
+int search_mail_id(Post *post, String mail_id, Mail **found, int *index) {
     for (int i = 0; i < post->length; ++i) {
-        if (equiv_str(post->mails->id, mail_id)) {
+        if (equiv_str(post->mails[i].id, mail_id)) {
             *found = &post->mails[i];
             *index = i;
             return 0;
@@ -223,13 +262,61 @@ int search_mail(Post *post, String mail_id, Mail **found, int *index) {
     return 1;
 }
 
+int search_mail_in_time(Post *post, Mail *found, int *index) {
+    time_t cur_time;
+    time(&cur_time);
+    struct tm *time_info = localtime(&cur_time);
+
+    Time time1 = {time_info->tm_mday, time_info->tm_mon + 1, time_info->tm_year + 1900, time_info->tm_hour,
+                  time_info->tm_min, time_info->tm_sec};
+
+    for (int i = 0; i < post->length; ++i) {
+        Time temp;
+        if (parse_time(&post->mails[i].delivery_date, &temp))
+            continue;
+
+        if (compare_time(&temp, &time1) > 0)
+            found[(*index)++] = post->mails[i];
+
+    }
+
+    qsort(found, *index, sizeof(Mail), compare_creation_date);
+
+    return 0;
+}
+
+int search_mail_delayed(Post *post, Mail *found, int *index) {
+    time_t cur_time;
+    time(&cur_time);
+    struct tm *time_info = localtime(&cur_time);
+
+    Time time1 = {time_info->tm_mday, time_info->tm_mon + 1, time_info->tm_year + 1900, time_info->tm_hour,
+                  time_info->tm_min, time_info->tm_sec};
+
+    for (int i = 0; i < post->length; ++i) {
+        Time temp;
+        if (parse_time(&post->mails[i].delivery_date, &temp))
+            continue;
+
+        if (compare_time(&temp, &time1) <= 0)
+            found[(*index)++] = post->mails[i];
+
+    }
+
+    qsort(found, *index, sizeof(Mail), compare_creation_date);
+
+    return 0;
+}
+
 int delete_post_mail(Post *post, String mail_id) {
     Mail *mail;
-    int index;
+    int index = 0;
 
-    if (search_mail(post, mail_id, &mail, &index)) {
+    if (!search_mail_id(post, mail_id, &mail, &index)) {
         destroy_mail(mail);
-        return 0;
+//        return 0;
+    } else {
+        return 1;
     }
 
     for (int i = index; i < post->length - 1; ++i) {
@@ -238,7 +325,7 @@ int delete_post_mail(Post *post, String mail_id) {
 
     post->length--;
 
-    return 1;
+    return 0;
 }
 
 void destroy_post(Post *post) {
@@ -253,8 +340,10 @@ void destroy_post(Post *post) {
     }
 
     destroy_address(post->address);
+    free(post->address);
+
+    post->address = NULL;
 
     post->length = 0;
     post->capacity = 0;
 }
-

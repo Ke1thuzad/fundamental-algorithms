@@ -40,6 +40,8 @@ void to_base16(int x, char *result, int size) {
     }
 }
 
+#ifndef LAB1T1_ARRAY_H
+
 int is_num(int x) {
     return x >= '0' && x <= '9';
 }
@@ -47,6 +49,8 @@ int is_num(int x) {
 int is_letter(int x) {
     return x >= 'A' && x <= 'Z' || x >= 'a' && x <= 'z';
 }
+
+#endif
 
 int handler_option_d(FILE *in_stream, char *out_filename) {
     FILE *out_stream = fopen(out_filename, "w");

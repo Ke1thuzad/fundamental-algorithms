@@ -23,7 +23,7 @@ void destroy_str(String *arr);
 
 int copystr(String *dst, String *src);
 
-int copy_newstr(String *dst, String *src);
+int copy_newstr(String *dst, const String *src);
 
 int concat_str(String *A, String B);
 

@@ -441,7 +441,7 @@ int concat(Array* A, Array B) {
 }
 
 // Concatenate B to A.
-int concat_str(Array* A, char* B) {
+int concat_str_to_arr(Array* A, char* B) {
     int i = 0;
     while (B[i] != '\0') {
         int err = append(A, B[i++]);

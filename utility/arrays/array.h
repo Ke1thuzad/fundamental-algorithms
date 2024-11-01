@@ -29,7 +29,7 @@ int add_arrays_base(Array A, Array B, Array* result, int base);
 int multiply(Array A, int B, int base, Array *result);
 int multiply_arrays(Array A, Array B, int base, Array* result);
 int concat(Array* A, Array B);
-int concat_str(Array* A, char* B);
+int concat_str_to_arr(Array* A, char* B);
 int slice(Array A, int start, int stop, int step, Array* result);
 int is_alnum(int x);
 int is_num(int x);

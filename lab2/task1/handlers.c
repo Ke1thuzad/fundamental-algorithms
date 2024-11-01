@@ -133,7 +133,7 @@ int handler_c(int argc, char **argv, Array *result) {
             rnd = rand() % amount;
         }
         str_list[rnd] = 1;
-        err = concat_str(result, argv[2 + rnd]);
+        err = concat_str_to_arr(result, argv[2 + rnd]);
         if (err)
             return err;
     }

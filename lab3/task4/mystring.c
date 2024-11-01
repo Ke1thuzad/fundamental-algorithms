@@ -1,6 +1,6 @@
 #include "mystring.h"
 
-int len(const char* str) {
+static int len(const char* str) {
     int i = 0;
     while (str[i] != '\0') {
         ++i;
@@ -86,21 +86,21 @@ int copystr(String *dst, String *src) {
     return 0;
 }
 
-int copy_newstr(String *dst, String *src) {
-    int err = create_str(dst, NULL);
+int copy_newstr(String *dst, const String *src) {
+    int err = create_str(dst, src->val);
     if (err)
         return err;
 
-    dst->length = src->length;
-
-    char *tempdst = dst->val, *tempsrc = src->val;
-    while ((*dst->val++ = *src->val++));
-    dst->val = tempdst;
-    src->val = tempsrc;
+//    (*dst)->length = src->length;
+//
+//    char *tempdst = (*dst)->val, *tempsrc = src->val;
+//    while ((*(*dst)->val++ = *src->val++));
+//    (*dst)->val = tempdst;
+//    src->val = tempsrc;
     return 0;
 }
 
-//int concat_str(String *A, String B) {
+//int concat_str_to_arr(String *A, String B) {
 //    for (int i = 0; i < B.length; ++i) {
 //        int err = append_str(A, B.val[i]);
 //        if (err)
