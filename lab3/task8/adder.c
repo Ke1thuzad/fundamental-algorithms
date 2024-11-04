@@ -9,11 +9,11 @@ int calculator(FILE *in) {
 
     while (!seek_char(&in, &ch) && ch > 0) {
         if (ch == '%') {
-            while ((ch = fgetc(in)) != '\n');
+            while ((ch = fgetc(in)) != '\n' && ch > 0);
             continue;
         }
         if (ch == '[') {
-            while ((ch = fgetc(in)) != ']');
+            while ((ch = fgetc(in)) != ']' && ch > 0);
             continue;
         }
 
@@ -101,6 +101,8 @@ int handle_command(FILE *in, Polynomial *current, Command cmd) {
         return err;
 
     Polynomial polynomials[2] = {{}, {}};
+    if (cmd == DIFFERENTIATION)
+        i++;
 
     if (i == 1)
         copy_polynomial(&polynomials[0], *current);
@@ -156,19 +158,21 @@ int handle_command(FILE *in, Polynomial *current, Command cmd) {
 }
 
 int read_arguments(FILE *in, Array *args, int *n) {
-    int ch;
+    int ch, any = 0;
 
     while ((ch = fgetc(in)) && ch > ' ' && ch != ')') {
         if (*n > 2)
             return throw_err(INCORRECT_INPUT_DATA);
 
-        if (ch != ',')
+        if (ch != ',') {
+            any = 1;
             append(&args[*n], (char) ch);
+        }
         else {
             (*n)++;
         }
     }
-    (*n)++;
+    (*n) += any;
 
     return 0;
 }
