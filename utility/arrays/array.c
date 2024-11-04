@@ -154,12 +154,19 @@ int str_to_arr(char* str, Array* result) {
 
 }
 
-void arr_to_value(Array arr, unsigned int* result) {
+void arr_to_value(Array arr, int *result) {
+    int sign = 1;
+
+    if (arr.val[0] == '-')
+        sign = -1;
+
     *result = 0;
-    for (int i = 0; i < arr.length; ++i) {
+    for (int i = (-sign + 1) / 2; i < arr.length; ++i) {
         *result *= 10;
         *result += arr.val[i] - '0';
     }
+
+    *result *= sign;
 }
 
 int add(const Array A, unsigned int B, Array* result) {

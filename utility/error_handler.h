@@ -11,7 +11,8 @@ typedef enum errcode {
     INCORRECT_OPTION,
     MEMORY_NOT_ALLOCATED,
     FILE_ERROR,
-    INCORRECT_INPUT_DATA
+    INCORRECT_INPUT_DATA,
+    DIVISION_BY_ZERO
 } errcode;
 
 int throw_err(errcode err);

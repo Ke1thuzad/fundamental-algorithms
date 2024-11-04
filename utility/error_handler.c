@@ -25,6 +25,9 @@ int throw_err(errcode err) {
         case INCORRECT_INPUT_DATA:
             err_msg = "Input data is not valid.";
             break;
+        case DIVISION_BY_ZERO:
+            err_msg = "Trying to divide by zero.";
+            break;
         default:
             err_msg = "An unknown message has occurred.";
             break;

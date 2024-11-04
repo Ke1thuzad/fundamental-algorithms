@@ -20,7 +20,7 @@ int reverse(Array* arr);
 void print_arr(Array arr);
 void reverse_print_arr(Array arr);
 int value_to_arr(unsigned int value, Array* result);
-void arr_to_value(Array arr, unsigned int* result);
+void arr_to_value(Array arr, int *result);
 int value_to_arr_base(unsigned int value, int base, Array* result);
 int str_to_arr(char* str, Array* result);
 int add(Array A, unsigned int B, Array* result);

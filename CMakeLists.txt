@@ -158,6 +158,18 @@ add_executable(lab3t2 lab3/task2/main.c lab3/task2/main.h
         lab3/task2/vectorarray.c
         utility/error_handler.c
         utility/error_handler.h)
+add_executable(lab3t6 lab3/task6/main.c lab3/task6/main.h
+        utility/error_handler.c
+        utility/error_handler.h)
+add_executable(lab3t8 lab3/task8/main.c lab3/task8/main.h
+        lab3/task8/polynomial.c
+        utility/error_handler.c
+        utility/error_handler.h
+        lab3/task8/adder.c
+        utility/arrays/array.c
+        utility/arrays/array.h
+        utility/overio.c
+        utility/overio.h)
 
 
 target_link_libraries(lab1t1 m)
