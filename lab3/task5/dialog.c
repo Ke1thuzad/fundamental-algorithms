@@ -49,9 +49,6 @@ int dialog_manager(FILE* in, FILE* out) {
                 return throw_err(INCORRECT_OPTION);
         }
     }
-
-//    destroy_stud(&students);
-//    return 0;
 }
 
 int wait_command(Command *result) {

@@ -1,4 +1,6 @@
 #include "main.h"
+#include "../task7/main.h"
+#include "../task5/main.h"
 
 int dialog_manager() {
     DialogFSM state = COMMAND_WAIT;
@@ -261,7 +263,7 @@ int handle_command(Command cmd, Post *post) {
         case REMOVE:
             // wtf?
             String stringID;
-            err = wait_search_param(&stringID);
+            err = wait_search_param(&stringID, PATRONYMIC);
 
             if (err)
                 return err;
@@ -311,7 +313,7 @@ int handle_command(Command cmd, Post *post) {
 
             String searchParameter;
 
-            err = wait_search_param(&searchParameter);
+            err = wait_search_param(&searchParameter, PATRONYMIC);
 
             if (err) {
                 free(found);
@@ -363,7 +365,7 @@ int wait_param(Command cmd, int *param) {
     }
 }
 
-int wait_search_param(String *searchParam) {
+int wait_search_param(SearchParameter *searchParam, SearchCriteria criteria) {
     printf("Please enter parameter to search for: \n");
     int scan_read = 0;
     char buf[1000];

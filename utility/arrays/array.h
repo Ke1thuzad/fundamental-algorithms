@@ -38,6 +38,7 @@ int to_lower(int x);
 int base_char_to_dec(char x);
 int seek_char(FILE **f, int *result);
 int read_value(FILE **f, Array *result, char first);
+int read_whole_input(Array *result);
 int is_arr_equal(Array str1, Array str2);
 int arr_compare(Array str1, Array str2);
 

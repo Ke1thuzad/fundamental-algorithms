@@ -91,12 +91,6 @@ int copy_newstr(String *dst, const String *src) {
     if (err)
         return err;
 
-//    (*dst)->length = src->length;
-//
-//    char *tempdst = (*dst)->val, *tempsrc = src->val;
-//    while ((*(*dst)->val++ = *src->val++));
-//    (*dst)->val = tempdst;
-//    src->val = tempsrc;
     return 0;
 }
 

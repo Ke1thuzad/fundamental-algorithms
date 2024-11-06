@@ -488,19 +488,38 @@ int seek_char(FILE **f, int *result) {
 
 int read_value(FILE **f, Array *result, char first) {
     int err;
+
     if (first) {
         err = append(result, first);
         if (err)
             return err;
     }
+
     int character = fgetc(*f);
+
     while (character > ' ') {
         err = append(result, (char) character);
         if (err)
             return err;
         character = fgetc(*f);
     }
-    fseek(*f, -1, SEEK_CUR);
+
+    if (*f != stdin)
+        fseek(*f, -1, SEEK_CUR);
+
+    return 0;
+}
+
+int read_whole_input(Array *result) {
+    int err;
+
+    char buf[1000];
+
+    fgets(buf, 999, stdin);
+
+    str_to_arr(buf, result);
+
+    result->val[result->length--] = '\0';
 
     return 0;
 }

@@ -179,6 +179,19 @@ add_executable(lab3t10 lab3/task10/main.c lab3/task10/main.h
         utility/overio.c
         utility/overio.h)
 
+add_executable(lab3t7 lab3/task7/main.c lab3/task7/main.h
+        lab3/task7/list.c
+        lab3/task7/dialog.c
+        lab3/task7/stack.c
+        utility/error_handler.c
+        utility/error_handler.h
+        utility/arrays/array.c
+        utility/arrays/array.h
+        utility/overio.c
+        utility/overio.h
+        lab3/task4/mystring.c
+        lab3/task4/mystring.h)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
