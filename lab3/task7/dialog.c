@@ -785,12 +785,14 @@ int change_export_path(Array *initial_path) {
     if (!err) {
         return throw_err(INCORRECT_INPUT_DATA);
     }
+
+    return 0;
 }
 
 int undo_cmd(LiverList **list, UndoStack *stack) {
     int err;
 
-    for (int i = 0; i < stack->length / 2; ++i) {
+    for (int i = 0; i < (stack->length + 1) / 2; ++i) {
         Change *change = pop_stack(stack);
         LiverList *found;
 
@@ -799,6 +801,8 @@ int undo_cmd(LiverList **list, UndoStack *stack) {
                 err = find_liver(list, *change->changed, &found);
                 if (err)
                     return err;
+
+                delete_node(list, found);
 
                 break;
             case REMOVE:
@@ -818,8 +822,13 @@ int undo_cmd(LiverList **list, UndoStack *stack) {
             default:
                 return throw_err(INCORRECT_OPTION);
         }
-        destroy_liver(change->old);
-        destroy_liver(change->changed);
+        if (change->old)
+            destroy_liver(change->old);
+        if (change->changed)
+            destroy_liver(change->changed);
+
+        free(change->old);
+        free(change->changed);
     }
 
     destroy_stack(stack);
@@ -827,5 +836,7 @@ int undo_cmd(LiverList **list, UndoStack *stack) {
     err = create_stack(stack);
     if (err)
         return err;
+
+    return 0;
 }
 
