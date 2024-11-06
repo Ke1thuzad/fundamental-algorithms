@@ -8,9 +8,13 @@ int dialog_manager() {
 
     int err;
 
-    err = init_post(&post);
-    if (err)
-        return err;
+    while (1) {
+        err = init_post(&post);
+        printf("\n");
+        if (!err) {
+            break;
+        }
+    }
 
     printf("Please input your command (or type 'help' for info).\n");
     while (1) {
@@ -50,7 +54,7 @@ int dialog_manager() {
 }
 
 int init_post(Post *post) {
-    int scan_read = 0;
+    int scan_read = 0, cur_read = 0;
 
     Array post_index, building, city, street;
 
@@ -79,28 +83,105 @@ int init_post(Post *post) {
         return err;
     }
 
-    unsigned int apartment, house;
+    int apartment, house;
 
     printf("Enter post address details:\n");
     printf("Post Index (6 digits): ");
-    scan_read += overfscanf(stdin, " %S", &post_index);
-    printf("City: ");
-    scan_read += overfscanf(stdin, " %S", &city);
-    printf("Street: ");
-    scan_read += overfscanf(stdin, " %S", &street);
-    printf("Building: ");
-    scan_read += overfscanf(stdin, " %S", &building);
-    printf("Block: ");
-    scan_read += scanf("%u", &house);
-    printf("Apartment: ");
-    scan_read += scanf("%u", &apartment);
+    scan_read += (cur_read = overfscanf(stdin, " %S", &post_index));
+//    fseek(stdin, 1, SEEK_CUR);
 
-    if (scan_read != 6)
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
         return throw_err(INCORRECT_INPUT_DATA);
+    }
+    printf("City: ");
+    scan_read += (cur_read = overfscanf(stdin, " %S", &city));
+//    fseek(stdin, 1, SEEK_CUR);
 
-    Address *addr = (Address*) malloc(sizeof(Address));
-    if (!addr)
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+    printf("Street: ");
+    scan_read += (cur_read = overfscanf(stdin, " %S", &street));
+//    fseek(stdin, 1, SEEK_CUR);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
+    printf("Building: ");
+    scan_read += (cur_read = overfscanf(stdin, " %S", &building));
+//    fseek(stdin, 1, SEEK_CUR);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
+    printf("Block (natural number): ");
+    scan_read += (cur_read = scanf("%d", &house));
+    char buf[1000];
+    fgets(buf, 1000, stdin);
+//    fseek(stdin, 1, SEEK_CUR);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
+    printf("Apartment (natural number): ");
+    scan_read += (cur_read = scanf("%d", &apartment));
+    fgets(buf, 1000, stdin);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
+    if (scan_read != 6) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
+    Address *addr = (Address *) malloc(sizeof(Address));
+    if (!addr) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+
         return throw_err(MEMORY_NOT_ALLOCATED);
+    }
 
     err = create_address(addr, post_index.val, building.val, city.val, street.val, apartment, house);
 
@@ -174,11 +255,11 @@ int handle_command(Command cmd, Post *post) {
         case ADD:
             err = add_mail_cmd(post);
             if (err)
-                return err;
+                return 0;
 
             break;
         case REMOVE:
-            if (1) {} // wtf?
+            // wtf?
             String stringID;
             err = wait_search_param(&stringID);
 
@@ -216,7 +297,8 @@ int handle_command(Command cmd, Post *post) {
                 } else if (param == 2) {
                     search_mail_delayed(post, found, &index);
                 } else {
-                    return throw_err(INCORRECT_OPTION);
+                    throw_err(INCORRECT_OPTION);
+                    return 0;
                 }
 
                 for (int i = 0; i < index; ++i) {
@@ -240,7 +322,7 @@ int handle_command(Command cmd, Post *post) {
             destroy_str(&searchParameter);
 
             if (err) {
-                printf("No occurrences were found.");
+                printf("No occurrences were found.\n");
                 free(found);
                 return 0;
             }
@@ -342,7 +424,7 @@ void print_cmd(Post post) {
 }
 
 int add_mail_cmd(Post *post) {
-    int scan_read = 0;
+    int scan_read = 0, cur_read = 0;
 
     char creation_date_p1[15], creation_date_p2[15];
     char delivery_date_p1[15], delivery_date_p2[15];
@@ -383,30 +465,136 @@ int add_mail_cmd(Post *post) {
         return err;
     }
 
-    unsigned int apartment, house;
+    int apartment, house;
     float weight;
 
     printf("Enter mail details:\n");
+
     printf("Post Index (6 digits): ");
-    scan_read += overfscanf(stdin, " %S", &post_index);
+    scan_read += (cur_read = overfscanf(stdin, " %S", &post_index));
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
     printf("City: ");
-    scan_read += overfscanf(stdin, " %S", &city);
+    scan_read += (cur_read = overfscanf(stdin, " %S", &city));
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
     printf("Street: ");
-    scan_read += overfscanf(stdin, " %S", &street);
+    scan_read += (cur_read = overfscanf(stdin, " %S", &street));
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
     printf("Building: ");
-    scan_read += overfscanf(stdin, " %S", &building);
+    scan_read += (cur_read = overfscanf(stdin, " %S", &building));
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
     printf("Block (natural number): ");
-    scan_read += scanf("%u", &house);
+    scan_read += (cur_read = scanf("%d", &house));
+    char buf[1000];
+    fgets(buf, 1000, stdin);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
+
     printf("Apartment (natural number): ");
-    scan_read += scanf("%u", &apartment);
+    scan_read += (cur_read = scanf("%d", &apartment));
+    fgets(buf, 1000, stdin);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
     printf("Weight (positive real number): ");
-    scan_read += scanf("%f", &weight);
+    scan_read += (cur_read = scanf("%f", &weight));
+    fgets(buf, 1000, stdin);
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
     printf("ID (14 digits): ");
-    scan_read += overfscanf(stdin, " %S", &id);
+    scan_read += (cur_read = overfscanf(stdin, " %S", &id));
+
+    if (cur_read < 1) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
     printf("Creation Date (dd:mm:yyyy hh:mm:ss): ");
-    scan_read += scanf("%10s %8s", creation_date_p1, creation_date_p2);
+    scan_read += (cur_read = scanf("%10s %8s", creation_date_p1, creation_date_p2));
+    fgets(buf, 1000, stdin);
+
+    if (cur_read < 2) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
     printf("Delivery Date (dd:mm:yyyy hh:mm:ss): ");
-    scan_read += scanf("%10s %8s", delivery_date_p1, delivery_date_p2);
+    scan_read += (cur_read = scanf("%10s %8s", delivery_date_p1, delivery_date_p2));
+    fgets(buf, 1000, stdin);
+
+    if (cur_read < 2) {
+        destroy(&post_index);
+        destroy(&building);
+        destroy(&city);
+        destroy(&street);
+        destroy(&id);
+
+        return throw_err(INCORRECT_INPUT_DATA);
+    }
 
     if (scan_read != 12)
         return throw_err(INCORRECT_INPUT_DATA);
@@ -416,6 +604,7 @@ int add_mail_cmd(Post *post) {
         return throw_err(MEMORY_NOT_ALLOCATED);
 
     err = create_address(addr, post_index.val, building.val, city.val, street.val, apartment, house);
+
 
     destroy(&post_index);
     destroy(&building);
@@ -445,15 +634,15 @@ int add_mail_cmd(Post *post) {
     free(addr);
     destroy(&id);
 
-    if (err) {
+    if (err)
         return err;
-    }
+
 
     err = append_post(post, mail);
     destroy_mail(&mail);
-    if (err) {
+    if (err)
         return err;
-    }
+
 
     printf("Mail added successfully.\n");
     return 0;

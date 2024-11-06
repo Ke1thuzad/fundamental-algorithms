@@ -7,8 +7,8 @@ int main(int argc, char **argv) {
     char *in = argv[1];
     char *out = argv[2];
 
-//    if (check_paths(in, out))
-//        return throw_err(INCORRECT_ARGUMENTS);
+    if (check_paths(in, out))
+        return throw_err(INCORRECT_ARGUMENTS);
 
     FILE* inp = fopen(in, "r");
     if (!inp)

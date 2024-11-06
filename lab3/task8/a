@@ -1,8 +1,12 @@
-Add(x^2+x+1,x^2+2x); xuy xuy
-Add(2x^2);
-Add(5x^2);
-Add(10x);
-Add(5);
+[[Div(x^10-12x^7+45x^6-123x^2+87,x^7-12x^6-x^2+1);%x^3 +
+Mod(x^10-12x^7+45x^6-123x^2+87,x^7-12x^6-x^2+1);%x^3 +
+Mod(-12x^7+x^10-x^8-123x^2+87+45x^6,x^7-12x^6-x^2+1);
+                            ]]Add(x^2+x+1,x^2+2x); asuu saefas;
+[Add(2x^2);
+AdD(5x^2);
+Add(10x);]
+Add(x);
+[Add(5);
 Sub(5);
 Sub(0);
 Add(0); Sub(0);Add(0);
@@ -10,9 +14,10 @@ Mult(x^2,x);
 Add(1);
 Diff(x^2);
 Diff();
-Mult(156x^6,1);
-Cmps(x^2);
+Mult(156x^6,1);]
+Cmps(2x^0.5,x^2);
 Eval(1);
 Add(1);
 Add(5x^9+x^5+2x^2,1);
-%Eval(5);
+Eval(5);
+[]

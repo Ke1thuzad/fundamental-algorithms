@@ -98,6 +98,59 @@ int append_polynomial(Polynomial *head, int val) {
     return err > 1;
 }
 
+int search_polynomial_power(Polynomial *a, int val, int power, int max_power) {
+    List *cur = a->head, *prev;
+
+    int err;
+    int cur_power = max_power;
+
+    if (power > cur_power) {
+        for (int i = power - 1; i > cur_power; --i) {
+            err = prepend_polynomial(a, 0);
+            if (err)
+                return err;
+        }
+        err = prepend_polynomial(a, val);
+        if (err)
+            return err;
+        return 1;
+    }
+
+    if (cur_power == power) {
+        err = prepend_polynomial(a, val);
+        if (err)
+            return err;
+        return 1;
+    }
+
+    while (cur && cur_power != power) {
+        prev = cur;
+        cur_power--;
+        cur = cur->next;
+    }
+
+    if (!cur && cur_power != power) {
+        for (int i = cur_power; i > power; --i) {
+            err = append_polynomial(a, 0);
+            if (err)
+                return err;
+        }
+    } else if (cur && cur_power == power) {
+        List *temp = create_node(val);
+
+        if (!temp)
+            return throw_err(MEMORY_NOT_ALLOCATED);
+
+        temp->next = cur->next;
+        free(cur);
+        prev->next = temp;
+
+        return 1;
+    }
+
+    return 0;
+}
+
 void print_polynomial(Polynomial head) {
     List *cur = head.head;
     int power = head.n;

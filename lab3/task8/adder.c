@@ -90,69 +90,138 @@ int handle_command(FILE *in, Polynomial *current, Command cmd) {
         return err;
 
     err = create_arr(5, &args[1]);
-    if (err)
+    if (err) {
+        destroy(&args[0]);
         return err;
+    }
 
     int i = 0;
     int point;
 
     err = read_arguments(in, args, &i);
-    if (err)
+    if (err) {
+        destroy(&args[0]);
+        destroy(&args[1]);
         return err;
+    }
 
     Polynomial polynomials[2] = {{}, {}};
     if (cmd == DIFFERENTIATION)
         i++;
 
     if (i == 1)
-        copy_polynomial(&polynomials[0], *current);
+        err = copy_polynomial(&polynomials[0], *current);
     else
-        parse_polynomial(args[0], &polynomials[0]);
+        err = parse_polynomial(args[0], &polynomials[0]);
+    if (err > 1) {
+
+        destroy_polynomial(&polynomials[0]);
+        destroy_polynomial(&polynomials[1]);
+        destroy(&args[0]);
+        destroy(&args[1]);
+        return err;
+    }
 
     if (cmd != EVALUATION) {
-        parse_polynomial(args[i - 1], &polynomials[1]);
+        err = parse_polynomial(args[i - 1], &polynomials[1]);
         destroy_polynomial(current);
     } else {
         arr_to_value(args[i - 1], &point);
     }
 
+    if (err > 1) {
+        destroy(&args[0]);
+        destroy(&args[1]);
+
+        destroy_polynomial(&polynomials[0]);
+        destroy_polynomial(&polynomials[1]);
+
+        return err;
+    }
+//    print_polynomial(polynomials[0]);
+//    print_polynomial(polynomials[1]);
+
+    destroy(&args[0]);
+    destroy(&args[1]);
 
     switch (cmd) {
         case SUM:
-            add_polynomials(polynomials[0], polynomials[1], current);
+            err = add_polynomials(polynomials[0], polynomials[1], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
             break;
         case SUBTRACTION:
-            subtract_polynomials(polynomials[0], polynomials[1], current);
+            err = subtract_polynomials(polynomials[0], polynomials[1], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
+
             break;
         case MULTIPLICATION:
-            multiply_polynomials(polynomials[0], polynomials[1], current);
+            err = multiply_polynomials(polynomials[0], polynomials[1], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
+
             break;
         case DIVISION:
-            divide_polynomials(polynomials[0], polynomials[1], current);
+            err = divide_polynomials(polynomials[0], polynomials[1], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
+
             break;
         case MODULUS:
-            modulus_polynomials(polynomials[0], polynomials[1], current);
+            err = modulus_polynomials(polynomials[0], polynomials[1], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
+
             break;
         case EVALUATION:
             printf("%d\n", evaluate_point(polynomials[0], point));
+
             break;
         case DIFFERENTIATION:
-            derive_polynomial(polynomials[0], current);
+            err = derive_polynomial(polynomials[0], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
+
             break;
         case COMPOSITION:
-            compose_polynomials(polynomials[0], polynomials[1], current);
+            err = compose_polynomials(polynomials[0], polynomials[1], current);
+            if (err) {
+                destroy_polynomial(&polynomials[0]);
+                destroy_polynomial(&polynomials[1]);
+                return err;
+            }
+
             break;
         default:
-            destroy(&args[0]);
-            destroy(&args[1]);
+            destroy_polynomial(&polynomials[0]);
+            destroy_polynomial(&polynomials[1]);
             return throw_err(INCORRECT_OPTION);
     }
 
     if (cmd != EVALUATION)
         print_polynomial(*current);
 
-    destroy(&args[0]);
-    destroy(&args[1]);
+    destroy_polynomial(&polynomials[0]);
+    destroy_polynomial(&polynomials[1]);
 
     return 0;
 }
@@ -204,8 +273,10 @@ int parse_polynomial(Array str, Polynomial *res) {  // TODO: add in-between sear
 
     for (int i = 0; i < str.length; ++i) {
         char cur = str.val[i];
+        if (cur == ' ')
+            continue;
 
-        if (first && cur == '-') {
+        if (first && cur == '-' && coefficient == 0 && power == 0) {
             minus = 1;
         } else if (cur == '+' || cur == '-') {
             if (is_x && !power && is_truly_x)
@@ -213,22 +284,24 @@ int parse_polynomial(Array str, Polynomial *res) {  // TODO: add in-between sear
 
             int pwr_diff = abs(prev_power - power);
 
-            if (pwr_diff > 1 && !first) {
-                for (int j = 1; j < pwr_diff; ++j) {
-                    int err = append_polynomial(res, 0);
-                    if (err)
-                        return err;
-                }
-            }
+            int flag = 0;
 
             coefficient = abs(coefficient) > 0 ? coefficient : 1;
 
             if (minus)
                 coefficient *= -1;
 
-            int err = append_polynomial(res, coefficient);
-            if (err)
-                return err;
+            if (pwr_diff > 1 && !first) {
+                flag = search_polynomial_power(res, coefficient, power, max_power);
+                if (flag > 1)
+                    return flag;
+            }
+
+            if (!flag) {
+                int err = append_polynomial(res, coefficient);
+                if (err)
+                    return err;
+            }
 
             if (power > max_power)
                 max_power = power;
@@ -268,27 +341,29 @@ int parse_polynomial(Array str, Polynomial *res) {  // TODO: add in-between sear
 
     int pwr_diff = abs(prev_power - power);
 
-    if (pwr_diff > 1 && !first) {
-        for (int j = 1; j < pwr_diff; ++j) {
-            int err = append_polynomial(res, 0);
-            if (err)
-                return err;
-        }
-    }
-
     if (power > 0)
         coefficient = abs(coefficient) > 0 ? coefficient : 1;
 
     if (minus)
         coefficient *= -1;
 
-    int err = append_polynomial(res, coefficient);
-    if (err)
-        return err;
+    int flag = 0;
+
+    if (pwr_diff > 1 && !first) {
+        flag = search_polynomial_power(res, coefficient, power, max_power);
+        if (flag > 1)
+            return flag;
+    }
+
+    if (!flag) {
+        int err = append_polynomial(res, coefficient);
+        if (err)
+            return err;
+    }
 
     if (power > 0) {
         for (int j = power; j > 0; --j) {
-            err = append_polynomial(res, 0);
+            int err = append_polynomial(res, 0);
             if (err)
                 return err;
         }
@@ -296,9 +371,6 @@ int parse_polynomial(Array str, Polynomial *res) {  // TODO: add in-between sear
 
     if (power > max_power)
         max_power = power;
-
-    if (is_power)
-        return 1;
 
     res->n = max_power;
 

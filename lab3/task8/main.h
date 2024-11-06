@@ -35,6 +35,7 @@ int append_list(List **list, int val);
 int delete_node(List **list, List *addr);
 int copy_list(List **dst, List *src);
 
+int search_polynomial_power(Polynomial *a, int val, int power, int max_power);
 int prepend_polynomial(Polynomial *head, int val);
 int append_polynomial(Polynomial *head, int val);
 void print_polynomial(Polynomial head);

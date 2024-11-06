@@ -39,8 +39,8 @@ int parse_time(const String *str, Time *time) {
 }
 
 int compare_creation_date(const void *a, const void *b) {
-    Mail *m1 = (Mail *)a;
-    Mail *m2 = (Mail *)b;
+    Mail *m1 = (Mail *) a;
+    Mail *m2 = (Mail *) b;
 
     return compare_time_str(&m1->creation_date, &m2->creation_date);
 }
@@ -74,8 +74,8 @@ int compare_time(const void *a, const void *b) {
     return t1.second - t2.second;
 }
 
-int create_address(Address *addr, char *post_index, char *building, char *city, char *street, unsigned int apartment,
-                   unsigned int house) {
+int create_address(Address *addr, char *post_index, char *building, char *city, char *street, int apartment,
+                   int house) {
     int err = create_str(&addr->post_index, post_index);
     if (err)
         return err;
@@ -97,6 +97,18 @@ int create_address(Address *addr, char *post_index, char *building, char *city, 
 
     if (addr->post_index.length != 6 || addr->building.length == 0 || addr->city.length == 0 ||
         addr->street.length == 0 || apartment < 1 || house < 1)
+        return throw_err(INCORRECT_INPUT_DATA);
+
+    int k = 0;
+
+    for (int i = 0; i < addr->post_index.length; ++i) {
+        if (!is_num(addr->post_index.val[i])) {
+            k = 1;
+            break;
+        }
+    }
+
+    if (k)
         return throw_err(INCORRECT_INPUT_DATA);
 
     return 0;

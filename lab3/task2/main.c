@@ -196,7 +196,7 @@ int main() {
             }
         }
         int count_vectors = 2;
-        int count_norms = 2;
+        int count_norms = 3;
         int p = 2;
         VectorArray **vectors = NULL;
         int errorMsg = compute_norms(&vectors, count_vectors, count_norms, v1, v2, norm1, norm2, p, norm3, A);

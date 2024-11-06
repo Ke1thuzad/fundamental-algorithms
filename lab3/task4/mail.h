@@ -53,8 +53,8 @@ int compare_creation_date(const void *a, const void *b);
 int compare_time_str(const void *a, const void *b);
 int compare_time(const void *a, const void *b);
 
-int create_address(Address *addr, char *post_index, char *building, char *city, char *street, unsigned int apartment,
-                   unsigned int house);
+int create_address(Address *addr, char *post_index, char *building, char *city, char *street, int apartment,
+                   int house);
 int copy_address(Address *dst, const Address *src);
 void print_address(Address addr);
 void destroy_address(Address *addr);
