@@ -142,6 +142,7 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
 
             break;
         case REMOVE:
+            printf("To remove a Liver, you have to find him using search.\n");
             err = wait_param(cmd, &param);
             if (err == EOF)
                 return err;
@@ -167,6 +168,7 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
 
             break;
         case EDIT:
+            printf("To edit a Liver, you have to find him using search.\n");
             err = wait_param(cmd, &param);
             if (err == EOF)
                 return err;
