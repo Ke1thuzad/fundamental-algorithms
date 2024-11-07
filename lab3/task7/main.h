@@ -83,7 +83,7 @@ void destroy_list(LiverList **list);
 void destroy_liver(Liver *liver);
 int copy_liver(Liver *dst, const Liver *src);
 int find_liver(LiverList **livers, Liver val, LiverList **result);
-int liver_search(LiverList **livers, SearchCriteria criteria, SearchParameter param, LiverList **result, int addresses);
+int liver_search(LiverList **livers, SearchCriteria criteria, SearchParameter param, LiverList **result);
 void write_livers(FILE *out, LiverList *list);
 
 int compare_age(const void *liver1, const void *liver2);

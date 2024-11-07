@@ -146,19 +146,24 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
             if (err == EOF)
                 return err;
 
-            if (err)
+            if (err || param < 0 || param > 5) {
+                throw_err(INCORRECT_OPTION);
                 break;
+            }
 
             err = wait_search_param(&parameter, param);
             if (err)
                 return err;
 
             err = delete_liver(livers, param, parameter, undoStack);
-            if (err)
-                return err;
 
             if (param >= SURNAME && param <= BIRTHDATE)
                 destroy_str(&parameter.str);
+
+            if (!err || err == INCORRECT_INPUT_DATA || err == OUT_OF_BOUNDS)
+                return 0;
+            else
+                return err;
 
             break;
         case EDIT:
@@ -166,19 +171,24 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
             if (err == EOF)
                 return err;
 
-            if (err)
+            if (err || param < 0 || param > 5) {
+                throw_err(INCORRECT_OPTION);
                 break;
+            }
 
             err = wait_search_param(&parameter, param);
             if (err)
                 return err;
 
             err = edit_liver(livers, param, parameter, undoStack);
-            if (err)
-                return err;
 
             if (param >= SURNAME && param <= BIRTHDATE)
                 destroy_str(&parameter.str);
+
+            if (!err || err == INCORRECT_INPUT_DATA || err == OUT_OF_BOUNDS)
+                return 0;
+            else
+                return err;
 
             break;
         case SEARCH:
@@ -186,8 +196,10 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
             if (err == EOF)
                 return err;
 
-            if (err)
+            if (err || param < 0 || param > 5) {
+                throw_err(INCORRECT_OPTION);
                 break;
+            }
 
             err = wait_search_param(&parameter, param);
             if (err)
@@ -195,7 +207,7 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
 
             LiverList *result = {};
 
-            int found = liver_search(livers, param, parameter, &result, 0);
+            int found = liver_search(livers, param, parameter, &result);
 
             if (param >= SURNAME && param <= BIRTHDATE)
                 destroy_str(&parameter.str);
@@ -216,7 +228,10 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
             change_export_path(export_path);
             break;
         case EXPORT:
-            err = 0;
+            if (export_path->length == 0) {
+                printf("No path for export file was provided.\n");
+                return 0;
+            }
 
             FILE *out = fopen(export_path->val, "w");
             if (!out)
@@ -495,7 +510,7 @@ int delete_liver(LiverList **list, SearchCriteria criteria, SearchParameter para
     LiverList *res = {};
     int read;
 
-    if (!(read = liver_search(list, criteria, parameter, &res, 1))) {
+    if (!(read = liver_search(list, criteria, parameter, &res))) {
         printf("No livers with this parameter were found.\n");
 
         destroy_list(&res);
@@ -503,17 +518,29 @@ int delete_liver(LiverList **list, SearchCriteria criteria, SearchParameter para
     }
 
     printf("Found livers:");
-    write_livers(stdout, *list);
+    write_livers(stdout, res);
 
     printf("Choose Liver to delete (type number of occurrence): ");
 
     int i;
 
-    if (!scanf("%d", &i)) {
+    if (!scanf("%d", &i) || i < 1 || i > read) {
+        destroy_list(&res);
         return throw_err(INCORRECT_INPUT_DATA);
     }
 
-    Change newChange = {REMOVE, &res[i].val, NULL};
+    LiverList *cur = res;
+
+    for (int j = 1; j < i; ++j) {
+        if (!cur) {
+            destroy_list(&res);
+            return throw_err(OUT_OF_BOUNDS);
+        }
+
+        cur = cur->next;
+    }
+
+    Change newChange = {REMOVE, &cur->val, NULL};
 
     int err = push_stack(undoStack, newChange);
     if (err) {
@@ -521,7 +548,10 @@ int delete_liver(LiverList **list, SearchCriteria criteria, SearchParameter para
         return err;
     }
 
-    err = delete_node(list, &res[i]);
+    LiverList *deleting;
+    find_liver(list, cur->val, &deleting);
+
+    err = delete_node(list, deleting);
     destroy_list(&res);
     if (err)
         return err;
@@ -536,7 +566,7 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
     int read;
     int err;
 
-    if (!(read = liver_search(list, criteria, parameter, &res, 1))) {
+    if (!(read = liver_search(list, criteria, parameter, &res))) {
         printf("No livers with this parameter were found.\n");
 
         destroy_list(&res);
@@ -544,19 +574,34 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
     }
 
     printf("Found livers:\n");
-    write_livers(stdout, *list);
+    write_livers(stdout, res);
 
     printf("Choose Liver to edit (type number of occurrence): ");
 
     int i;
 
     if (!scanf("%d", &i) || i < 1 || i > read) {
+        destroy_list(&res);
         return throw_err(INCORRECT_INPUT_DATA);
     }
 
-    LiverList *liver = &res[i - 1];
+    LiverList *cur = res;
 
-    Liver changingLiver = liver->val;
+    for (int j = 1; j < i; ++j) {
+        if (!cur) {
+            destroy_list(&res);
+            return throw_err(OUT_OF_BOUNDS);
+        }
+
+        cur = cur->next;
+    }
+
+    LiverList *editing;
+    find_liver(list, cur->val, &editing);
+
+    Liver changingLiver = editing->val, oldLiver;
+
+    copy_liver(&oldLiver, &changingLiver);
 
     destroy_list(&res);
 
@@ -568,29 +613,42 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
 
     printf("Choose parameter to edit (number): ");
 
-    if (!scanf("%d", &i) || i < 1 || i > read) {
+    if (!scanf("%d", &i) || i < 1 || i > 6) {
+        destroy_liver(&oldLiver);
         return throw_err(INCORRECT_OPTION);
     }
+
+    i--;
 
     Array temp;
     String edit_value;
 
     err = create_arr(5, &temp);
-    if (err)
+    if (err) {
+        destroy_liver(&oldLiver);
         return err;
+    }
 
     if (i >= SURNAME && i <= BIRTHDATE) {
         printf("Choose new string value: ");
+        fgetc(stdin);
 
         err = read_whole_input(&temp);
-        if (err)
+        if (err) {
+            destroy_liver(&oldLiver);
+            destroy(&temp);
             return err;
+        }
     }
 
     err = create_str(&edit_value, temp.val);
     destroy(&temp);
-    if (err)
+    if (err) {
+        destroy_liver(&oldLiver);
         return err;
+    }
+
+    Time time;
 
     switch (i) {
         case SURNAME:
@@ -603,6 +661,12 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
             copystr(&changingLiver.patronymic, &edit_value);
             break;
         case BIRTHDATE:
+            if (parse_time(&edit_value, &time)) {
+                destroy_liver(&oldLiver);
+                destroy_str(&edit_value);
+                return throw_err(INCORRECT_INPUT_DATA);
+            }
+
             copystr(&changingLiver.birthdate, &edit_value);
             break;
         case SEX:
@@ -611,8 +675,11 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
             char sex;
 
             err = scanf("%c", &sex);
-            if (!err || sex != 'W' && sex != 'M')
+            if (!err || sex != 'W' && sex != 'M') {
+                destroy_liver(&oldLiver);
+                destroy_str(&edit_value);
                 return throw_err(INCORRECT_INPUT_DATA);
+            }
 
             changingLiver.sex = sex;
             break;
@@ -622,25 +689,31 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
             float salary;
 
             err = scanf("%f", &salary);
-            if (!err || salary < 0)
+            if (!err || salary < 0) {
+                destroy_liver(&oldLiver);
+                destroy_str(&edit_value);
                 return throw_err(INCORRECT_INPUT_DATA);
+            }
 
             changingLiver.mean_salary = salary;
             break;
         default:
+            destroy_liver(&oldLiver);
             destroy_str(&edit_value);
             return throw_err(INCORRECT_OPTION);
     }
 
     destroy_str(&edit_value);
 
-    Change newChange = {EDIT, &liver->val, &changingLiver};
+    Change newChange = {EDIT, &oldLiver, &changingLiver};
 
     err = push_stack(undoStack, newChange);
     if (err)
         return err;
 
-    liver->val = changingLiver;
+    destroy_liver(&oldLiver);
+
+    editing->val = changingLiver;
 
     printf("Liver was edited successfully.\n");
 
@@ -792,6 +865,8 @@ int change_export_path(Array *initial_path) {
 int undo_cmd(LiverList **list, UndoStack *stack) {
     int err;
 
+    printf("%d actions were undone.\n", (stack->length + 1) / 2);
+
     for (int i = 0; i < (stack->length + 1) / 2; ++i) {
         Change *change = pop_stack(stack);
         LiverList *found;
@@ -801,6 +876,8 @@ int undo_cmd(LiverList **list, UndoStack *stack) {
                 err = find_liver(list, *change->changed, &found);
                 if (err)
                     return err;
+
+                destroy_liver(&found->val);
 
                 delete_node(list, found);
 
@@ -822,6 +899,7 @@ int undo_cmd(LiverList **list, UndoStack *stack) {
             default:
                 return throw_err(INCORRECT_OPTION);
         }
+
         if (change->old)
             destroy_liver(change->old);
         if (change->changed)

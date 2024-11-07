@@ -42,7 +42,7 @@ int append_list(LiverList **list, Liver val) {
 
     temp->next = new;
 
-    return 1;
+    return 0;
 }
 
 int append_list_address(LiverList **list, LiverList *val) {
@@ -78,8 +78,8 @@ int delete_node(LiverList **list, LiverList *addr) {
             return 0;
         }
 
-        cur = cur->next;
         prev = cur;
+        cur = cur->next;
     }
 
     *list = cur;
@@ -141,12 +141,16 @@ void write_livers(FILE *out, LiverList *list) {
 
 int insert_list_condition(LiverList **list, Liver val, int (*cmp)(const void*, const void*)) {
     LiverList *cur = *list, *prev = cur;
+    int err;
 
     while (cur) {
 
         if (cmp(&cur->val, &val) >= 0) {
             if (cur == *list) {
-                prepend_list(list, val);
+                err = prepend_list(list, val);
+
+                if (err)
+                    return err;
 
                 return 0;
             }
@@ -165,7 +169,9 @@ int insert_list_condition(LiverList **list, Liver val, int (*cmp)(const void*, c
         cur = cur->next;
     }
 
-    append_list(list, val);
+    err = append_list(list, val);
+    if (err)
+        return err;
 
     return 0;
 }
@@ -213,7 +219,7 @@ int find_liver(LiverList **livers, Liver val, LiverList **result) {
     return 1;
 }
 
-int liver_search(LiverList **livers, SearchCriteria criteria, SearchParameter param, LiverList **result, int addresses) {
+int liver_search(LiverList **livers, SearchCriteria criteria, SearchParameter param, LiverList **result) {
     double eps = 0.0000001;
     int read = 0;
     int err;
@@ -225,78 +231,54 @@ int liver_search(LiverList **livers, SearchCriteria criteria, SearchParameter pa
             case SURNAME:
                 if (equiv_str(cur->val.surname, param.str)) {
                     read++;
-                    if (addresses)
-                        append_list_address(result, cur);  // TODO: Change it because recursion happens
-                    else {
-                        err = insert_list_condition(result, cur->val, compare_age);
-                        if (err)
-                            return err;
-                    }
+                    err = insert_list_condition(result, cur->val, compare_age);
+                    if (err)
+                        return err;
                 }
 
                 break;
             case NAME:
                 if (equiv_str(cur->val.name, param.str)) {
                     read++;
-                    if (addresses)
-                        append_list_address(result, cur);
-                    else {
-                        err = insert_list_condition(result, cur->val, compare_age);
-                        if (err)
-                            return err;
-                    }
+                    err = insert_list_condition(result, cur->val, compare_age);
+                    if (err)
+                        return err;
                 }
 
                 break;
             case PATRONYMIC:
                 if (equiv_str(cur->val.patronymic, param.str)) {
                     read++;
-                    if (addresses)
-                        append_list_address(result, cur);
-                    else {
-                        err = insert_list_condition(result, cur->val, compare_age);
-                        if (err)
-                            return err;
-                    }
+                    err = insert_list_condition(result, cur->val, compare_age);
+                    if (err)
+                        return err;
                 }
 
                 break;
             case BIRTHDATE:
                 if (equiv_str(cur->val.birthdate, param.str)) {
                     read++;
-                    if (addresses)
-                        append_list_address(result, cur);
-                    else {
-                        err = insert_list_condition(result, cur->val, compare_age);
-                        if (err)
-                            return err;
-                    }
+                    err = insert_list_condition(result, cur->val, compare_age);
+                    if (err)
+                        return err;
                 }
 
                 break;
             case SEX:
                 if (cur->val.sex == param.sex) {
                     read++;
-                    if (addresses)
-                        append_list_address(result, cur);
-                    else {
-                        err = insert_list_condition(result, cur->val, compare_age);
-                        if (err)
-                            return err;
-                    }
+                    err = insert_list_condition(result, cur->val, compare_age);
+                    if (err)
+                        return err;
                 }
 
                 break;
             case SALARY:
                 if (fabsf(cur->val.mean_salary - param.salary) < eps) {
                     read++;
-                    if (addresses)
-                        append_list_address(result, cur);
-                    else {
-                        err = insert_list_condition(result, cur->val, compare_age);
-                        if (err)
-                            return err;
-                    }
+                    err = insert_list_condition(result, cur->val, compare_age);
+                    if (err)
+                        return err;
                 }
 
                 break;

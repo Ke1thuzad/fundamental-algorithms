@@ -519,7 +519,7 @@ int read_whole_input(Array *result) {
 
     str_to_arr(buf, result);
 
-    result->val[result->length--] = '\0';
+    result->val[--result->length] = '\0';
 
     return 0;
 }
