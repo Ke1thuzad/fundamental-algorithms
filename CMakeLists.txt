@@ -192,6 +192,14 @@ add_executable(lab3t7 lab3/task7/main.c lab3/task7/main.h
         lab3/task4/mystring.c
         lab3/task4/mystring.h)
 
+add_executable(lab3t9 lab3/task9/main.c lab3/task9/main.h
+        lab3/task9/tree.c
+        lab3/task4/mystring.c
+        lab3/task4/mystring.h
+        utility/error_handler.c
+        utility/error_handler.h
+        lab3/task9/list.c)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
