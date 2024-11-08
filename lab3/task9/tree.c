@@ -53,8 +53,10 @@ int insert_tree(Node **root, String val) {
 }
 
 void print_tree(Node *root, int level) {
-    if (!root)
+    if (!root) {
+        printf("%*s\n", level * 10, "N");
         return;
+    }
 
     print_tree(root->left, level + 1);
 
@@ -77,13 +79,15 @@ int tree_depth(Node *root, int *max_depth) {
     return 0;
 }
 
-void find_most_frequent_words(Node *root, NodeList **most_frequent) {
+int find_most_frequent_words(Node *root, NodeList **most_frequent) {
     if (!root)
-        return;
+        return 0;
 
     find_most_frequent_words(root->left, most_frequent);
 
-    insert_list_condition(most_frequent, root, compare_frequency);
+    int err = insert_list_condition(most_frequent, root, compare_frequency);
+    if (err)
+        return err;
 
     find_most_frequent_words(root->right, most_frequent);
 }
@@ -133,4 +137,6 @@ void destroy_tree(Node *root) {
     destroy_tree_nodes(root);
 
     free(root);
+
+    root = NULL;
 }

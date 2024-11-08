@@ -20,6 +20,7 @@ typedef struct NodeList {
 
 typedef enum Command {
     HELP,
+    PRINT,
     SEARCH,
     N_MOST_FREQUENT,
     EDGES,
@@ -39,7 +40,7 @@ Node *create_tree_node(String val);
 int insert_tree(Node **root, String val);
 void print_tree(Node *root, int level);
 int tree_depth(Node *root, int *max_depth);
-void find_most_frequent_words(Node *root, NodeList **most_frequent);
+int find_most_frequent_words(Node *root, NodeList **most_frequent);
 int search_word(Node *root, String val, Node **result);
 void destroy_tree_nodes(Node *root);
 void destroy_tree(Node *root);
@@ -57,12 +58,16 @@ void destroy_list(NodeList **list);
 int dialog_manager(FILE *in, char **argv, int argc);
 int parse_file_seps(FILE *in, Node **root, char **argv, int argc);
 int wait_command(Command *result);
-int handle_command(Command cmd, Node *root);
+int handle_command(Command cmd, Node **root);
 int wait_param(Command cmd, int *param);
 int read_whole_input_str(String *result);
 void cmd_description(Command cmd);
 void help_cmd();
 Node *find_longest_word(Node *root);
 Node *find_shortest_word(Node *root);
+int save_tree_to_file(Node *root, const char *filepath);
+void save_tree_nodes(Node *root, FILE *out);
+int load_tree_from_file(const char *filepath, Node **result);
+int load_tree_nodes(Node **root, FILE *file);
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

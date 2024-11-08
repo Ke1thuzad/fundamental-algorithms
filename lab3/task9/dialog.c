@@ -28,11 +28,11 @@ int dialog_manager(FILE *in, char **argv, int argc) {
                 state = COMMAND_HANDLE;
                 break;
             case COMMAND_HANDLE:
-                err = handle_command(cmd, root);
-                if (err) {
-                    destroy_tree(root);
-                    return err;
-                }
+                err = handle_command(cmd, &root);
+//                if (err) {
+//                    destroy_tree(root);
+//                    return err;
+//                }
 
                 state = COMMAND_WAIT;
                 break;
@@ -59,6 +59,9 @@ int wait_command(Command *result) {
             return 1;
         } else if (is_str_equal(buf.val, "help")) {
             *result = HELP;
+            break;
+        } else if (is_str_equal(buf.val, "print")) {
+            *result = PRINT;
             break;
         } else if (is_str_equal(buf.val, "search")) {
             *result = SEARCH;
@@ -92,7 +95,7 @@ int wait_command(Command *result) {
     return 0;
 }
 
-int handle_command(Command cmd, Node *root) {
+int handle_command(Command cmd, Node **root) {
     int param = 0;
     int err = 0;
 
@@ -100,10 +103,14 @@ int handle_command(Command cmd, Node *root) {
     NodeList *most_frequent = NULL;
     Node *result = NULL;
     int depth;
+    Array path;
 
     switch (cmd) {
         case HELP:
             help_cmd();
+            break;
+        case PRINT:
+            print_tree(*root, 0);
             break;
         case SEARCH:
             printf("Enter word to search: ");
@@ -113,7 +120,7 @@ int handle_command(Command cmd, Node *root) {
                 return err;
             }
 
-            if (search_word(root, searchString, &result)) {
+            if (search_word(*root, searchString, &result)) {
                 printf("Word '%s' not found.\n", searchString.val);
             } else {
                 printf("Word '%s' found with frequency %d.\n", searchString.val, result->frequency);
@@ -127,7 +134,9 @@ int handle_command(Command cmd, Node *root) {
             if (!err)
                 return throw_err(INCORRECT_INPUT_DATA);
 
-            find_most_frequent_words(root, &most_frequent);
+            err = find_most_frequent_words(*root, &most_frequent);
+            if (err)
+                return err;
 
             NodeList *cur = most_frequent;
 
@@ -137,38 +146,50 @@ int handle_command(Command cmd, Node *root) {
                 cur = cur->next;
             }
 
-//            print_list(stdout, most_frequent);
-
             destroy_list(&most_frequent);
             break;
         case EDGES:
-            printf("Longest word: %s\n", find_longest_word(root)->val.val);
-            printf("Shortest word: %s\n", find_shortest_word(root)->val.val);
+            printf("Longest word: %s\n", find_longest_word(*root)->val.val);
+            printf("Shortest word: %s\n", find_shortest_word(*root)->val.val);
             break;
         case DEPTH:
-            tree_depth(root, &depth);
+            tree_depth(*root, &depth);
 
             printf("Depth of the BST: %d\n", depth);
             break;
         case SAVE:
             printf("Enter file path to save the tree: ");
-            Array filePath;
-            create_arr(5, &filePath);
-            read_whole_input(&filePath);
-//            save_tree_to_file(root, filePath.val);
-            destroy(&filePath);
+            err = create_arr(5, &path);
+            if (err)
+                return err;
+
+            err = read_whole_input(&path);
+            if (err) {
+                destroy(&path);
+                return err;
+            }
+
+            save_tree_to_file(*root, path.val);
+            destroy(&path);
             break;
         case LOAD:
             printf("Enter file path to load the tree: ");
-//            Array filePath;
-//            create_arr(5, &filePath);
-//            read_whole_input(&filePath);
-//            Node *newRoot = load_tree_from_file(filePath.val);
-//            if (newRoot) {
-//                destroy_tree(root);
-//                root = newRoot;
-//            }
-//            destroy(&filePath);
+            err = create_arr(5, &path);
+            if (err)
+                return err;
+
+            err = read_whole_input(&path);
+            if (err) {
+                destroy(&path);
+                return err;
+            }
+
+            err = load_tree_from_file(path.val, root);
+            destroy(&path);
+            if (err)
+                return err;
+
+//            print_tree(*root, 0);
             break;
         default:
             return throw_err(INCORRECT_OPTION);
@@ -183,10 +204,11 @@ void cmd_description(Command cmd) {
 
     char *cmd_descriptions[][10] = {
             {"'help' - Print all available commands and their options",                         NULL},
+            {"'print' - Print whole tree",                                                      NULL},
             {"'search' - Search for word and its frequency",                                    NULL},
             {"'most_frequent' - Find the most frequent word in the text",                       NULL},
             {"'edges' - Find the longest and shortest words and their frequencies accordingly", NULL},
-            {"'depth' - Find depth of the BST", NULL},
+            {"'depth' - Find depth of the BST",                                                 NULL},
             {"'save' - Save tree to the file",                                                  NULL},
             {"'load' - Read tree from the file",                                                NULL},
     };
@@ -202,7 +224,7 @@ void cmd_description(Command cmd) {
 }
 
 void help_cmd() {
-    int cmd_amount = 6;
+    int cmd_amount = 8;
 
     printf("Available commands (you can use them by typing numbers corresponding or command strings):\n");
     for (int i = 1; i <= cmd_amount; ++i) {
@@ -293,4 +315,118 @@ int parse_file_seps(FILE *in, Node **root, char **argv, int argc) {
     destroy_str(&inp);
 
     return err;
+}
+
+int save_tree_to_file(Node *root, const char *filepath) {
+    FILE *file = fopen(filepath, "w");
+    if (!file)
+        return throw_err(FILE_ERROR);
+
+    save_tree_nodes(root, file);
+
+    fclose(file);
+
+    return 0;
+}
+
+void save_tree_nodes(Node *root, FILE *out) {
+    if (!root) {
+        fprintf(out, "N\n");
+        return;
+    }
+
+    fprintf(out, "S %s %d\n", root->val.val, root->frequency);
+    save_tree_nodes(root->left, out);
+    save_tree_nodes(root->right, out);
+}
+
+int load_tree_from_file(const char *filepath, Node **result) {
+    FILE *file = fopen(filepath, "r");
+    if (!file)
+        return throw_err(FILE_ERROR);
+
+    Node *root = NULL;
+    load_tree_nodes(&root, file);
+
+    fclose(file);
+
+    if (*result) {
+        destroy_tree(*result);
+    }
+
+    *result = root;
+
+    return 0;
+}
+
+int load_tree_nodes(Node **root, FILE *file) {
+    char type;
+
+    int err;
+
+    String val;
+    Array temp;
+
+    err = create_arr(5, &temp);
+    if (err)
+        return err;
+
+    int frequency;
+
+    if (fscanf(file, " %c", &type) != 1) {
+        destroy(&temp);
+        return 0;
+    }
+
+    if (type == 'S') {
+        fgetc(file);
+
+        err = read_value(&file, &temp, 0);
+        if (err) {
+            destroy(&temp);
+            return err;
+        }
+
+        err = create_str(&val, temp.val);
+        if (err) {
+            destroy(&temp);
+            return err;
+        }
+
+        err = fscanf(file, "%d", &frequency);
+        if (!err) {
+            destroy_str(&val);
+            destroy(&temp);
+            return throw_err(INCORRECT_INPUT_DATA);
+        }
+
+        *root = create_tree_node(val);
+        if (!(*root)) {
+            destroy_str(&val);
+            destroy(&temp);
+            return throw_err(MEMORY_NOT_ALLOCATED);
+        }
+
+        (*root)->frequency = frequency;
+        err = load_tree_nodes(&(*root)->left, file);
+        if (err) {
+            destroy_str(&val);
+            destroy(&temp);
+            return err;
+        }
+
+        err = load_tree_nodes(&(*root)->right, file);
+        if (err) {
+            destroy_str(&val);
+            destroy(&temp);
+            return err;
+        }
+
+        reset(&temp);
+        destroy_str(&val);
+    }
+
+    destroy(&temp);
+
+    return 0;
 }
