@@ -24,6 +24,7 @@ int dialog_manager(FILE *in) {
     fclose(in);
     if (err) {
         destroy_stack(&undoStack);
+        destroy_list(&livers);
         destroy(&filename);
         return err;
     }
@@ -831,6 +832,7 @@ int read_livers_file(FILE *in, LiverList **list) {
             destroy(&surname);
             destroy(&name);
             destroy(&patronymic);
+            destroy_str(&birthdate);
 
             return throw_err(INCORRECT_INPUT_DATA);
         }
@@ -841,8 +843,7 @@ int read_livers_file(FILE *in, LiverList **list) {
         destroy(&name);
         if (err) {
             destroy(&surname);
-            if (!is_birthdate)
-                destroy(&patronymic);
+            destroy(&patronymic);
 
             return err;
         }
@@ -850,8 +851,7 @@ int read_livers_file(FILE *in, LiverList **list) {
         err = create_str(&surname_str, surname.val);
         destroy(&surname);
         if (err) {
-            if (!is_birthdate)
-                destroy(&patronymic);
+            destroy(&patronymic);
 
             return err;
         }
@@ -863,9 +863,10 @@ int read_livers_file(FILE *in, LiverList **list) {
 
         Liver liver = {surname_str, name_str, patronymic_str, birthdate, sex, salary};
 
-        insert_list_condition(list, liver, compare_age);
-
+        err = insert_list_condition(list, liver, compare_age);
         destroy_liver(&liver);
+        if (err)
+            return err;
     }
 
     return 0;
