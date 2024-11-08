@@ -249,7 +249,8 @@ int handle_command(Command cmd, LiverList **livers, Array *export_path, UndoStac
                 return err;
             break;
         default:
-            return throw_err(INCORRECT_OPTION);
+            throw_err(INCORRECT_OPTION);
+            return 0;
     }
 
     return 0;
@@ -435,7 +436,14 @@ int add_liver(LiverList **list, UndoStack *undoStack) {
 
     printf("Date of birth (dd.mm.yyyy): ");
     cur_scan = scanf("%10s", temp_birth);
-    fgets(buf, 99, stdin);
+
+    err = skip_to_end_line();
+    if (err) {
+        destroy_str(&surname);
+        destroy_str(&name);
+        destroy_str(&patronymic);
+        return err;
+    }
 
     String birthdate;
     err = create_str(&birthdate, temp_birth);
@@ -460,7 +468,13 @@ int add_liver(LiverList **list, UndoStack *undoStack) {
 
     printf("Sex (M or W): ");
     cur_scan = scanf("%c", &sex);
-    fgets(buf, 99, stdin);
+    err = skip_to_end_line();
+    if (err) {
+        destroy_str(&surname);
+        destroy_str(&name);
+        destroy_str(&patronymic);
+        return err;
+    }
 
     if (cur_scan < 1 || (sex != 'W' && sex != 'M')) {
         destroy_str(&surname);
@@ -474,7 +488,13 @@ int add_liver(LiverList **list, UndoStack *undoStack) {
 
     printf("Salary (positive real number): ");
     cur_scan = scanf("%f", &salary);
-    fgets(buf, 99, stdin);
+    err = skip_to_end_line();
+    if (err) {
+        destroy_str(&surname);
+        destroy_str(&name);
+        destroy_str(&patronymic);
+        return err;
+    }
 
     if (cur_scan < 1 || salary < 0) {
         destroy_str(&surname);

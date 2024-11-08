@@ -14,6 +14,7 @@ void string_concat(char *str1, const char *str2);
 int is_str_equal(char *str1, char *str2);
 int snread_value(const char *str, char *result, int n, char first);
 //int read_value(FILE **f, Array* result, char first);
+int skip_to_end_line();
 int sread_value(char **s, Array *result, char first);
 int sseek_char(char **s, char *result);
 int roman_value(char c);

@@ -512,15 +512,15 @@ int read_value(FILE **f, Array *result, char first) {
 
 int read_whole_input(Array *result) {
     int err;
+    int ch = fgetc(stdin);
 
-    char buf[1000];
+    while (ch > 0 && ch != '\n') {
+        err = append(result, (char) ch);
+        if (err)
+            return err;
 
-    fgets(buf, 999, stdin);
-
-    str_to_arr(buf, result);
-
-    result->val[--result->length] = '\0';
-
+        ch = fgetc(stdin);
+    }
     return 0;
 }
 

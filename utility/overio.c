@@ -229,6 +229,15 @@ int is_str_equal(char *str1, char *str2) {
     return !*str1 && !*str2;
 }
 
+int skip_to_end_line() {
+    int ch = fgetc(stdin);
+
+    while (ch > 0 && ch != '\n')
+        ch = fgetc(stdin);
+
+    return ch <= 0;
+}
+
 int sseek_char(char **s, char *result) {
     while (**s != '\0') {
         char cur = *(*s)++;
