@@ -650,10 +650,10 @@ int edit_liver(LiverList **list, SearchCriteria criteria, SearchParameter parame
         destroy_liver(&oldLiver);
         return err;
     }
+    fgetc(stdin);
 
     if (i >= SURNAME && i <= BIRTHDATE) {
         printf("Choose new string value: ");
-        fgetc(stdin);
 
         err = read_whole_input(&temp);
         if (err) {
