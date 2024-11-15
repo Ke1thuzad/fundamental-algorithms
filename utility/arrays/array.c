@@ -1,11 +1,11 @@
 #include "array.h"
 #include "../error_handler.h"
 
-int create_arr(unsigned int length, Array* arr) {
+int create_arr(unsigned int length, Array *arr) {
 
     arr->capacity = length;
     arr->length = 0;
-    arr->val = (char*) malloc(length);
+    arr->val = (char *) malloc(length);
 
     if (!arr->val) return throw_err(MEMORY_NOT_ALLOCATED);
     arr->val[0] = '\0';
@@ -13,7 +13,7 @@ int create_arr(unsigned int length, Array* arr) {
     return 0;
 }
 
-int append(Array* arr, char value) {
+int append(Array *arr, char value) {
     if (arr->length >= (arr->capacity - 2)) {
         int err = extend(arr);
         if (err)
@@ -25,13 +25,13 @@ int append(Array* arr, char value) {
     return 0;
 }
 
-void reset(Array* arr) {
+void reset(Array *arr) {
     arr->val[0] = '\0';
     arr->length = 0;
 }
 
-int resize(Array* arr, int size_delta) {
-    char* new_addr = (char*) realloc(arr->val, arr->capacity + size_delta);
+int resize(Array *arr, int size_delta) {
+    char *new_addr = (char *) realloc(arr->val, arr->capacity + size_delta);
 
     if (!new_addr) {
         free(arr->val);
@@ -44,11 +44,11 @@ int resize(Array* arr, int size_delta) {
 }
 
 // Double array length.
-int extend(Array* arr) {
+int extend(Array *arr) {
     return resize(arr, arr->capacity);
 }
 
-void destroy(Array* arr) {
+void destroy(Array *arr) {
     if (arr->val)
         free(arr->val);
     arr->val = NULL;
@@ -56,16 +56,16 @@ void destroy(Array* arr) {
     arr->capacity = 0;
 }
 
-int copy(Array* dst, const Array *src) {
+int copy(Array *dst, const Array *src) {
     destroy(dst);
-    dst->val = (char*) calloc(src->capacity, sizeof(char));
+    dst->val = (char *) calloc(src->capacity, sizeof(char));
     if (!dst->val) {
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
     dst->length = src->length;
     dst->capacity = src->capacity;
 
-    char* tempdst = dst->val, *tempsrc = src->val;
+    char *tempdst = dst->val, *tempsrc = src->val;
     while ((*tempdst++ = *tempsrc++));
 //    dst->val = tempdst;
 //    src->val = tempsrc;
@@ -85,7 +85,7 @@ void reverse_print_arr(const Array arr) {
     }
 }
 
-int reverse(Array* arr) {
+int reverse(Array *arr) {
     int size = arr->length;
     for (int i = 0; i < size / 2; ++i) {
         char temp = arr->val[i];
@@ -96,7 +96,7 @@ int reverse(Array* arr) {
     return 0;
 }
 
-int value_to_arr(unsigned int value, Array* result) {
+int value_to_arr(unsigned int value, Array *result) {
     if (result)
         destroy(result);
     int err = create_arr(10, result);
@@ -114,7 +114,7 @@ int value_to_arr(unsigned int value, Array* result) {
     return 0;
 }
 
-int value_to_arr_base(unsigned int value, int base, Array* result) {
+int value_to_arr_base(unsigned int value, int base, Array *result) {
     if (result)
         destroy(result);
     int err = create_arr(10, result);
@@ -135,7 +135,7 @@ int value_to_arr_base(unsigned int value, int base, Array* result) {
     return 0;
 }
 
-int str_to_arr(char* str, Array* result) {
+int str_to_arr(char *str, Array *result) {
     if (result)
         destroy(result);
     int err = create_arr(10, result), i = 0;
@@ -169,7 +169,7 @@ void arr_to_value(Array arr, int *result) {
     *result *= sign;
 }
 
-int add(const Array A, unsigned int B, Array* result) {
+int add(const Array A, unsigned int B, Array *result) {
     if (result)
         destroy(result);
     int err = create_arr(5, result);
@@ -178,7 +178,7 @@ int add(const Array A, unsigned int B, Array* result) {
 
     int i = 0, sum = 0, shift = 0;
 
-    while(B > 0) {
+    while (B > 0) {
         if (A.val[i])
             sum = A.val[i++] - '0' + B % 10 + shift;
         else
@@ -195,7 +195,7 @@ int add(const Array A, unsigned int B, Array* result) {
     return 0;
 }
 
-int add_arrays(Array A, Array B, Array* result) {
+int add_arrays(Array A, Array B, Array *result) {
     if (result)
         destroy(result);
     int err = create_arr(5, result);
@@ -206,7 +206,7 @@ int add_arrays(Array A, Array B, Array* result) {
     reverse(&A);
     reverse(&B);
 
-    while(A.val[i] && B.val[i]) {
+    while (A.val[i] && B.val[i]) {
         sum = A.val[i] - '0' + B.val[i] - '0' + shift;
         shift = sum / 10;
         append(result, sum % 10 + '0');
@@ -265,7 +265,7 @@ int base_char_to_dec(char x) {
     return throw_err(-2);
 }
 
-int add_arrays_base(Array A, Array B, Array* result, int base) {
+int add_arrays_base(Array A, Array B, Array *result, int base) {
     if (base < 2 || base > 36)
         return throw_err(INCORRECT_ARGUMENTS);
 
@@ -284,7 +284,7 @@ int add_arrays_base(Array A, Array B, Array* result, int base) {
     // 1000 0100 0010 0001
     // 0001 0010 0100 1000
 
-    while(A.val[i] && B.val[i]) {
+    while (A.val[i] && B.val[i]) {
         int Adec = base_char_to_dec(A.val[i]);
         int Bdec = base_char_to_dec(B.val[i]);
         if (Adec >= base || Bdec >= base)
@@ -370,7 +370,7 @@ int multiply(Array A, int B, int base, Array *result) {
     return 0;
 }
 
-int multiply_arrays(Array A, Array B, int base, Array* result) {
+int multiply_arrays(Array A, Array B, int base, Array *result) {
     if (base < 2 || base > 36)
         return throw_err(INCORRECT_ARGUMENTS);
 
@@ -391,7 +391,7 @@ int multiply_arrays(Array A, Array B, int base, Array* result) {
     // 210
     // MULTIPLY EVERY DIGIT AND ADD THEM UP
 
-    while(B.val[i]) {
+    while (B.val[i]) {
         multiply(A, base_char_to_dec(B.val[i]), base, &temp);
 //        for (int j = 0; j < shift; ++j) {
 //        }
@@ -437,7 +437,7 @@ int multiply_arrays(Array A, Array B, int base, Array* result) {
 }
 
 // Concatenate B to A.
-int concat(Array* A, Array B) {
+int concat(Array *A, Array B) {
     for (int i = 0; i < B.length; ++i) {
         int err = append(A, B.val[i]);
         if (err)
@@ -448,7 +448,7 @@ int concat(Array* A, Array B) {
 }
 
 // Concatenate B to A.
-int concat_str_to_arr(Array* A, char* B) {
+int concat_str_to_arr(Array *A, char *B) {
     int i = 0;
     while (B[i] != '\0') {
         int err = append(A, B[i++]);
@@ -459,7 +459,7 @@ int concat_str_to_arr(Array* A, char* B) {
     return 0;
 }
 
-int slice(Array A, int start, int stop, int step, Array* result) {
+int slice(Array A, int start, int stop, int step, Array *result) {
     for (int i = start; i < stop; i += step) {
         if (i >= A.length)
             return throw_err(INCORRECT_ARGUMENTS);
@@ -507,6 +507,9 @@ int read_value(FILE **f, Array *result, char first) {
     if (*f != stdin)
         fseek(*f, -1, SEEK_CUR);
 
+    if (character == -1)
+        return -1;
+
     return 0;
 }
 
@@ -540,5 +543,24 @@ int arr_compare(Array str1, Array str2) {
     }
     if (str1.length < str2.length) return -1;
     if (str1.length > str2.length) return 1;
+    return 0;
+}
+
+int compare_array_str(Array arr, const char *str) {
+    int i = 0;
+    while (i < arr.length && str[i] != '\0') {
+        if (arr.val[i] != str[i]) {
+            return arr.val[i] - str[i];
+        }
+        i++;
+    }
+
+    if (i < arr.length) {
+        return arr.val[i];
+    }
+    if (str[i] != '\0') {
+        return -str[i];
+    }
+
     return 0;
 }
