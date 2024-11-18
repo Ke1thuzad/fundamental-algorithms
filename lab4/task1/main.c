@@ -35,7 +35,7 @@ int parse_file(FILE* in, HashTable * ht) {
     int err, defines = 1;
 
     Array arr, spacings;
-    err = create_arr(2, &arr);
+    err = create_arr(64, &arr);
     if (err)
         return err;
 
@@ -126,7 +126,7 @@ int parse_file(FILE* in, HashTable * ht) {
                 reset(&arr);
                 reset(&spacings);
             } else {
-                if (arr.val[0] == '#') {
+                if (defines && arr.val[0] == '#') {
                     ch = fgetc(in);
                     continue;
                 }
