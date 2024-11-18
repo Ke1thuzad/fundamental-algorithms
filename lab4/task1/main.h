@@ -33,8 +33,8 @@ int create_hash_table(HashTable *table, unsigned long size);
 void print_hash_table(HashTable *ht);
 int get_from_hashtable(HashTable *ht, String def_name, String *def_value);
 void destroy_hash_table(HashTable *table);
-void rehash(HashTable *ht, unsigned long new_size);
-void check_and_rehash(HashTable *ht);
+int rehash(HashTable *ht, unsigned long new_size);
+int check_and_rehash(HashTable *ht);
 
 int base_char_to_value(char c);
 int hash_function(String str, unsigned long *hash, unsigned long hash_size);

@@ -35,6 +35,8 @@ int resize(Array *arr, int size_delta) {
 
     if (!new_addr) {
         free(arr->val);
+        arr->val = NULL;
+
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
 

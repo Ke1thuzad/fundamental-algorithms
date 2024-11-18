@@ -28,7 +28,9 @@ void destroy_node(Node *node) {
 int insert_node(HashTable *table, String def_name, String value) {
     int res =  insert_node_hash(table, def_name, value, table->size);
 
-    check_and_rehash(table);
+    int err = check_and_rehash(table);
+    if (err)
+        return err;
 
     return res;
 }
@@ -44,6 +46,9 @@ int insert_node_hash(HashTable *table, String def_name, String value, unsigned l
     }
 
     Node *node = (Node*) calloc(1, sizeof(Node));
+    if (!node)
+        return throw_err(MEMORY_NOT_ALLOCATED);
+
     err = create_node(node, def_name, value);
     if (err)
         return err;
@@ -140,10 +145,14 @@ int get_from_hashtable(HashTable *ht, String def_name, String *def_value) {
     return 0;
 }
 
-void rehash(HashTable *ht, unsigned long new_size) {
+int rehash(HashTable *ht, unsigned long new_size) {
     HashTable *new_ht = (HashTable *) malloc(sizeof(HashTable));
+    if (!new_ht)
+        return throw_err(MEMORY_NOT_ALLOCATED);
 
-    create_hash_table(new_ht, new_size);
+    int err = create_hash_table(new_ht, new_size);
+    if (err)
+        return err;
 
     for (int i = 0; i < ht->size; i++) {
         Node *current = ht->table[i];
@@ -158,13 +167,15 @@ void rehash(HashTable *ht, unsigned long new_size) {
     }
 
     destroy_hash_table(ht);
-//    ht = malloc(sizeof(HashTable));
+
     ht->table = new_ht->table;
     ht->size = new_ht->size;
     free(new_ht);
+
+    return 0;
 }
 
-void check_and_rehash(HashTable *ht) {
+int check_and_rehash(HashTable *ht) {
     unsigned long min_chain_length = ht->size;
     unsigned long max_chain_length = 0;
 
@@ -184,8 +195,12 @@ void check_and_rehash(HashTable *ht) {
 
     if (min_chain_length != ht->size && max_chain_length > 2 * min_chain_length) {
         unsigned long new_size = ht->size * 2;
-        rehash(ht, new_size);
+        int err = rehash(ht, new_size);
+        if (err)
+            return err;
     }
+
+    return 0;
 }
 
 void destroy_hash_table(HashTable *table) {

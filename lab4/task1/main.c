@@ -35,7 +35,7 @@ int parse_file(FILE* in, HashTable * ht) {
     int err, defines = 1;
 
     Array arr, spacings;
-    err = create_arr(64, &arr);
+    err = create_arr(2, &arr);
     if (err)
         return err;
 
@@ -156,6 +156,7 @@ int parse_file(FILE* in, HashTable * ht) {
                 }
 
                 err = get_from_hashtable(ht, str, &out_value);
+                destroy_str(&str);
 
                 if (!err) {
                     printf("%s", out_value.val);
