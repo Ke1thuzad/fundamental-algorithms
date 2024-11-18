@@ -74,15 +74,70 @@ int create_hash_table(HashTable *table, unsigned long size) {
 
 void print_hash_table(HashTable *ht) {
     for (int i = 0; i < ht->size; i++) {
-//        printf("Bucket %d: ", i);
         Node *current = ht->table[i];
         while (current != NULL) {
-//            printf("Bucket %d: ", i);
-            printf("(%s, %s, %lu) ", current->def_name.val, current->value.val, current->hash);
+            printf("(%s, %s, %lu) ", current->def_name.val, current->value.val, current->hash % ht->size);
             current = current->next;
         }
-//        printf("\n");
     }
+}
+
+int get_from_hashtable(HashTable *ht, String def_name, String *def_value) {
+    if (!ht)
+        return throw_err(INCORRECT_ARGUMENTS);
+
+    int err;
+
+    unsigned long hash;
+
+    err = hash_function(def_name, &hash, ht->size);
+    if (err)
+        return err;
+
+    hash %= ht->size;
+
+    Node *val = ht->table[hash], *prev = val;
+
+    int i = 0;
+
+    if (val) {
+        while (val && i < ht->size - 1) {
+            def_name = val->def_name;
+            prev = val;
+            err = hash_function(val->value, &hash, ht->size);
+            if (err)
+                return err;
+
+            hash %= ht->size;
+            val = ht->table[hash];
+            if (val && !equiv_str(val->def_name, prev->value)) {
+                break;
+            }
+
+            i++;
+        }
+
+        if (equiv_str(prev->def_name, def_name))
+            *def_value = prev->value;
+        else {
+            while (prev) {
+                if (equiv_str(prev->def_name, def_name)) {
+                    *def_value = prev->value;
+                    return 0;
+                }
+
+                prev = prev->next;
+            }
+
+            return 1;
+        }
+
+
+    } else {
+        return 1;
+    }
+
+    return 0;
 }
 
 void rehash(HashTable *ht, unsigned long new_size) {

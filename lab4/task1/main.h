@@ -31,6 +31,7 @@ int insert_node(HashTable *table, String def_name, String value);
 int insert_node_hash(HashTable *table, String def_name, String value, unsigned long hash);
 int create_hash_table(HashTable *table, unsigned long size);
 void print_hash_table(HashTable *ht);
+int get_from_hashtable(HashTable *ht, String def_name, String *def_value);
 void destroy_hash_table(HashTable *table);
 void rehash(HashTable *ht, unsigned long new_size);
 void check_and_rehash(HashTable *ht);

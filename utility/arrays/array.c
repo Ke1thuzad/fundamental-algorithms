@@ -251,6 +251,10 @@ int is_letter(int x) {
     return x >= 'A' && x <= 'Z' || x >= 'a' && x <= 'z';
 }
 
+int is_special_character(int x) {
+    return !is_letter(x) && !is_num(x) && x != '\'' && x != '"' && x != '#' && x != '_';
+}
+
 int to_lower(int x) {
     if (x >= 'A' && x <= 'Z')
         return x + ('a' - 'A');
@@ -498,6 +502,33 @@ int read_value(FILE **f, Array *result, char first) {
     int character = fgetc(*f);
 
     while (character > ' ') {
+        err = append(result, (char) character);
+        if (err)
+            return err;
+        character = fgetc(*f);
+    }
+
+    if (*f != stdin)
+        fseek(*f, -1, SEEK_CUR);
+
+    if (character == -1)
+        return -1;
+
+    return 0;
+}
+
+int read_value_to_sc(FILE **f, Array *result, char first) {
+    int err;
+
+    if (first) {
+        err = append(result, first);
+        if (err)
+            return err;
+    }
+
+    int character = fgetc(*f);
+
+    while (character > ' ' && !is_special_character(character)) {
         err = append(result, (char) character);
         if (err)
             return err;

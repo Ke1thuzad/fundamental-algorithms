@@ -48,7 +48,7 @@ int parse_file(FILE* in, HashTable * ht) {
     int ch = fgetc(in);
 
     while(ch > 0) {
-        if (ch > ' ') {
+        if (ch > ' ' && !is_special_character(ch) || defines && ch == '#') {
             err = append(&arr, (char) ch);
             if (err) {
                 destroy(&arr);
@@ -57,11 +57,18 @@ int parse_file(FILE* in, HashTable * ht) {
             }
 
             if (defines && !compare_array_str(arr, "#define")) {
-                fgetc(in);
+                int first_letter = 0;
+
+                err = seek_char(&in, &first_letter);
+                if (err) {
+                    destroy(&arr);
+                    destroy(&spacings);
+                    return err;
+                }
 
                 reset(&arr);
 
-                err = read_value(&in, &arr, 0);
+                err = read_value(&in, &arr, (char) first_letter);
                 if (err) {
                     destroy(&arr);
                     destroy(&spacings);
@@ -80,7 +87,15 @@ int parse_file(FILE* in, HashTable * ht) {
 
                 reset(&arr);
 
-                err = read_value(&in, &arr, 0);
+                err = seek_char(&in, &first_letter);
+                if (err) {
+                    destroy(&arr);
+                    destroy(&spacings);
+                    destroy_str(&def_name);
+                    return err;
+                }
+
+                err = read_value(&in, &arr, (char) first_letter);
                 if (err) {
                     destroy(&arr);
                     destroy(&spacings);
@@ -122,7 +137,7 @@ int parse_file(FILE* in, HashTable * ht) {
                 reset(&spacings);
                 reset(&arr);
 
-                err = read_value(&in, &arr, (char) ch);
+                err = read_value_to_sc(&in, &arr, (char) ch);
                 if (err > 0) {
                     destroy(&arr);
                     destroy(&spacings);
@@ -132,8 +147,7 @@ int parse_file(FILE* in, HashTable * ht) {
                 if (err == EOF)
                     fgetc(in);
 
-                unsigned long hash;
-                String str;
+                String str, out_value;
                 err = create_str(&str, arr.val);
                 if (err) {
                     destroy(&arr);
@@ -141,32 +155,16 @@ int parse_file(FILE* in, HashTable * ht) {
                     return err;
                 }
 
-                err = hash_function(str, &hash, ht->size);
-                destroy_str(&str);
-                if (err) {
+                err = get_from_hashtable(ht, str, &out_value);
+
+                if (!err) {
+                    printf("%s", out_value.val);
+                } else if (err == 1) {
+                    printf("%s", arr.val);
+                } else {
                     destroy(&arr);
                     destroy(&spacings);
                     return err;
-                }
-
-                hash %= ht->size;
-                Node *val = ht->table[hash], *prev = val;
-                if (val) {
-                    while (val) {
-                        prev = val;
-                        err = hash_function(val->value, &hash, ht->size);
-                        if (err) {
-                            destroy(&arr);
-                            destroy(&spacings);
-
-                            return err;
-                        }
-                        hash %= ht->size;
-                        val = ht->table[hash];
-                    }
-                    printf("%s", prev->value.val);
-                } else {
-                    printf("%s", arr.val);
                 }
 
                 reset(&arr);
