@@ -102,7 +102,7 @@ int handle_command(Command cmd, Node **root) {
     String searchString;
     NodeList *most_frequent = NULL;
     Node *result = NULL;
-    int depth;
+    int depth = 0;
     Array path;
 
     switch (cmd) {
@@ -153,7 +153,7 @@ int handle_command(Command cmd, Node **root) {
             printf("Shortest word: %s\n", find_shortest_word(*root)->val.val);
             break;
         case DEPTH:
-            tree_depth(*root, &depth);
+            tree_depth(*root, &depth, 0);
 
             printf("Depth of the BST: %d\n", depth);
             break;
@@ -289,7 +289,7 @@ int parse_file_seps(FILE *in, Node **root, char **argv, int argc) {
         return err;
 
     while ((c = fgetc(in)) > 0) {
-        if (i < argc && ((char) c) == argv[i][0]) {
+        if (in_seps(c, argv, argc)) {
             if (inp.length > 0) {
                 err = insert_tree(root, inp);
                 if (err) {
@@ -315,6 +315,15 @@ int parse_file_seps(FILE *in, Node **root, char **argv, int argc) {
     destroy_str(&inp);
 
     return err;
+}
+
+int in_seps(char x, char **argv, int argc) {
+    for (int i = 2; i < argc; ++i) {
+        if (x == argv[i][0])
+            return 1;
+    }
+
+    return 0;
 }
 
 int save_tree_to_file(Node *root, const char *filepath) {

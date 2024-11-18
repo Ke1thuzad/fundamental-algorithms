@@ -65,16 +65,16 @@ void print_tree(Node *root, int level) {
     print_tree(root->right, level + 1);
 }
 
-int tree_depth(Node *root, int *max_depth) {
+int tree_depth(Node *root, int *max_depth, int current_depth) {
     if (!root) {
-        *max_depth = 0;
+        if (current_depth > *max_depth) {
+            *max_depth = current_depth;
+        }
         return 0;
     }
 
-    tree_depth(root->left, max_depth);
-    (*max_depth)++;
-    tree_depth(root->right, max_depth);
-    (*max_depth)++;
+    tree_depth(root->left, max_depth, current_depth + 1);
+    tree_depth(root->right, max_depth, current_depth + 1);
 
     return 0;
 }

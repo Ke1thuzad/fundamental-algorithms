@@ -39,7 +39,7 @@ typedef enum DialogFSM {
 Node *create_tree_node(String val);
 int insert_tree(Node **root, String val);
 void print_tree(Node *root, int level);
-int tree_depth(Node *root, int *max_depth);
+int tree_depth(Node *root, int *max_depth, int current_depth);
 int find_most_frequent_words(Node *root, NodeList **most_frequent);
 int search_word(Node *root, String val, Node **result);
 void destroy_tree_nodes(Node *root);
@@ -57,6 +57,7 @@ void destroy_list(NodeList **list);
 // Dialog
 int dialog_manager(FILE *in, char **argv, int argc);
 int parse_file_seps(FILE *in, Node **root, char **argv, int argc);
+int in_seps(char x, char **argv, int argc);
 int wait_command(Command *result);
 int handle_command(Command cmd, Node **root);
 int wait_param(Command cmd, int *param);

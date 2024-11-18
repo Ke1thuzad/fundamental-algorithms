@@ -433,7 +433,7 @@ int add_liver(LiverList **list, UndoStack *undoStack) {
 
     destroy(&temp);
 
-    char temp_birth[11], buf[100];
+    char temp_birth[11];
 
     printf("Date of birth (dd.mm.yyyy): ");
     cur_scan = scanf("%10s", temp_birth);

@@ -1,10 +1,20 @@
-#define asdf a
-#define a m
-#define lasfk helpme
-#define aifi lasfk
+#define MAX_LENG22TH 10
+#define GREETING "Hello"
+#define TINGGREE "HI!"
+#define PI 3.14
+#define A zzz
 
-adif aifi asdf ajdfi isdjf asf
-asdf a a a
+int main()
+{
+    char message[ MAX_LENG22TH ] = GREETING ;
+    double radius = 2.5;
+    double area = PI * radius * radius;
 
+    char message1[MAX_LENG22TH] = TINGGREE;
+    printf("%s\n", message);
+    printf("Circle area: %f\n", area);
 
-aifi
+    int a = A + A + A + A + C + D;
+
+    return 0;
+}

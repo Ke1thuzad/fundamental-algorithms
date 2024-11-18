@@ -168,7 +168,7 @@ int hash_function(String str, unsigned long *hash, unsigned long hash_size) {
     for (; i < str.length; ++i) {
         int char_value = base_char_to_value(str.val[i]);
         if (char_value == -1)
-            return throw_err(OUT_OF_BOUNDS);
+            continue;
 
         unsigned long a = (*hash * base + char_value);
 
