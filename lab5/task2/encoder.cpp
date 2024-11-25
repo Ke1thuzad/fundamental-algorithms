@@ -3,11 +3,9 @@
 encoder::encoder(std::vector<std::byte> &key) {
     this->encoding_key = key;
     this->s_block.resize(256);
-
-//    this->KSA();
 }
 
-encoder& encoder::KSA() {
+encoder &encoder::KSA() {
     for (int i = 0; i < 256; ++i) {
         this->s_block[i] = static_cast<std::byte>(i);
     }
@@ -23,7 +21,7 @@ encoder& encoder::KSA() {
     return *this;
 }
 
-std::byte& encoder::PRGA(int i, int j) {
+std::byte &encoder::PRGA(int i, int j) {
     std::swap(this->s_block[i], this->s_block[j]);
 
     int t = (static_cast<unsigned char>(this->s_block[i]) + static_cast<unsigned char>(this->s_block[j])) % 256;
@@ -34,8 +32,6 @@ std::byte& encoder::PRGA(int i, int j) {
 void encoder::change_key(std::vector<std::byte> &new_key) {
     this->encoding_key = new_key;
     this->s_block.clear();
-
-//    this->KSA();
 }
 
 int encoder::encode(const std::string &in_path, const std::string &out_path) {
@@ -67,7 +63,6 @@ int encoder::encode(const std::string &in_path, const std::string &out_path) {
     while (!in.eof()) {
         i = (i + 1) % 256;
         j = (j + static_cast<unsigned char>(this->s_block[i])) % 256;
-//        ch = ;
 
         std::byte outchar = static_cast<std::byte>(ch) ^ this->PRGA(i, j);
 
