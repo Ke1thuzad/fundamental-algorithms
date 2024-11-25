@@ -38,12 +38,12 @@ int main() {
     }
 
     // Test 5: Encode with the same input and output path (should fail)
-//    int result5 = enc1.encode("rofls.txt", "rofls.txt");
-//    if (result5 == 1) {
-//        std::cout << "Test 5: Encoding with same input and output path failed as expected" << std::endl;
-//    } else {
-//        std::cout << "Test 5: Encoding with same input and output path did not fail as expected" << std::endl;
-//    }
+    int result5 = enc1.encode("rofls.txt", "rofls.txt");
+    if (result5 == 1) {
+        std::cout << "Test 5: Encoding with same input and output path failed as expected" << std::endl;
+    } else {
+        std::cout << "Test 5: Encoding with same input and output path did not fail as expected" << std::endl;
+    }
 
     // Test 6: Encode a non-existent file (should fail)
     int result6 = enc1.encode("non_existent_file.txt", "test_output_non_existent.txt");

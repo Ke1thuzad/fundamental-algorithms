@@ -4,10 +4,10 @@ encoder::encoder(std::vector<std::byte> &key) {
     this->encoding_key = key;
     this->s_block.resize(256);
 
-    this->KSA();
+//    this->KSA();
 }
 
-void encoder::KSA() {
+encoder& encoder::KSA() {
     for (int i = 0; i < 256; ++i) {
         this->s_block[i] = static_cast<std::byte>(i);
     }
@@ -19,9 +19,11 @@ void encoder::KSA() {
              static_cast<unsigned char>(this->encoding_key[i % this->encoding_key.size()])) % 256;
         std::swap(this->s_block[i], this->s_block[j]);
     }
+
+    return *this;
 }
 
-std::byte encoder::PRGA(int i, int j) {
+std::byte& encoder::PRGA(int i, int j) {
     std::swap(this->s_block[i], this->s_block[j]);
 
     int t = (static_cast<unsigned char>(this->s_block[i]) + static_cast<unsigned char>(this->s_block[j])) % 256;
@@ -33,12 +35,15 @@ void encoder::change_key(std::vector<std::byte> &new_key) {
     this->encoding_key = new_key;
     this->s_block.clear();
 
-    this->KSA();
+//    this->KSA();
 }
 
 int encoder::encode(const std::string &in_path, const std::string &out_path) {
-//    if (std::filesystem::equivalent(in_path, out_path)) TODO
-//        return 1;
+    auto fullpath1 = std::filesystem::weakly_canonical(std::filesystem::absolute(in_path));
+    auto fullpath2 = std::filesystem::weakly_canonical(std::filesystem::absolute(out_path));
+
+    if (fullpath1 == fullpath2)
+        return 1;
 
     std::ifstream in(in_path, std::ios::binary);
     if (!in.is_open())
@@ -50,6 +55,8 @@ int encoder::encode(const std::string &in_path, const std::string &out_path) {
         return 1;
     }
 
+    this->KSA();
+
     char ch;
 
     in.get(ch);
@@ -58,14 +65,13 @@ int encoder::encode(const std::string &in_path, const std::string &out_path) {
     int j = 0;
 
     while (!in.eof()) {
-        std::cout << static_cast<int>(ch) << '\n';
         i = (i + 1) % 256;
         j = (j + static_cast<unsigned char>(this->s_block[i])) % 256;
+//        ch = ;
 
-        char outchar = ch ^ static_cast<unsigned char>(this->PRGA(i, j));
-        std::cout << " outchar: " << static_cast<int>(ch) << '\n';
+        std::byte outchar = static_cast<std::byte>(ch) ^ this->PRGA(i, j);
 
-        out.put(outchar);
+        out.put(static_cast<char>(outchar));
 
         in.get(ch);
     }

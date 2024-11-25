@@ -13,8 +13,8 @@ private:
     std::vector<std::byte> encoding_key;
     std::vector<std::byte> s_block;
 
-    void KSA();
-    std::byte PRGA(int i, int j);
+    encoder& KSA();
+    std::byte& PRGA(int i, int j);
 public:
 
     encoder(std::vector<std::byte> &key);
