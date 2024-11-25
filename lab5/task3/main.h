@@ -33,7 +33,7 @@ public:
 
     unsigned int get_bit(int pos) const;
 
-    void to_char(char *str) const;
+    char* to_char(char *str) const;
 };
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

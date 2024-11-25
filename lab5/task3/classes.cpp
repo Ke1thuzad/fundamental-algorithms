@@ -52,14 +52,16 @@ unsigned int logical_values_array::get_bit(int pos) const {
     return getVal() & (1 << pos);
 }
 
-void logical_values_array::to_char(char *str) const {
+char* logical_values_array::to_char(char *str) const {
     int size = sizeof(unsigned int) * 8;
 
-    if (!str)
-        str = new char[size + 1];
+    if (str == nullptr)
+        throw std::invalid_argument("Null pointer");
 
     for (int i = 0; i < size; ++i) {
         str[size - i - 1] = (get_bit(i) ? '1' : '0');
     }
     str[size] = '\0';
+
+    return str;
 }
