@@ -9,3 +9,5 @@ add_executable(lab5t2 task2/main.cpp task2/main.h
         task2/encoder.cpp)
 add_executable(lab5t4 task4/main.cpp task4/main.h
         task4/complex.cpp)
+add_executable(lab5t3 task3/main.cpp task3/main.h
+        task3/classes.cpp)
