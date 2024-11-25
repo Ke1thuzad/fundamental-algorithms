@@ -107,7 +107,6 @@ int get_from_hashtable(HashTable *ht, String def_name, String *def_value) {
 
     if (val) {
         while (val && i < ht->size - 1) {
-            def_name = val->def_name;
             prev = val;
             err = hash_function(val->value, &hash, ht->size);
             if (err)
@@ -120,6 +119,8 @@ int get_from_hashtable(HashTable *ht, String def_name, String *def_value) {
             }
 
             i++;
+            if (val)
+                def_name = val->def_name;
         }
 
         if (equiv_str(prev->def_name, def_name))
