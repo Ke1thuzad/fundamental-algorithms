@@ -1,0 +1,9 @@
+Heap для заявок
+ID отделения - где хранится его Heap
+StartDate
+FinishDate
+MinProcessTime
+MaxProcessTime
+Кол-во отделений
+Кол-во обработчиков
+OverloadCoefficient - n / h, где n - кол-во сообщений, h - кол-во обработчиков.

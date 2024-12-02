@@ -214,6 +214,40 @@ add_executable(lab4t1 lab4/task1/main.c lab4/task1/main.h
         utility/arrays/array.c
         utility/arrays/array.h)
 
+add_executable(lab4t9 lab4/task9/main.c lab4/task9/main.h
+        lab4/task9/heaps.h
+        lab4/task9/heaps.c
+        utility/error_handler.c
+        utility/error_handler.h
+        lab4/task9/heaps/binomial/binomial.c
+        lab4/task9/heaps/binomial/binomial.h
+        lab4/task9/heaps/fibonacci/fibonacci.c
+        lab4/task9/heaps/fibonacci/fibonacci.h
+        lab4/task9/support_app.c
+        lab4/task9/support_app.h
+        lab4/task9/heaps/binary/binary.c
+        lab4/task9/heaps/binary/binary.h
+        lab4/task9/heaps/leftist/leftist.c
+        lab4/task9/heaps/leftist/leftist.h
+        lab4/task9/heaps/skew/skew.c
+        lab4/task9/heaps/skew/skew.h
+        lab4/task9/heaps/treap/treap.c
+        lab4/task9/heaps/treap/treap.h
+        lab3/task4/mystring.c
+        lab3/task4/mystring.h
+        lab4/task9/department_structures/bst/bst.c
+        lab4/task9/department_structures/bst/bst.h
+        lab4/task9/department_structures/dynamic_array/dynamic_array.c
+        lab4/task9/department_structures/dynamic_array/dynamic_array.h
+        lab4/task9/department_structures/hashset/hashset.c
+        lab4/task9/department_structures/hashset/hashset.h
+        lab4/task9/department_structures/trie/trie.c
+        lab4/task9/department_structures/trie/trie.h
+        lab4/task9/department_structures/department.c
+        lab4/task9/department_structures/department.h
+        lab4/task9/ticket.h
+        lab4/task9/department_structures/department_structure.h)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
@@ -224,3 +258,4 @@ target_link_libraries(lab2t9 m)
 target_link_libraries(lab2t10 m)
 target_link_libraries(lab3t3 m)
 target_link_libraries(lab3t2 m)
+target_link_libraries(lab4t9 m)
