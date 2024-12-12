@@ -3,6 +3,7 @@
 
 #include "arrays/array.h"
 #include "error_handler.h"
+#include "../lab3/task4/mystring.h"
 
 #include <stdarg.h>
 #include <stdio.h>

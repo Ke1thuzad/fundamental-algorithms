@@ -15,6 +15,7 @@ SkewNode *create_skew_node(Ticket ticket) {
 
     res->ticket = ticket;
     copy_newstr(&res->ticket.key, &ticket.key);
+    copy_newstr(&res->ticket.value, &ticket.value);
 
     return res;
 }
@@ -24,32 +25,6 @@ void swap_nodes_skew(SkewNode **node1, SkewNode **node2) {
     temp = *node1;
     *node1 = *node2;
     *node2 = temp;
-}
-
-void destroy_skew_nodes(SkewNode *root) {
-    if (!root)
-        return;
-
-    if (root->left) {
-        destroy_skew_nodes(root->left);
-        root->left = NULL;
-    }
-
-    if (root->right) {
-        destroy_skew_nodes(root->right);
-        root->right = NULL;
-    }
-
-    destroy_str(&root->ticket.key);
-    free(root);
-}
-
-void destroy_skew_heap(SkewHeap *heap) {
-    if (!heap)
-        return;
-
-    destroy_skew_nodes(heap->head);
-    free(heap);
 }
 
 SkewNode *merge_skew_heap(SkewNode *head1, SkewNode *head2) {
@@ -148,3 +123,32 @@ int merge_skew_heap_with_copy(SkewHeap *heap1, SkewHeap *heap2, SkewHeap *result
     return 0;
 }
 
+void destroy_skew_nodes(SkewNode *root) {
+    if (!root)
+        return;
+
+    if (root->left) {
+        destroy_skew_nodes(root->left);
+        root->left = NULL;
+    }
+
+    if (root->right) {
+        destroy_skew_nodes(root->right);
+        root->right = NULL;
+    }
+
+    destroy_str(&root->ticket.key);
+    free(root);
+}
+
+void destroy_skew_heap(SkewHeap *heap) {
+    if (!heap)
+        return;
+
+    destroy_skew_nodes(heap->head);
+    free(heap);
+}
+
+size_t get_size_skew_heap(SkewHeap *heap) {
+    return heap->size;
+}

@@ -203,6 +203,17 @@ void destroy_polynomial(Polynomial *head) {
     head->head = NULL;
 }
 
+void destroy_list(List **head) {
+    List *cur = *head, *prev;
+    while (cur != NULL) {
+        prev = cur;
+        cur = cur->next;
+        free(prev);
+    }
+
+    *head = NULL;
+}
+
 int copy_polynomial(Polynomial *dst, Polynomial src) {
     if (src.head == NULL && src.n == 0) {
         append_polynomial(dst, 0);

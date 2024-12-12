@@ -8,8 +8,10 @@ BinaryHeap *create_binary_heap() {
     new_heap->size = 0;
     new_heap->capacity = 10;
     new_heap->heap = (BinaryNode *) calloc(new_heap->capacity, sizeof(BinaryNode));
-    if (!new_heap->heap)
+    if (!new_heap->heap) {
+        free(new_heap);
         return NULL;
+    }
 
     return new_heap;
 }
@@ -68,6 +70,7 @@ int insert_binary_heap(BinaryHeap *heap, Ticket ticket) {
 
     BinaryNode node = {ticket};
     copy_newstr(&node.ticket.key, &ticket.key);
+    copy_newstr(&node.ticket.value, &ticket.value);
 
     heap->heap[heap->size] = node;
     sift_up_binary_heap(heap, heap->size);
@@ -148,5 +151,9 @@ BinaryHeap *merge_binary_heap_with_copy(const BinaryHeap *heap1, const BinaryHea
     }
 
     return copy1;
+}
+
+size_t get_size_binary_heap(BinaryHeap *heap) {
+    return heap->size;
 }
 

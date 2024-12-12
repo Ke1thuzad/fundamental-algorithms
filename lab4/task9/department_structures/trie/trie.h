@@ -14,13 +14,15 @@ typedef struct TrieNode {
     struct TrieNode *child;
 } TrieNode;
 
+TrieNode *create_trie();
+
 TrieNode *create_trie_node(char c);
 
 int insert_department_trie_node(TrieNode *root, Department *department);
 
-Department* search_department_trie(TrieNode *root, Department department);
+int search_department_trie(TrieNode *root, String id, Department **result);
 
-int find_least_loaded_department_trie(TrieNode *root, Department **result);
+//int find_least_loaded_department_trie(TrieNode *root, Department **result);
 
 void destroy_trie(TrieNode *root);
 

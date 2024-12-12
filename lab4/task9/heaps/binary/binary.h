@@ -32,4 +32,8 @@ void destroy_binary_heap(BinaryHeap *heap);
 
 void print_binary_heap_as_tree(BinaryHeap *heap);
 
+size_t get_size_binary_heap(BinaryHeap *heap);
+
 #endif //FUNDAMENTAL_ALGORITHMS_BINARY_H
+
+

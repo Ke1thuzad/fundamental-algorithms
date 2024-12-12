@@ -73,6 +73,37 @@ int overfscanf(FILE *stream, const char *format, ...) {
 
                 read_value(&stream, result, ch);
                 read++;
+            } else if (is_str_equal(flag, "Se")) {
+                String* result = va_arg(args, String *);
+                int ch;
+
+                seek_char(&stream, &ch);
+                if (ch == EOF) {
+                    destroy(&buffer);
+                    return -1;
+                }
+
+                read_value_string(&stream, result, ch);
+                read++;
+            } else if (is_str_equal(flag, "Sn")) {
+                String* result = va_arg(args, String *);
+
+                err = create_str(result, "");
+                if (err) {
+                    destroy(&buffer);
+                    return err;
+                }
+
+                int ch;
+
+                seek_char(&stream, &ch);
+                if (ch == EOF) {
+                    destroy(&buffer);
+                    return -1;
+                }
+
+                read_value_string(&stream, result, ch);
+                read++;
             }
             else {
                 int cur_read = vfscanf(stream, flaga, args);

@@ -246,7 +246,9 @@ add_executable(lab4t9 lab4/task9/main.c lab4/task9/main.h
         lab4/task9/department_structures/department.c
         lab4/task9/department_structures/department.h
         lab4/task9/ticket.h
-        lab4/task9/department_structures/department_structure.h)
+        lab4/task9/department_structures/department_structure.h
+        lab4/task9/department_structures/overload_heap/overload_heap.c
+        lab4/task9/department_structures/overload_heap/overload_heap.h)
 
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)

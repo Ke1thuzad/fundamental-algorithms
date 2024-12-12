@@ -7,6 +7,7 @@ TreapNode *create_treap_node(Ticket ticket) {
 
     new_node->ticket = ticket;
     copy_newstr(&new_node->ticket.key, &ticket.key);
+    copy_newstr(&new_node->ticket.value, &ticket.value);
 
     return new_node;
 }
@@ -163,3 +164,8 @@ void destroy_treap(Treap *treap) {
     destroy_treap_node(treap->head);
     free(treap);
 }
+
+size_t get_size_treap(Treap *treap) {
+    return treap->size;
+}
+

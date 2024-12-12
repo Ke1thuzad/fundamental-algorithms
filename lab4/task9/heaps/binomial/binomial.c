@@ -9,6 +9,7 @@ BinomialNode *create_binomial_node(Ticket ticket) {
     if (ticket.key.val) {
         new_node->ticket = ticket;
         copy_newstr(&new_node->ticket.key, &ticket.key);
+        copy_newstr(&new_node->ticket.value, &ticket.value);
     }
 
     return new_node;
@@ -20,7 +21,7 @@ BinomialNode *simple_merge_binomial_heap(BinomialNode *head1, BinomialNode *head
     if (!head2)
         return head1;
 
-    BinomialNode *res = create_binomial_node((Ticket) {{}, 0, 0, NULL}), *reshead = res;
+    BinomialNode *res = create_binomial_node((Ticket) {{}, 0, 0, 0}), *reshead = res;
     if (!res)
         return NULL;
 
@@ -60,6 +61,7 @@ void adopt_binomial_tree(BinomialNode *parent, BinomialNode *child) {
 }
 
 /*
+Аккуратно, в алгоритме минимизируем, а в коде максимизируем!!!
 ПОЛНЫЕ АЛГОРИТМЫ:
     Вариант 1:
         1. Соединяем 2 кучи в одну результирующую в невозрастающем порядке степеней.
@@ -334,3 +336,6 @@ void print_binomial_heap(BinomialNode *head) {
     }
 }
 
+size_t get_size_binomial_heap(BinomialHeap *heap) {
+    return heap->size;
+}

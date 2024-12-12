@@ -11,7 +11,7 @@ typedef struct TreapNode {
 
 typedef struct Treap {
     TreapNode *head;
-    int size;
+    size_t size;
 } Treap;
 
 TreapNode *create_treap_node(Ticket ticket);
@@ -31,5 +31,6 @@ int merge_treap_with_copy(Treap *treap1, Treap *treap2, Treap *result);
 void destroy_treap_node(TreapNode *node);
 void destroy_treap(Treap *treap);
 
+size_t get_size_treap(Treap *treap);
 
 #endif //FUNDAMENTAL_ALGORITHMS_TREAP_H

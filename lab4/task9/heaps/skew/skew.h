@@ -31,4 +31,6 @@ SkewNode* copy_skew_node(SkewNode* node);
 SkewHeap* copy_skew_heap(SkewHeap* heap);
 int merge_skew_heap_with_copy(SkewHeap *heap1, SkewHeap *heap2, SkewHeap *result);
 
+size_t get_size_skew_heap(SkewHeap *heap);
+
 #endif //FUNDAMENTAL_ALGORITHMS_SKEW_H

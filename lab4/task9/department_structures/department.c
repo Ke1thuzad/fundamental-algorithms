@@ -1,8 +1,71 @@
 #include "department.h"
 
+const dept_functions STORAGE_IMPLEMENTATIONS[] = {
+        {   // BST Implementation
+                .create = (D_storage *(*)()) create_department_bst,
+                .insert = (int (*)(D_storage *, Department *)) insert_department_bstree,
+                .get = (int (*)(D_storage *, String, Department **)) get_from_department_bstree,
+                .destroy = (void (*)(D_storage *)) destroy_department_bstree
+        },
+        {   // Dynamic Array Implementation
+                .create = (D_storage *(*)()) create_department_array,
+                .insert = (int (*)(D_storage *, Department *)) insert_department_array,
+                .get = (int (*)(D_storage *, String, Department **)) get_from_department_array,
+                .destroy = (void (*)(D_storage *)) destroy_department_array
+        },
+        {   // HashSet Implementation
+                .create = (D_storage *(*)()) create_standard_hash_table,
+                .insert = (int (*)(D_storage *, Department *)) insert_hashnode,
+                .get = (int (*)(D_storage *, String, Department **)) get_from_hashtable,
+                .destroy = (void (*)(D_storage *)) destroy_hash_table
+        },
+        {   // Trie Implementation
+                .create = (D_storage *(*)()) create_trie,
+                .insert = (int (*)(D_storage *, Department *)) insert_department_trie_node,
+                .get = (int (*)(D_storage *, String, Department **)) search_department_trie,
+                .destroy = (void (*)(D_storage *)) destroy_trie
+        }
+};
+
+char *generate_base52_string(int len) {
+    char mapping[52] = {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+    };
+    char *buf = (char *) malloc(len + 1);
+    if (!buf)
+        return NULL;
+
+    for (int i = 0; i < len; i++) {
+        long index = random() % 52;
+        buf[i] = mapping[index];
+    }
+    buf[len] = '\0';
+    return buf;
+}
+
 String *randomize_operator_name() {
-    // TODO: Implement randomization of names. Randomized names must be unique.
-    return NULL;
+    srandom(time(NULL));
+    char *str = generate_base52_string(12);
+    if (!str)
+        return NULL;
+
+    String *result = (String *) malloc(sizeof(String));
+    if (!result) {
+        free(str);
+        return NULL;
+    }
+
+    int err = create_str(result, str);
+    free(str);
+    if (err) {
+        free(result);
+        return NULL;
+    }
+
+    return result;
 }
 
 Department *create_department(String id, HeapType heap_type, int total_operators, float overload_coefficient) {
@@ -12,8 +75,8 @@ Department *create_department(String id, HeapType heap_type, int total_operators
 
     copy_newstr(&new_department->id, &id);
 
-    new_department->heap_type = heap_type;
-    new_department->priority_queue = HEAP_IMPLEMENTATIONS[heap_type].create_heap();
+    new_department->heap_funcs = HEAP_IMPLEMENTATIONS[heap_type];
+    new_department->priority_queue = new_department->heap_funcs.create_heap();
 
     new_department->total_operators = total_operators;
     new_department->occupied_operators = 0;
@@ -34,20 +97,29 @@ Department *create_department(String id, HeapType heap_type, int total_operators
 
         cur_op->department = new_department;
 
-        create_str(&cur_op->name, "");
+        String *random_name = randomize_operator_name();
+
+        copy_newstr(&cur_op->name, random_name);
+
+        destroy_str(random_name);
     }
 
     return new_department;
 }
 
 float get_department_load(Department department) {
-    return (float) department.occupied_operators / (float) department.total_operators;
+    float total_tickets = (float) (department.occupied_operators +
+                                   department.heap_funcs.get_size(department.priority_queue));
+    return total_tickets / (float) department.total_operators;
 }
 
 void destroy_department(Department *department) {
     destroy_str(&department->id);
 
-    HEAP_IMPLEMENTATIONS[department->heap_type].destroy(department->priority_queue);
+    if (department->priority_queue) {
+        department->heap_funcs.destroy(department->priority_queue);
+        department->priority_queue = NULL;
+    }
 
     for (int i = 0; i < department->total_operators; ++i) {
         Operator *cur_op = &department->operators[i];
@@ -56,4 +128,6 @@ void destroy_department(Department *department) {
         if (cur_op->is_occupied && cur_op->current_ticket)
             destroy_str(&cur_op->current_ticket->key);
     }
+
+    free(department->operators);
 }

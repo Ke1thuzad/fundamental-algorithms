@@ -31,4 +31,8 @@ int compare_str(String a, String b);
 
 int equiv_str(String a, String b);
 
+int compare_str_and_cstr(String a, const char* b);
+
+int read_value_string(FILE **f, String *result, char first);
+
 #endif //FUNDAMENTAL_ALGORITHMS_MYSTRING_H

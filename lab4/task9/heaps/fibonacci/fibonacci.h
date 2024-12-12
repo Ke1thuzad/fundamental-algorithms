@@ -43,4 +43,6 @@ void print_fibonacci_node(FibonacciNode* node, int level);
 
 void print_fibonacci_heap(FibonacciHeap* heap);
 
+size_t get_size_fibonacci_heap(FibonacciHeap *heap);
+
 #endif //FUNDAMENTAL_ALGORITHMS_FIBONACCI_H

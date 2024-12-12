@@ -1,5 +1,13 @@
 #include "trie.h"
 
+TrieNode *create_trie() {
+    TrieNode *trie = (TrieNode*) calloc(1, sizeof(TrieNode));
+    if (!trie)
+        return NULL;
+
+    return trie;
+}
+
 TrieNode *create_trie_node(char c) {
     TrieNode *new_node = (TrieNode*) calloc(1, sizeof(TrieNode));
     if (!new_node)
@@ -61,15 +69,15 @@ int insert_department_trie_node(TrieNode *root, Department *department) {
     return 0;
 }
 
-Department* search_department_trie(TrieNode *root, Department department) {
+int search_department_trie(TrieNode *root, String id, Department **result) {
     TrieNode *cur = root;
 
-    for (int i = 0; i < department.id.length; i++) {
+    for (int i = 0; i < id.length; i++) {
         TrieNode *next = cur->child;
         int found = 0;
 
         while (next) {
-            if (next->character == department.id.val[i]) {
+            if (next->character == id.val[i]) {
                 found = 1;
                 cur = next;
                 break;
@@ -77,36 +85,44 @@ Department* search_department_trie(TrieNode *root, Department department) {
             next = next->sibling;
         }
 
-        if (!found) return NULL;
+        if (!found)
+            return 0;
     }
 
-    return cur->terminating ? cur->department : NULL;
-}
-
-int find_least_loaded_department_trie(TrieNode *root, Department **result) {
-    if (!root || !result)
-        return -1;
-
-    static float min_load = 10000;
-    static Department *min_department = NULL;
-
-    if (root->terminating) {
-        float current_load = get_department_load(*root->department);
-        if (current_load < min_load) {
-            min_load = current_load;
-            min_department = root->department;
-        }
+    if (cur->terminating) {
+        *result = cur->department;
+        return 1;
     }
 
-    TrieNode *child = root->child;
-    while (child) {
-        find_least_loaded_department_trie(child, result);
-        child = child->sibling;
-    }
+    *result = NULL;
 
-    *result = min_department;
     return 0;
 }
+
+//int find_least_loaded_department_trie(TrieNode *root, Department **result) {
+//    if (!root || !result)
+//        return -1;
+//
+//    static float min_load = 10000;
+//    static Department *min_department = NULL;
+//
+//    if (root->terminating) {
+//        float current_load = get_department_load(*root->department);
+//        if (current_load < min_load) {
+//            min_load = current_load;
+//            min_department = root->department;
+//        }
+//    }
+//
+//    TrieNode *child = root->child;
+//    while (child) {
+//        find_least_loaded_department_trie(child, result);
+//        child = child->sibling;
+//    }
+//
+//    *result = min_department;
+//    return 0;
+//}
 
 
 void destroy_trie(TrieNode *root) {
@@ -122,6 +138,7 @@ void destroy_trie(TrieNode *root) {
 
     if (root->terminating) {
         destroy_department(root->department);
+        free(root->department);
         root->department = NULL;
     }
 

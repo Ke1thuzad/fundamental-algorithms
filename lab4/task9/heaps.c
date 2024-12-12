@@ -7,7 +7,8 @@ const heap_functions HEAP_IMPLEMENTATIONS[] = {
                 .extract_max = (int (*)(Q_queue *, Ticket *))extract_max_binary_heap,
                 .merge = NULL,
                 .destroy = (void (*)(Q_queue *))destroy_binary_heap,
-                .merge_with_copy = NULL
+                .merge_with_copy = NULL,
+                .get_size = (size_t (*)(Q_queue *))get_size_binary_heap,
         },
         {   // Leftist Heap
                 .create_heap = (Q_queue *(*)())create_leftist_heap,
@@ -15,7 +16,8 @@ const heap_functions HEAP_IMPLEMENTATIONS[] = {
                 .extract_max = (int (*)(Q_queue *, Ticket *))extract_max_leftist_heap,
                 .merge = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_leftist_heap_errcode,
                 .destroy = (void (*)(Q_queue *))destroy_leftist_heap,
-                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_leftist_heap_with_copy
+                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_leftist_heap_with_copy,
+                .get_size = (size_t (*)(Q_queue *))get_size_leftist_heap,
         },
         {   // Skew Heap
                 .create_heap = (Q_queue *(*)())create_skew_heap,
@@ -23,7 +25,8 @@ const heap_functions HEAP_IMPLEMENTATIONS[] = {
                 .extract_max = (int (*)(Q_queue *, Ticket *))extract_max_skew_heap,
                 .merge = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_skew_heap_errcode,
                 .destroy = (void (*)(Q_queue *))destroy_skew_heap,
-                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_skew_heap_with_copy
+                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_skew_heap_with_copy,
+                .get_size = (size_t (*)(Q_queue *))get_size_skew_heap,
         },
         {   // Binomial Heap
                 .create_heap = (Q_queue *(*)())create_binomial_heap,
@@ -31,7 +34,8 @@ const heap_functions HEAP_IMPLEMENTATIONS[] = {
                 .extract_max = (int (*)(Q_queue *, Ticket *))extract_max_binomial_heap,
                 .merge = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_binomial_heap_errcode,
                 .destroy = (void (*)(Q_queue *))destroy_binomial_heap,
-                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_binomial_heap_with_copy
+                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_binomial_heap_with_copy,
+                .get_size = (size_t (*)(Q_queue *))get_size_binomial_heap,
         },
         {   // Fibonacci Heap
                 .create_heap = (Q_queue *(*)())create_fibonacci_heap,
@@ -39,7 +43,8 @@ const heap_functions HEAP_IMPLEMENTATIONS[] = {
                 .extract_max = (int (*)(Q_queue *, Ticket *))extract_max_fibonacci_heap,
                 .merge = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_fibonacci_heap_errcode,
                 .destroy = (void (*)(Q_queue *))destroy_fibonacci_heap,
-                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_fibonacci_heap_with_copy
+                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_fibonacci_heap_with_copy,
+                .get_size = (size_t (*)(Q_queue *))get_size_fibonacci_heap,
         },
         {   // Treap
                 .create_heap = (Q_queue *(*)())create_treap,
@@ -47,7 +52,8 @@ const heap_functions HEAP_IMPLEMENTATIONS[] = {
                 .extract_max = (int (*)(Q_queue *, Ticket *))extract_max_treap,
                 .merge = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_treap_errcode,
                 .destroy = (void (*)(Q_queue *))destroy_treap,
-                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_treap_with_copy
+                .merge_with_copy = (int (*)(Q_queue *, Q_queue *, Q_queue *))merge_treap_with_copy,
+                .get_size = (size_t (*)(Q_queue *))get_size_treap,
         }
 };
 

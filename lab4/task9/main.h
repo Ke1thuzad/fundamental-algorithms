@@ -8,7 +8,6 @@
 #include <time.h>
 
 #include "heaps.h"
-
-#include "department_structures/trie/trie.h"
+#include "department_structures/department.h"
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

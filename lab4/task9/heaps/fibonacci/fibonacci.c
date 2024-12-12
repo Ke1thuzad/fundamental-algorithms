@@ -7,6 +7,7 @@ FibonacciNode *create_fibonacci_node(Ticket ticket) {
 
     new_node->ticket = ticket;
     copy_newstr(&new_node->ticket.key, &ticket.key);
+    copy_newstr(&new_node->ticket.value, &ticket.value);
 
     return new_node;
 }
@@ -43,20 +44,6 @@ int insert_fibonacci_heap(FibonacciHeap *heap, Ticket ticket) {
 
 Ticket get_max_fibonacci_heap(FibonacciHeap *heap) {
     return heap->max->ticket;
-}
-
-int get_max_degree_fibonacci_heap(FibonacciHeap *heap) {
-    FibonacciNode *cur = heap->max->right;
-    int max_degree = heap->max->degree;
-
-    while (cur != heap->max) {
-        if (cur->degree > max_degree)
-            max_degree = cur->degree;
-
-        cur = cur->right;
-    }
-
-    return max_degree;
 }
 
 void union_fibonacci_roots(FibonacciNode *heap1, FibonacciNode *heap2) {
@@ -336,4 +323,7 @@ void print_fibonacci_heap(FibonacciHeap *heap) {
     printf("Size: %d\n", heap->size);
 }
 
+size_t get_size_fibonacci_heap(FibonacciHeap *heap) {
+    return heap->size;
+}
 

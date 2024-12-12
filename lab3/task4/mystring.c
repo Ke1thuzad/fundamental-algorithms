@@ -129,3 +129,62 @@ int equiv_str(String a, String b) {
         return 1;
     return 0;
 }
+
+int compare_str_and_cstr(String a, const char* b) {
+    const char* str1 = a.val;
+    const char* str2 = b;
+
+    while (*str1 && *str2) {
+        if (*str1 < *str2) return -1;
+        if (*str1 > *str2) return 1;
+        str1++;
+        str2++;
+    }
+
+    if (*str1) return 1;
+    if (*str2) return -1;
+    return 0;
+}
+
+int read_value_string(FILE **f, String *result, char first) {
+    int err;
+
+    if (first) {
+        err = append_str(result, first);
+        if (err)
+            return err;
+    }
+
+    int character = fgetc(*f);
+
+    while (character > ' ') {
+        err = append_str(result, (char) character);
+        if (err)
+            return err;
+        character = fgetc(*f);
+    }
+
+    if (*f != stdin)
+        fseek(*f, -1, SEEK_CUR);
+
+    if (character == -1)
+        return -1;
+
+    return 0;
+}
+
+int val_to_string(int value, String *result) {
+    if (value < 0)
+        return 1;
+
+    do {
+        int err = append_str(result, (char) (value % 10));
+        if (err)
+            return err;
+
+        value /= 10;
+    } while(value > 0);
+
+
+    return 0;
+}

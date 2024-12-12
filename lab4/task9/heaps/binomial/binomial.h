@@ -38,6 +38,6 @@ Ticket get_max_priority_binomial_heap(BinomialHeap *heap);
 void print_binomial_tree(BinomialNode *node, int level);
 void print_binomial_heap(BinomialNode *head);
 
-
+size_t get_size_binomial_heap(BinomialHeap *heap);
 
 #endif //FUNDAMENTAL_ALGORITHMS_BINOMIAL_H

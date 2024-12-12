@@ -31,4 +31,6 @@ LeftistNode* copy_leftist_node(LeftistNode* node);
 LeftistHeap* copy_leftist_heap(LeftistHeap* heap);
 int merge_leftist_heap_with_copy(LeftistHeap *heap1, LeftistHeap *heap2, LeftistHeap *result);
 
+size_t get_size_leftist_heap(LeftistHeap *heap);
+
 #endif //FUNDAMENTAL_ALGORITHMS_LEFTIST_H

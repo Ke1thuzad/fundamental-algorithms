@@ -15,6 +15,7 @@ LeftistNode *create_leftist_node(Ticket ticket) {
 
     res->ticket = ticket;
     copy_newstr(&res->ticket.key, &ticket.key);
+    copy_newstr(&res->ticket.value, &ticket.value);
 
     return res;
 }
@@ -237,4 +238,9 @@ int merge_leftist_heap_with_copy(LeftistHeap *heap1, LeftistHeap *heap2, Leftist
     free(copy1);
     return 0;
 }
+
+size_t get_size_leftist_heap(LeftistHeap *heap) {
+    return heap->size;
+}
+
 

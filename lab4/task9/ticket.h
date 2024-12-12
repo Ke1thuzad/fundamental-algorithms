@@ -15,8 +15,8 @@ typedef struct Time {
 typedef struct Ticket {
     Time submit_time;
     int priority;
-    int department_id;
-    String key;
+    String key;  // Dept ID
+    String value;  // Ticket Content
 } Ticket;
 
 typedef struct BinaryHeap BinaryHeap;
@@ -51,9 +51,13 @@ typedef struct heap_functions {
     int (*merge_with_copy)(Q_queue *queue1, Q_queue *queue2, Q_queue *result);
     int (*extract_max)(Q_queue *queue, Ticket *result);
     Ticket (*get_max_priority)(Q_queue *queue);
+    size_t (*get_size)(Q_queue *queue);
     void (*destroy)(Q_queue *queue);
 } heap_functions;
 
+
 extern const heap_functions HEAP_IMPLEMENTATIONS[];
+
+
 
 #endif //FUNDAMENTAL_ALGORITHMS_TICKET_H

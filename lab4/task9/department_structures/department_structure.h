@@ -8,7 +8,7 @@ typedef struct Operator Operator;
 typedef struct Department {
     String id;
     Q_queue *priority_queue;
-    HeapType heap_type;
+    heap_functions heap_funcs;
     int total_operators;
     int occupied_operators;
     float overload_coefficient;  // TODO: not needed?
