@@ -65,3 +65,13 @@ char* logical_values_array::to_char(char *str) const {
 
     return str;
 }
+
+std::ostream &operator<<(std::ostream &stream, const logical_values_array &logicv) {
+    char temp[33];
+
+    logicv.to_char(temp);
+
+    stream << temp;
+
+    return stream;
+}

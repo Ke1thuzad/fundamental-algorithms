@@ -34,6 +34,9 @@ public:
     unsigned int get_bit(int pos) const;
 
     char* to_char(char *str) const;
+
+    friend std::ostream &operator<< (std::ostream &stream, const logical_values_array& logicv);
+
 };
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

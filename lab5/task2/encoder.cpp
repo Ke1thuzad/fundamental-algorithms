@@ -56,7 +56,7 @@ int encoder::encode(const std::string &in_path, const std::string &out_path) {
     char ch;
 
     in.get(ch);
-
+    
     int i = 0;
     int j = 0;
 
