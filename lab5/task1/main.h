@@ -9,15 +9,16 @@ private:
 public:
     binary_int();
     binary_int(int x);
+    binary_int &operator= (const binary_int &x);
     binary_int operator- () const;
-    binary_int operator+ (binary_int x) const;
+    binary_int operator+ (const binary_int &x) const;
     binary_int operator- (binary_int x) const;
     binary_int &operator+= (binary_int x);
     binary_int &operator-= (binary_int x);
-    binary_int &operator++ ();
-    binary_int &operator-- ();
-    binary_int operator++ (int)&;
-    binary_int operator-- (int)&;
+    binary_int &operator++ () &;
+    binary_int &operator-- () &;
+    binary_int operator++ (int) &;
+    binary_int operator-- (int) &;
     bool operator< (binary_int x) const;
     binary_int &operator*= (binary_int x);
     binary_int operator* (binary_int x) const;

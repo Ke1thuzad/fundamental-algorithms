@@ -16,6 +16,8 @@ typedef struct SupportSystem {
     Time startModelTime;
     Time stopModelTime;
 
+    Time currentModelTime;
+
     int minTicketTime;
     int maxTicketTime;
 

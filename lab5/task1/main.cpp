@@ -3,7 +3,7 @@
 int main() {
     binary_int a(128);
 
-//    std::cout << a;
+    std::cout << a;
 
     std::cout << a + a - 1 << ' ' << a * 10 << ' ' << '\n' << a << '\n' << a++ << '\n' << a << '\n' << ++a << '\n';
 

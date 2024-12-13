@@ -169,10 +169,12 @@ BinomialHeap* create_binomial_heap() {
 }
 
 BinomialNode* copy_binomial_node(BinomialNode* node) {
-    if (!node) return NULL;
+    if (!node)
+        return NULL;
 
     BinomialNode* new_node = create_binomial_node(node->ticket);
-    if (!new_node) return NULL;
+    if (!new_node)
+        return NULL;
 
     new_node->degree = node->degree;
     new_node->child = copy_binomial_node(node->child);
@@ -182,10 +184,12 @@ BinomialNode* copy_binomial_node(BinomialNode* node) {
 }
 
 BinomialHeap* copy_binomial_heap(BinomialHeap* heap) {
-    if (!heap) return NULL;
+    if (!heap)
+        return NULL;
 
     BinomialHeap* new_heap = create_binomial_heap();
-    if (!new_heap) return NULL;
+    if (!new_heap)
+        return NULL;
 
     new_heap->head = copy_binomial_node(heap->head);
     new_heap->size = heap->size;

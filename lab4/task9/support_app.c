@@ -158,10 +158,8 @@ int read_config_file(const char *filename, SupportSystem *result) {
 
     char startTime[20], stopTime[20];
 
-    cur_read = overfscanf(in, "%Sn\n%Sn\n%19s\n%19s\n%d\n%d\n%d", hTypeTemp, sTypeTemp, startTime, stopTime,
+    cur_read = overfscanf(in, "%Sn\n%Sn\n%19s\n%19s\n%d\n%d\n%d", &hTypeTemp, &sTypeTemp, startTime, stopTime,
                           &minTicketTime, &maxTicketTime, &departmentAmount);
-
-    int operatorCounts[departmentAmount];
 
     if (cur_read == EOF || cur_read != 7 || !hTypeTemp || !sTypeTemp || minTicketTime < 1 || maxTicketTime < 1 ||
         departmentAmount < 1 || departmentAmount > 100 || !ISO8601_to_Time(startTime, &modelStartTime) ||
@@ -174,6 +172,8 @@ int read_config_file(const char *filename, SupportSystem *result) {
 
         return throw_err(INCORRECT_INPUT_DATA);
     }
+
+    int operatorCounts[departmentAmount];
 
     for (int i = 0; i < departmentAmount; i++) {
         cur_read = fscanf(in, "%d", &operatorCounts[i]);
@@ -241,7 +241,7 @@ int read_config_file(const char *filename, SupportSystem *result) {
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
 
-    result->department_array = (Department **) malloc(sizeof(Department*) * departmentAmount);
+    result->department_array = (Department **) malloc(sizeof(Department *) * departmentAmount);
 
     for (int i = 1; i <= departmentAmount; ++i) {
         Array temp;
@@ -305,7 +305,7 @@ int read_tickets_from_file(SupportSystem *system, const char *filename) {
         String *id = NULL;
         Time ticketTime;
 
-        cur_read = overfscanf(in, "%19s %d %Sn", isoTime, &priority, id);
+        cur_read = overfscanf(in, "%19s %d %Sn", isoTime, &priority, &id);
         if (cur_read == EOF)
             break;
         if (cur_read != 3 || !id || priority < 0 || priority > system->max_priority ||
@@ -408,12 +408,12 @@ int distribute_tickets_inside_department(Department *department, int minTicketTi
     int err;
 
     for (int i = 0; i < free_operators; ++i) {
-        Ticket *extracted = NULL;
-        err = department->heap_funcs.extract_max(department->priority_queue, extracted);
-        if (err == OUT_OF_BOUNDS || !extracted)
+        Ticket extracted;
+        err = department->heap_funcs.extract_max(department->priority_queue, &extracted);
+        if (err == OUT_OF_BOUNDS)
             break;
         else if (err) {
-            destroy_ticket(extracted);
+            destroy_ticket(&extracted);
             return err;
         }
 
@@ -424,7 +424,7 @@ int distribute_tickets_inside_department(Department *department, int minTicketTi
 
             if (!cur_op->is_occupied) {
                 cur_op->is_occupied = 1;
-                cur_op->current_ticket = extracted;
+                cur_op->current_ticket = &extracted;
                 cur_op->remaining_time = minTicketTime + rand() % (maxTicketTime - minTicketTime);
                 // TODO: Log requests.
                 break;
@@ -457,7 +457,8 @@ int first_distribution_all_tickets(SupportSystem *system) {
 
         Department *next_dept;
 
-        err = system->storage_funcs.get(system->departments, get_min_overload_binary_heap(system->load_heap), &next_dept);
+        err = system->storage_funcs.get(system->departments, get_min_overload_binary_heap(system->load_heap),
+                                        &next_dept);
         if (err)
             return err;
 
@@ -495,9 +496,8 @@ int bleed_remaining_time(SupportSystem *system) {
         for (int j = 0; j < cur_dep->total_operators; ++j) {
             Operator *cur_oper = &cur_dep->operators[j];
 
-            if (!cur_oper->is_occupied) {
+            if (!cur_oper->is_occupied)
                 continue;
-            }
 
             counter++;
 
@@ -511,6 +511,38 @@ int bleed_remaining_time(SupportSystem *system) {
 
             if (counter >= cur_dep->occupied_operators)
                 break;
+        }
+    }
+
+    return 0;
+}
+
+int check_for_updates_tickets(SupportSystem *system) {
+    int err;
+    for (int i = system->remaining_ticket_amount - 1; i >= 0; --i) {
+        if (system->not_distributed_tickets[i] &&
+            time_difference_minutes(&system->currentModelTime, &system->not_distributed_tickets[i]->submit_time) < 0)
+            break;
+
+        String dept_id = system->not_distributed_tickets[i]->key;
+        Department *dept;
+        err = system->storage_funcs.get(system->departments, dept_id, &dept);
+        if (err)
+            return err;
+
+        float load = get_department_load(*dept);
+        if (load > dept->overload_coefficient) {
+            Department *best;
+            String best_id = get_min_overload_binary_heap(system->load_heap);
+            err = system->storage_funcs.get(system->departments, best_id, &best);
+            if (err)
+                return err;
+
+            err = best->heap_funcs.insert(best->priority_queue, *system->not_distributed_tickets[i]);
+            if (err)
+                return err;
+
+            
         }
     }
 
