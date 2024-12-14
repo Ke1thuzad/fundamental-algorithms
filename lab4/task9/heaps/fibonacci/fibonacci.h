@@ -34,6 +34,8 @@ void consolidate_fibonacci_heap(FibonacciHeap *heap);
 
 Ticket get_max_fibonacci_heap(FibonacciHeap *heap);
 int extract_max_fibonacci_heap(FibonacciHeap *heap, Ticket *result);
+
+void destroy_fibonacci_nodes(FibonacciNode *node);
 void destroy_fibonacci_heap(FibonacciHeap *heap);
 
 FibonacciHeap* copy_fibonacci_heap(FibonacciHeap* heap);

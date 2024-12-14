@@ -225,6 +225,7 @@ void destroy_binomial_node(BinomialNode* node) {
     if (!node) return;
 
     destroy_str(&node->ticket.key);
+    destroy_str(&node->ticket.value);
 
     destroy_binomial_node(node->child);
     destroy_binomial_node(node->sibling);
@@ -270,7 +271,7 @@ Ticket get_max_priority_binomial_heap(BinomialHeap *heap) {
 
 int extract_max_binomial_heap(BinomialHeap *heap, Ticket *result) {
     if (!heap->head || heap->size <= 0)
-        return throw_err(OUT_OF_BOUNDS);
+        return OUT_OF_BOUNDS;
 
     BinomialNode *max_node = get_max_binomial_heap(heap->head);
     BinomialNode *prev = NULL;

@@ -62,7 +62,7 @@ int insert_skew_heap(SkewHeap *heap, Ticket ticket) {
 
 int extract_max_skew_heap(SkewHeap *heap, Ticket *result) {
     if (!heap || heap->size == 0)
-        return throw_err(OUT_OF_BOUNDS);
+        return OUT_OF_BOUNDS;
 
     *result = heap->head->ticket;
     SkewNode *temp = merge_skew_heap(heap->head->left, heap->head->right);
@@ -138,6 +138,7 @@ void destroy_skew_nodes(SkewNode *root) {
     }
 
     destroy_str(&root->ticket.key);
+    destroy_str(&root->ticket.value);
     free(root);
 }
 

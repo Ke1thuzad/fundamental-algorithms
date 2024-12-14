@@ -13,7 +13,9 @@ TreapNode *create_treap_node(Ticket ticket) {
 }
 
 Treap *create_treap() {
-    Treap *new_treap = calloc(1, sizeof(Treap));
+    Treap *new_treap = (Treap *) calloc(1, sizeof(Treap));
+    if (!new_treap)
+        return NULL;
 
     return new_treap;
 }
@@ -64,7 +66,11 @@ int insert_treap(Treap *head, Ticket ticket) {
     if (!new_node)
         return throw_err(MEMORY_NOT_ALLOCATED);
 
-    split_treap(head->head, ticket.key, &temp1, &temp2);
+    int err = split_treap(head->head, new_node->ticket.key, &temp1, &temp2);
+    if (err) {
+        destroy_treap_node(new_node);
+        return err;
+    }
 
     head->head = merge_treap(merge_treap(temp1, new_node), temp2);
 
@@ -75,13 +81,14 @@ int insert_treap(Treap *head, Ticket ticket) {
 
 int extract_max_treap(Treap *head, Ticket *res) {
     if (head->size <= 0)
-        return throw_err(OUT_OF_BOUNDS);
+        return OUT_OF_BOUNDS;
 
     TreapNode *max = head->head;
 
-    head->head = merge_treap(max->left, max->right);
-
     *res = max->ticket;
+
+    head->head = merge_treap(head->head->left, head->head->right);
+
     free(max);
 
     head->size--;
@@ -97,11 +104,10 @@ TreapNode *copy_treap_node(TreapNode *node) {
     if (!node)
         return NULL;
 
-    TreapNode *new_node = (TreapNode *)calloc(1, sizeof(TreapNode));
+    TreapNode *new_node = create_treap_node(node->ticket);
     if (!new_node)
         return NULL;
 
-    new_node->ticket = node->ticket;
     new_node->left = copy_treap_node(node->left);
     new_node->right = copy_treap_node(node->right);
 
@@ -149,10 +155,10 @@ void destroy_treap_node(TreapNode *node) {
     if (!node)
         return;
 
+    destroy_ticket(&node->ticket);
+
     destroy_treap_node(node->left);
     destroy_treap_node(node->right);
-
-    destroy_str(&node->ticket.key);
 
     free(node);
 }
@@ -168,4 +174,3 @@ void destroy_treap(Treap *treap) {
 size_t get_size_treap(Treap *treap) {
     return treap->size;
 }
-

@@ -88,6 +88,12 @@ int overfscanf(FILE *stream, const char *format, ...) {
             } else if (is_str_equal(flag, "Sn")) {
                 String **result = va_arg(args, String **);
 
+                *result = (String*) malloc(sizeof(String));
+                if (!(*result)) {
+                    destroy(&buffer);
+                    return throw_err(MEMORY_NOT_ALLOCATED);
+                }
+
                 err = create_str(*result, "");
                 if (err) {
                     destroy(&buffer);

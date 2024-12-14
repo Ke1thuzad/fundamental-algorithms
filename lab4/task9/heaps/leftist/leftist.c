@@ -42,6 +42,7 @@ void destroy_leftist_nodes(LeftistNode *root) {
     }
 
     destroy_str(&root->ticket.key);
+    destroy_str(&root->ticket.value);
     free(root);
 }
 
@@ -180,7 +181,7 @@ int insert_leftist_heap(LeftistHeap *heap, Ticket ticket) {
 
 int extract_max_leftist_heap(LeftistHeap *heap, Ticket *result) {
     if (!heap || heap->size == 0)
-        return throw_err(OUT_OF_BOUNDS);
+        return OUT_OF_BOUNDS;
 
     *result = heap->head->ticket;
     LeftistNode *temp = merge_leftist_heap(heap->head->left, heap->head->right);

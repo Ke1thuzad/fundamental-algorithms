@@ -9,5 +9,6 @@
 
 #include "heaps.h"
 #include "department_structures/department.h"
+#include "support_app.h"
 
 #endif //FUNDAMENTAL_ALGORITHMS_MAIN_H

@@ -17,6 +17,7 @@ typedef struct Ticket {
     int priority;
     String key;  // Dept ID
     String value;  // Ticket Content
+    int ID;  // Ticket ID
 } Ticket;
 
 typedef struct BinaryHeap BinaryHeap;
@@ -58,6 +59,6 @@ typedef struct heap_functions {
 
 extern const heap_functions HEAP_IMPLEMENTATIONS[];
 
-
+void destroy_ticket(Ticket *ticket);
 
 #endif //FUNDAMENTAL_ALGORITHMS_TICKET_H

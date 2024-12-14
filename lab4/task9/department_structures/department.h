@@ -41,9 +41,11 @@ typedef struct dept_functions {
 
 extern const dept_functions STORAGE_IMPLEMENTATIONS[];
 
-String *randomize_operator_name();
+char *generate_base52_string(int len);
 
-Department *create_department(String id, HeapType heap_type, int total_operators, float overload_coefficient);
+String *randomize_operator_name(Department *department);
+
+int is_operator_name_unique(Department *department, char *name);
 
 float get_department_load(Department department);
 

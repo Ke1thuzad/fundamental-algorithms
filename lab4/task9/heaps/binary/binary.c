@@ -80,7 +80,7 @@ int insert_binary_heap(BinaryHeap *heap, Ticket ticket) {
 
 int extract_max_binary_heap(BinaryHeap *heap, Ticket *res) {
     if (heap->size <= 0) {
-        return throw_err(OUT_OF_BOUNDS);
+        return OUT_OF_BOUNDS;
     }
 
     *res = heap->heap[0].ticket;
@@ -105,6 +105,7 @@ void destroy_binary_heap(BinaryHeap *heap) {
     if (heap->heap) {
         for (int i = 0; i < heap->size; ++i) {
             destroy_str(&heap->heap[i].ticket.key);
+            destroy_str(&heap->heap[i].ticket.value);
         }
 
         free(heap->heap);
@@ -137,20 +138,20 @@ BinaryHeap *copy_binary_heap(const BinaryHeap *heap) {
     return new_heap;
 }
 
-BinaryHeap *merge_binary_heap_with_copy(const BinaryHeap *heap1, const BinaryHeap *heap2) {
-    BinaryHeap *copy1 = copy_binary_heap(heap1);
-
-    if (!copy1)
-        return NULL;
-
-    for (size_t i = 0; i < heap2->size; i++) {
-        if (insert_binary_heap(copy1, heap2->heap[i].ticket) != 0) {
-            destroy_binary_heap(copy1);
-            return NULL;
-        }
+int merge_binary_heap(BinaryHeap *heap1, BinaryHeap *heap2, BinaryHeap *result) {
+    for (size_t i = 0; i < heap1->size; i++) {
+        int err = insert_binary_heap(result, heap1->heap[i].ticket);
+        if (err)
+            return err;
     }
 
-    return copy1;
+    for (size_t i = 0; i < heap2->size; i++) {
+        int err = insert_binary_heap(result, heap2->heap[i].ticket);
+        if (err)
+            return err;
+    }
+
+    return 0;
 }
 
 size_t get_size_binary_heap(BinaryHeap *heap) {

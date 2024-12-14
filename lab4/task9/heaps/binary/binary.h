@@ -34,6 +34,8 @@ void print_binary_heap_as_tree(BinaryHeap *heap);
 
 size_t get_size_binary_heap(BinaryHeap *heap);
 
+int merge_binary_heap(BinaryHeap *heap1, BinaryHeap *heap2, BinaryHeap *result);
+
 #endif //FUNDAMENTAL_ALGORITHMS_BINARY_H
 
 

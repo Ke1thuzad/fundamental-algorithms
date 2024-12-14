@@ -97,22 +97,14 @@ void link_fibonacci_nodes(FibonacciNode *child, FibonacciNode *parent) {
 }
 
 void consolidate_fibonacci_heap(FibonacciHeap *heap) {
-    // Находим максимальный порядок биномиального дерева и выделяем статический массив под деревья
-    int max_degree = (int) log2(heap->size) + 1;
-    FibonacciNode *degree_trees[max_degree];
+    int max_degree = (int) log2(heap->size) + 5;
+    FibonacciNode **degree_trees = calloc(max_degree, sizeof(FibonacciNode *));
 
-    for (int i = 0; i < max_degree; ++i) {
-        degree_trees[i] = NULL;
-    }
-
-    // Пробегаем полный круг, объединяя все деревья разных порядков
-
-    FibonacciNode *cur = heap->max, *max = heap->max;
-    heap->max = NULL;
+    FibonacciNode *cur = heap->max;
+    if (!cur) return;
 
     do {
         int degree = cur->degree;
-        // Пока дерево существует, объединяем его с другими деревьями равной степени
         while (degree_trees[degree] != NULL) {
             FibonacciNode *other = degree_trees[degree];
             if (cur->ticket.priority < other->ticket.priority) {
@@ -120,39 +112,35 @@ void consolidate_fibonacci_heap(FibonacciHeap *heap) {
                 cur = other;
                 other = temp;
             }
-            if (other == max)
-                max = cur;
-
             link_fibonacci_nodes(other, cur);
             degree_trees[degree] = NULL;
             degree++;
         }
-
-        // Если не существует - записиваем в массив и идем дальше
         degree_trees[degree] = cur;
         cur = cur->right;
-    } while (cur != max);
+    } while (cur != heap->max);
 
-    // Выносим все полученные деревья из массива степеней, обновляем минимум, если необходимо
+    heap->max = NULL;
     for (int i = 0; i < max_degree; ++i) {
-        if (degree_trees[i] != NULL) {
+        if (degree_trees[i]) {
+            if (!heap->max || degree_trees[i]->ticket.priority > heap->max->ticket.priority) {
+                heap->max = degree_trees[i];
+            }
             if (heap->max == NULL) {
                 heap->max = degree_trees[i];
-                heap->max->left = heap->max;
-                heap->max->right = heap->max;
             } else {
-                FibonacciNode *prev_right = heap->max->right;
-                heap->max->right = degree_trees[i];
-                degree_trees[i]->right = prev_right;
+                degree_trees[i]->right = heap->max->right;
                 degree_trees[i]->left = heap->max;
-                prev_right->left = degree_trees[i];
-
+                heap->max->right->left = degree_trees[i];
+                heap->max->right = degree_trees[i];
                 if (degree_trees[i]->ticket.priority > heap->max->ticket.priority) {
                     heap->max = degree_trees[i];
                 }
             }
         }
     }
+
+    free(degree_trees);
 }
 
 int extract_max_fibonacci_heap(FibonacciHeap *heap, Ticket *result) {
@@ -162,39 +150,31 @@ int extract_max_fibonacci_heap(FibonacciHeap *heap, Ticket *result) {
     FibonacciNode *max_node = heap->max;
     *result = max_node->ticket;
 
-    if (max_node != NULL) {
+    if (max_node->child) {
         FibonacciNode *child = max_node->child;
-        FibonacciNode *next_child;
-
-        // Потрошим детей минимума - пихаем всех в кучу без разбора
-        if (child != NULL) {
-            do {
-                next_child = child->right;
-                child->left = heap->max;
-                child->right = heap->max->right;
-                heap->max->right->left = child;
-                heap->max->right = child;
-                child->parent = NULL;
-                child = next_child;
-            } while (child != max_node->child);
-        }
-
-        // Закругляем список
-        max_node->left->right = max_node->right;
-        max_node->right->left = max_node->left;
-
-        // Прореживаем деревья
-        if (max_node == max_node->right) {
-            heap->max = NULL;
-        } else {
-            heap->max = max_node->right;
-            consolidate_fibonacci_heap(heap);
-        }
-
-        heap->size--;
+        do {
+            child->parent = NULL;
+            child = child->right;
+        } while (child != max_node->child);
     }
 
+    if (max_node == heap->max->right) {
+        heap->max = NULL;
+    } else {
+        heap->max = max_node->right;
+    }
+
+    max_node->left->right = max_node->right;
+    max_node->right->left = max_node->left;
+
+    heap->size--;
+
     free(max_node);
+
+    if (heap->size > 0) {
+        heap->max = heap->max->right;
+        consolidate_fibonacci_heap(heap);
+    }
 
     return 0;
 }
@@ -229,7 +209,7 @@ void destroy_fibonacci_heap(FibonacciHeap *heap) {
             FibonacciNode *next = current->right;
             if (current->child) {
                 destroy_fibonacci_nodes(current->child);
-                free(current->child);
+//                free(current->child);
             }
             destroy_str(&current->ticket.key);
             free(current);
@@ -240,6 +220,46 @@ void destroy_fibonacci_heap(FibonacciHeap *heap) {
     free(heap);
 }
 
+FibonacciNode* copy_fibonacci_subtree(FibonacciNode* node) {
+    if (!node)
+        return NULL;
+
+    FibonacciNode* new_node = (FibonacciNode*) calloc(1, sizeof(FibonacciNode));
+    if (!new_node)
+        return NULL;
+
+    new_node->ticket = node->ticket;
+    copy_newstr(&new_node->ticket.key, &node->ticket.key);
+    copy_newstr(&new_node->ticket.value, &node->ticket.value);
+    new_node->degree = node->degree;
+    new_node->marked = node->marked;
+    new_node->parent = NULL;
+    new_node->left = NULL;
+    new_node->right = NULL;
+    new_node->child = NULL;
+
+    if (node->child) {
+        new_node->child = copy_fibonacci_subtree(node->child);
+        if (new_node->child) {
+            // Adjust child's parent pointers
+            FibonacciNode* child_iter = new_node->child;
+            do {
+                child_iter->parent = new_node;
+                child_iter = child_iter->right;
+            } while (child_iter != new_node->child);
+        }
+    }
+
+    if (node->right != node) { // Not the only root
+        new_node->right = copy_fibonacci_subtree(node->right);
+        if (new_node->right) {
+            new_node->right->left = new_node;
+        }
+    }
+
+    return new_node;
+}
+
 FibonacciHeap* copy_fibonacci_heap(FibonacciHeap* heap) {
     if (!heap)
         return NULL;
@@ -248,19 +268,29 @@ FibonacciHeap* copy_fibonacci_heap(FibonacciHeap* heap) {
     if (!new_heap)
         return NULL;
 
-    FibonacciNode *current = heap->max;
-    if (current) {
-        do {
-            insert_fibonacci_heap(new_heap, current->ticket);
-            current = current->right;
-        } while (current != heap->max);
+    if (heap->size == 0) {
+        return new_heap;
     }
+
+    FibonacciNode* original_root = heap->max;
+    FibonacciNode* new_root = copy_fibonacci_subtree(original_root);
+    if (!new_root) {
+        destroy_fibonacci_heap(new_heap);
+        return NULL;
+    }
+
+    new_heap->max = new_root;
+    new_root->left->right = new_root;
+    new_root->right->left = new_root;
+
+    new_heap->size = heap->size;
+
     return new_heap;
 }
 
 int merge_fibonacci_heap_with_copy(FibonacciHeap *heap1, FibonacciHeap *heap2, FibonacciHeap *result) {
-    FibonacciHeap *copy1 = copy_fibonacci_heap(heap1);
-    FibonacciHeap *copy2 = copy_fibonacci_heap(heap2);
+    FibonacciHeap* copy1 = copy_fibonacci_heap(heap1);
+    FibonacciHeap* copy2 = copy_fibonacci_heap(heap2);
 
     if (!copy1 || !copy2) {
         destroy_fibonacci_heap(copy1);
@@ -268,22 +298,22 @@ int merge_fibonacci_heap_with_copy(FibonacciHeap *heap1, FibonacciHeap *heap2, F
         return throw_err(MEMORY_NOT_ALLOCATED);
     }
 
-    int merge_result = merge_fibonacci_heap(&copy1, copy2);
-    if (merge_result != 0) {
-        destroy_fibonacci_heap(copy1);
-        destroy_fibonacci_heap(copy2);
-        return merge_result;
+    if (copy1->size == 0) {
+        result->max = copy2->max;
+        result->size = copy2->size;
+    } else if (copy2->size == 0) {
+        result->max = copy1->max;
+        result->size = copy1->size;
+    } else {
+        union_fibonacci_roots(copy1->max, copy2->max);
+        result->max = (copy1->max->ticket.priority > copy2->max->ticket.priority) ? copy1->max : copy2->max;
+        result->size = copy1->size + copy2->size;
+
+        consolidate_fibonacci_heap(result);
     }
 
-    result->max = copy1->max;
-    result->size = copy1->size;
-
-    copy1->max = NULL;
-    copy2->max = NULL;
-    copy1->size = 0;
-
-    destroy_fibonacci_heap(copy1);
-    destroy_fibonacci_heap(copy2);
+//    destroy_fibonacci_heap(copy1);
+//    destroy_fibonacci_heap(copy2);
 
     return 0;
 }
@@ -326,4 +356,3 @@ void print_fibonacci_heap(FibonacciHeap *heap) {
 size_t get_size_fibonacci_heap(FibonacciHeap *heap) {
     return heap->size;
 }
-

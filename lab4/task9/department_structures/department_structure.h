@@ -21,6 +21,7 @@ typedef struct Operator {
     unsigned char is_occupied;
     Ticket *current_ticket;
     int remaining_time;
+    int initial_time;
 } Operator;
 
 #endif //FUNDAMENTAL_ALGORITHMS_DEPARTMENT_STRUCTURE_H

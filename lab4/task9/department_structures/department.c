@@ -34,23 +34,29 @@ char *generate_base52_string(int len) {
             'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
             'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
     };
-    char *buf = (char *) malloc(len + 1);
+    char *buf = (char *) calloc(1, len + 1);
     if (!buf)
         return NULL;
 
     for (int i = 0; i < len; i++) {
-        long index = random() % 52;
+        long index = rand() % 52;
         buf[i] = mapping[index];
     }
     buf[len] = '\0';
     return buf;
 }
 
-String *randomize_operator_name() {
-    srandom(time(NULL));
-    char *str = generate_base52_string(12);
-    if (!str)
-        return NULL;
+String *randomize_operator_name(Department *department) {
+    char *str;
+    int unique;
+    do {
+        str = generate_base52_string(16);
+        if (!str)
+            return NULL;
+        unique = is_operator_name_unique(department, str);
+        if (unique)
+            free(str);
+    } while (unique);
 
     String *result = (String *) malloc(sizeof(String));
     if (!result) {
@@ -66,6 +72,15 @@ String *randomize_operator_name() {
     }
 
     return result;
+}
+
+int is_operator_name_unique(Department *department, char *name) {
+    for (int i = 0; i < department->total_operators; i++) {
+        if (department->operators[i].name.val && compare_str_and_cstr(department->operators[i].name, name) == 0) {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 Department *create_department(String id, HeapType heap_type, int total_operators, float overload_coefficient) {
@@ -97,11 +112,12 @@ Department *create_department(String id, HeapType heap_type, int total_operators
 
         cur_op->department = new_department;
 
-        String *random_name = randomize_operator_name();
+        String *random_name = randomize_operator_name(new_department);
 
         copy_newstr(&cur_op->name, random_name);
 
         destroy_str(random_name);
+        free(random_name);
     }
 
     return new_department;
@@ -125,8 +141,11 @@ void destroy_department(Department *department) {
         Operator *cur_op = &department->operators[i];
 
         destroy_str(&cur_op->name);
-        if (cur_op->is_occupied && cur_op->current_ticket)
+        if (cur_op->is_occupied && cur_op->current_ticket) {
             destroy_str(&cur_op->current_ticket->key);
+            destroy_str(&cur_op->current_ticket->value);
+            free(cur_op->current_ticket);
+        }
     }
 
     free(department->operators);

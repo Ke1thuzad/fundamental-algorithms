@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef LAB1T1_ARRAY_H
 #define LAB1T1_ARRAY_H
 

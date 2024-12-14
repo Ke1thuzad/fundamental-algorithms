@@ -215,6 +215,12 @@ add_executable(lab4t1 lab4/task1/main.c lab4/task1/main.h
         utility/arrays/array.h)
 
 add_executable(lab4t9 lab4/task9/main.c lab4/task9/main.h
+        utility/overio.c
+        utility/overio.h
+        lab3/task4/mystring.c
+        lab3/task4/mystring.h
+        utility/arrays/array.c
+        utility/arrays/array.h
         lab4/task9/heaps.h
         lab4/task9/heaps.c
         utility/error_handler.c
@@ -250,6 +256,10 @@ add_executable(lab4t9 lab4/task9/main.c lab4/task9/main.h
         lab4/task9/department_structures/overload_heap/overload_heap.c
         lab4/task9/department_structures/overload_heap/overload_heap.h)
 
+add_executable(lab4t9aux1 lab4/task9/generating_apps/aux1.c
+        utility/error_handler.c
+        utility/error_handler.h)
+
 target_link_libraries(lab1t1 m)
 target_link_libraries(lab1t2 m)
 target_link_libraries(lab1t3 m)
@@ -261,3 +271,4 @@ target_link_libraries(lab2t10 m)
 target_link_libraries(lab3t3 m)
 target_link_libraries(lab3t2 m)
 target_link_libraries(lab4t9 m)
+add_executable(lab4t9aux2 lab4/task9/generating_apps/aux2.c)

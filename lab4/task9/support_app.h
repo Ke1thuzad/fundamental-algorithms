@@ -1,7 +1,8 @@
+#pragma once
+
 #ifndef FUNDAMENTAL_ALGORITHMS_SUPPORT_APP_H
 #define FUNDAMENTAL_ALGORITHMS_SUPPORT_APP_H
 
-#include "../../utility/arrays/array.h"
 #include "../../utility/overio.h"
 
 #include "main.h"
@@ -41,13 +42,21 @@ int is_leap_year(int year);
 
 int days_in_month(int month, int year);
 
+void increment_minutes(Time *time, int minutes);
+
 int ISO8601_to_Time(const char *input, Time *res);
+
+double time_to_jdn(const Time *t);
+
+long long time_difference_minutes(const Time *t1, const Time *t2);
 
 int compare_time(const void *a, const void *b);
 
 Ticket *create_ticket(Time time, int priority, String dept_id, String text_content);
 
-void destroy_ticket(Ticket *ticket);
+Department *create_department(String id, HeapType heap_type, int total_operators, float overload_coefficient);
+
+int compare_tickets(const void *t1, const void *t2);
 
 int read_config_file(const char *filename, SupportSystem *result);
 
@@ -57,8 +66,24 @@ int distribute_tickets_inside_department(Department *department, int minTicketTi
 
 int first_distribution_all_tickets(SupportSystem *system);
 
+int bleed_remaining_time(SupportSystem *system);
 
-//int log_event(SupportSystem *system, LOG_CODES code, Ticket *ticket);
+int redistribute_tickets(SupportSystem *system);
 
+int check_for_updates_tickets(SupportSystem *system);
+
+void destroy_system(SupportSystem *system);
+
+int clear_log_file();
+
+void log_event(const char* event_type, const char* description);
+
+void log_new_request(const Ticket* ticket, const Department* dept);
+
+void log_request_handling_started(const Ticket* ticket, const Operator* op);
+
+void log_request_handling_finished(const Ticket* ticket, const Operator* op, int duration);
+
+void log_department_overloaded(const Ticket* ticket, const Department* overloaded_dept, const Department* target_dept);
 
 #endif //FUNDAMENTAL_ALGORITHMS_SUPPORT_APP_H

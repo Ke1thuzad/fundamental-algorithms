@@ -3,8 +3,6 @@
 #ifndef FUNDAMENTAL_ALGORITHMS_HEAPS_H
 #define FUNDAMENTAL_ALGORITHMS_HEAPS_H
 
-#include "../../lab3/task4/mystring.h"
-#include "../../utility/error_handler.h"
 #include "ticket.h"
 
 #include "heaps/binary/binary.h"
