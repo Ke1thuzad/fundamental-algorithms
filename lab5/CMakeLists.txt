@@ -13,3 +13,5 @@ add_executable(lab5t3 task3/main.cpp task3/main.h
         task3/classes.cpp)
 add_executable(lab5t6 task6/main.cpp task6/main.h
         task6/classes.cpp)
+add_executable(lab5t7 task7/main.cpp task7/main.h
+        task7/classes.cpp)
